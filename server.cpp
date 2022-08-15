@@ -12,6 +12,8 @@
 
 #include "server.hpp"
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/tcp.h> // TCP_NODELAY
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
@@ -132,6 +134,72 @@ bool	Server::is_valid_pwd(std::string pwd)
 
 void	Server::network_init(void)
 {
+	int retval;
+
+	// socket
+	listen_sock_ = socket(AF_INET, SOCK_STREAM, 0);
+	if (listen_sock_ == -1) {
+		#ifdef DEBUG
+		std::cout << "socket() failed\n";
+		#endif
+		status_ = false;
+		return ;
+	}
+
+	// set listen_sock_ O_NONBLOCK
+	int flags = fcntl(listen_sock_, F_GETFL);
+	flags |= O_NONBLOCK;
+	fcntl(listen_sock_, F_SETFL, flags);
+
+	// set listen_sock_ SO_REUSEADDR
+	//struct timeval optval = {0, 1000};
+	int optval = 1;
+	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR, 
+		&optval, sizeof(optval));
+	if (retval == -1) {
+		#ifdef DEBUG
+		std::cout << "setsockopt() for SO_REUSADDR failed\n";
+		#endif
+		status_ = false;
+		return ;
+	}
+
+	// unset Nagle algorithm
+	//int optval = 1;
+	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+	if (retval == -1) {
+		#ifdef DEBUG
+		std::cout << "setsockopt() for TCP_NODELAY failed\n";
+		#endif
+		status_ = false;
+		return ;
+	}
+
+	// bind
+	memset(&s_addr_in_, 0, sizeof(s_addr_in_));
+	s_addr_in_.sin_family = AF_INET;
+	s_addr_in_.sin_addr.s_addr = htonl(INADDR_ANY);
+	s_addr_in_.sin_port = htons(s_port_); // SERVERPORT
+	retval = bind(listen_sock_, reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
+	if (retval == -1) {
+		#ifdef DEBUG
+		std::cout << "bind() failed\n";
+		#endif
+		status_ = false;
+		return ;
+	}
+
+	// listen
+	retval = listen(listen_sock_, SOMAXCONN);
+	if (retval == -1) {
+		#ifdef DEBUG
+		std::cout << "listen() failed\n";
+		#endif
+		status_ = false;
+		return ;
+	}
+
+	std::cout << "Server started\n";
 	return ;
 }
 
