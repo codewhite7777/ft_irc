@@ -1,5 +1,6 @@
 .vscode/
 *.o
-ft_irc
+ircserv
 *.json
 *.c
+a.out
