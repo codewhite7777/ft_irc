@@ -6,14 +6,15 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 15:12:20 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/15 23:56:14 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <netinet/tcp.h> // TCP_NODELAY
+#include <netinet/tcp.h>
+#include <unistd.h>
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
@@ -26,107 +27,86 @@ Server::Server(int argc, char *argv[])
 		return ;
 	}
 	//verify port, config port
-	if (is_valid_port(argv[1]) == false)
+	if (config_port(argv[1]) == false)
 	{
 		std::cerr << "Error : Invalid Port" << std::endl;
 		status_ = false;
 		return ;
 	}
 	//verify pwd, config pwd
-	if (is_valid_pwd(argv[2]) == false)
+	if (config_pwd(argv[2]) == false)
 	{
 		std::cerr << "Error : Invalid password" << std::endl;
 		status_ = false;
 		return ;
 	}
 	network_init();
+ERROR:
+
 	return ;
 }
 
 Server::~Server(void)
 {
+	network_close();
 	return ;
 }
 
-#define WELL_KNOWN	0
-#define REGISTERED	1
-#define DYNAMIC		2
-#define ERROR		3
-int getPortType(int value)
+bool	Server::config_port(std::string port)
 {
-	if (value >= 0 && value < 1024)
-		return (WELL_KNOWN);
-	else if (value < 49152)
-		return (REGISTERED);
-	else if (value < 65536) // unsigned short면 왜 에러를??
-		return (DYNAMIC);
-	return (ERROR);
+	int	retPort;
+	if (is_valid_port(port) == false)
+		return (false);
+	if (getPortNumber(port.c_str(), &retPort) == false)
+		return (false);
+	s_port_ = static_cast<unsigned short>(retPort);
+	return (true);
 }
 
-bool getPortNumber(const char *str, int *value)
+bool	Server::is_valid_port(std::string port)
+{
+	return (port.find_first_not_of("0123456789") == std::string::npos);
+}
+
+t_port	Server::getPortType(int value)
+{
+	if (value >= 0 && value < 1024)
+		return (WELL_KNOWN_PORT);
+	else if (value < 49152)
+		return (REGISTERED_PORT);
+	else if (value < 65536)
+		return (DYNAMIC_PORT);
+	return (INVALID_PORT);
+}
+
+bool	Server::getPortNumber(const char *str, int *o_value)
 {
 	long long total = 0;
 
 	while (*str)
 	{
 		total = total * 10 + *str - '0';
-		#ifdef DEBUG
-		std::cout << "total:" << total << '\n';
-		#endif
-		// if (total > 0xcffffff || total < 0xffffffff)
 		if (total > 2147483647 || total < -2147483648)
 			return (false);
 		str++;
 	}
-
-	// getType: WELL_KNOWN | REGISTERED | DYNAMIC | ERROR
-	if (getPortType(total) != REGISTERED)
+	t_port	retPort = getPortType(total);
+	if (retPort == WELL_KNOWN_PORT || retPort == INVALID_PORT)
 		return (false);
-	*value = total;
+	*o_value = total;
 	return (true);
 }
 
-// true: valid port | false: not valid port
-bool	Server::is_valid_port(std::string port)
+bool	Server::config_pwd(std::string pwd)
 {
-	bool	flag;
-	int		retPort;
-
-	flag = ( port.find_first_not_of("0123456789") == std::string::npos );
-
-	#ifdef DEBUG
-	std::cout << "find_first_not_of start\n";
-	std::cout << "Flag Value: " << flag << '\n';
-	std::cout << "----------END----------\n\n";
-	#endif
-
-	if (!flag)
-		return (flag);
-	
-	#ifdef DEBUG
-	std::cout << "getPortNumber start\n";
-	#endif
-
-	flag = getPortNumber(port.c_str(), &retPort);
-	if (!flag)
-		return (flag);
-	
-	#ifdef DEBUG
-	std::cout << "----------END----------\n\n";
-	#endif
-
-	s_port_ = static_cast<unsigned short>(retPort);
-
-	#ifdef DEBUG
-	std::cout << "real portnum: " << s_port_ << '\n';
-	#endif
-
-	return (flag);
+	if (is_valid_pwd(pwd) == false)
+		return (false);
+	raw_pwd_ = pwd;
+	return (true);
 }
 
 bool	Server::is_valid_pwd(std::string pwd)
 {
-	//TODO : 특수문자가 패스워드로 등록이 불가능 하도록
 	if (pwd.length() == 0)
 		return (false);
 	return (true);
@@ -137,7 +117,7 @@ void	Server::network_init(void)
 	int retval;
 
 	// socket
-	listen_sock_ = socket(AF_INET, SOCK_STREAM, 0);
+	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listen_sock_ == -1) {
 		#ifdef DEBUG
 		std::cout << "socket() failed\n";
@@ -154,7 +134,7 @@ void	Server::network_init(void)
 	// set listen_sock_ SO_REUSEADDR
 	//struct timeval optval = {0, 1000};
 	int optval = 1;
-	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR, 
+	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR,
 		&optval, sizeof(optval));
 	if (retval == -1) {
 		#ifdef DEBUG
@@ -199,7 +179,13 @@ void	Server::network_init(void)
 		return ;
 	}
 
-	std::cout << "Server started\n";
+	std::cout << "IRC Server started" << std::endl;
+	return ;
+}
+
+void	Server::network_close(void)
+{
+	close(listen_sock_);
 	return ;
 }
 
@@ -212,3 +198,5 @@ void	Server::Run(void)
 {
 	return ;
 }
+
+
