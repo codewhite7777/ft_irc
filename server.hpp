@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 13:24:51 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/15 15:12:45 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,33 +17,41 @@
 
 typedef int	SOCKET;
 
+/* ************************************************************************** */
+/*   멤버 변수                                                                */
+/*   Ex) int	value_;                                                       */
+/*       SOCKET	sock_;                                                        */
+/*                                                                            */
+/* ************************************************************************** */
+
 class Server
 {
 private:
-	std::string	raw_port;
-	std::string	raw_pwd;
-	bool		status;
+	std::string	raw_port_;
+	std::string	raw_pwd_;
+	bool		status_;
 
 	//network
-	SOCKET				listen_sock;
-	struct	sockaddr_in	s_addr_in;
-	unsigned short		port;
-	
-
-
+	SOCKET				listen_sock_;
+	struct sockaddr_in	s_addr_in_;
+	unsigned short		s_port_;
+	std::string			s_ip_;
 
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
 
 	//server init
-	bool	is_vaild_port(std::string port);
-	bool	is_vaild_pwd(std::string pwd);
-
+	bool	is_valid_port(std::string port);
+	bool	is_valid_pwd(std::string pwd);
+	void	network_init(void);
+	// void	network_close(...);
 
 
 	//status
 	bool	getStatus(void);
+
+	void	Run(void);
 
 
 };
