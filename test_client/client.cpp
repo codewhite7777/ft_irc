@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 16:11:18 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 16:33:23 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/15 16:37:11 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	main(void)
 			std::cerr << "Error : send(...)" << std::endl;
 			break ;
 		}
+		std::cout << "send " << send_result << "byte" << std::endl;
 		msg.clear();
 	}
 	return (0);
