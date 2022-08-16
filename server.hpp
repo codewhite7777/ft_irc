@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 15:12:45 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/15 23:54:00 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ typedef int	SOCKET;
 /*       SOCKET	sock_;                                                        */
 /*                                                                            */
 /* ************************************************************************** */
+
+typedef enum e_port
+{
+	WELL_KNOWN_PORT,
+	REGISTERED_PORT,
+	DYNAMIC_PORT,
+	INVALID_PORT,
+}			t_port;
 
 class Server
 {
@@ -41,19 +49,22 @@ public:
 	Server(int argc, char *argv[]);
 	~Server(void);
 
-	//server init
+	//configure port
+	bool	config_port(std::string port);
 	bool	is_valid_port(std::string port);
-	bool	is_valid_pwd(std::string pwd);
-	void	network_init(void);
-	// void	network_close(...);
+	bool	getPortNumber(const char *str, int *o_value);
+	t_port	getPortType(int value);
 
+	//configure pwd
+	bool	config_pwd(std::string pwd);
+	bool	is_valid_pwd(std::string pwd);
+
+	void	network_init(void);
+	void	network_close(void);
 
 	//status
 	bool	getStatus(void);
-
 	void	Run(void);
-
-
 };
 
 #endif
