@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 18:37:57 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/16 19:03:16 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,9 @@ public:
 
 	//select
 	int		getMaxFD(SOCKET sock);
+
+	//network process
+	void	accept_client(SOCKET listen_sock);
 
 	//status
 	bool	getStatus(void);

@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 18:47:58 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/16 19:09:48 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,33 @@ int	Server::getMaxFD(SOCKET sock)
 	return (max_fd);
 }
 
+void	Server::accept_client(SOCKET listen_sock)
+{
+	SOCKET				client_sock;
+	struct sockaddr_in	c_addr_in;
+	socklen_t			c_addr_len = sizeof(c_addr_in);
+	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
+	//accept(...)
+	client_sock = accept(listen_sock, reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
+	if (client_sock == -1)
+		return ;
+
+	//push client socket
+	client_list_.push_back(client_sock);
+
+	//TODO : select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
+	//TODO : 클라이언트 세션 생성 및 데이터 초기화
+
+	//display client network info
+	std::cout << "-------------------" << std::endl;
+	std::cout << "client connected" << std::endl;
+	std::cout << "client socket : " << client_sock << std::endl;
+	std::cout << "client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
+	std::cout << "client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
+	std::cout << "-------------------" << std::endl;
+	return ;
+}
+
 bool	Server::getStatus(void)
 {
 	return (this->status_);
@@ -256,13 +283,18 @@ void	Server::Run(void)
 	{
 		//new client
 		if (FD_ISSET(listen_sock_, &read_set))
-		{
-			//accept (...)
-		}
+			accept_client(listen_sock_);
 		//old client
 		for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
 		{
-			//send(...), recv(...)
+			if (FD_ISSET(*iter, &read_set))
+			{
+
+			}
+			// if (FD_ISSET(*iter, &write_set))
+			// {
+
+			// }
 		}
 	}
 	return ;
