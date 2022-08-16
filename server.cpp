@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 23:56:14 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/16 18:47:58 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <fcntl.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
+#include <sys/select.h>
+#include <sys/time.h>
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
@@ -43,7 +45,6 @@ Server::Server(int argc, char *argv[])
 	}
 	network_init();
 ERROR:
-
 	return ;
 }
 
@@ -212,6 +213,17 @@ void	Server::network_close(void)
 	return ;
 }
 
+int	Server::getMaxFD(SOCKET sock)
+{
+	int	max_fd = sock;
+	for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+	{
+		if (max_fd < *iter)
+			max_fd = *iter;
+	}
+	return (max_fd);
+}
+
 bool	Server::getStatus(void)
 {
 	return (this->status_);
@@ -219,7 +231,39 @@ bool	Server::getStatus(void)
 
 void	Server::Run(void)
 {
+	//FD ZERO
+	FD_ZERO(&read_set);
+	FD_ZERO(&write_set);
+
+	//listen socket add(read_set)
+	FD_SET(listen_sock_, &read_set);
+
+	//client socket add(read_set, write_set)
+	for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+	{
+		FD_SET(*iter, &read_set);
+		FD_SET(*iter, &write_set);
+	}
+
+	//set timeout
+	struct timeval	time_out;
+	time_out.tv_sec = 0;
+	time_out.tv_usec = 0;
+
+	//select
+	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set, &write_set, NULL, &time_out);
+	if (select_result > 0)
+	{
+		//new client
+		if (FD_ISSET(listen_sock_, &read_set))
+		{
+			//accept (...)
+		}
+		//old client
+		for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+		{
+			//send(...), recv(...)
+		}
+	}
 	return ;
 }
-
-

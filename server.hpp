@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/15 23:54:00 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/16 18:37:57 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_HPP
 # include <iostream>
 # include <netinet/in.h>
+# include <list>
 
 typedef int	SOCKET;
 
@@ -45,6 +46,13 @@ private:
 	unsigned short		s_port_;
 	std::string			s_ip_;
 
+	int					client_max;
+
+	//client
+	std::list<SOCKET>	client_list_;
+	fd_set				read_set;
+	fd_set				write_set;
+
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
@@ -59,11 +67,18 @@ public:
 	bool	config_pwd(std::string pwd);
 	bool	is_valid_pwd(std::string pwd);
 
+
+	//network init, close
 	void	network_init(void);
 	void	network_close(void);
 
+	//select
+	int		getMaxFD(SOCKET sock);
+
 	//status
 	bool	getStatus(void);
+
+	//run
 	void	Run(void);
 };
 
