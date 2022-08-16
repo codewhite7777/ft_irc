@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 06:59:03 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/17 07:10:02 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ Server::Server(int argc, char *argv[])
 		return ;
 	}
 	network_init();
-ERROR:
 	return ;
 }
 
@@ -109,7 +108,7 @@ bool	Server::config_pwd(std::string pwd)
 
 bool	isSpecialCharactor(std::string str)
 {
-	int i = 0;
+	size_t i = 0;
 #ifdef DEBUG
 	std::cout << str << '\n';
 	std::cout << "size: " << str.size() << '\n';
