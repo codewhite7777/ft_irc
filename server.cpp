@@ -12,6 +12,7 @@
 
 #include "server.hpp"
 #include <arpa/inet.h>
+#include <cctype>
 #include <fcntl.h>
 #include <netinet/tcp.h> // TCP_NODELAY
 
@@ -124,10 +125,32 @@ bool	Server::is_valid_port(std::string port)
 	return (flag);
 }
 
+bool	isSpecialCharactor(std::string str)
+{
+	int i = 0;
+#ifdef DEBUG
+	std::cout << str << '\n';
+	std::cout << "size: " << str.size() << '\n';
+#endif
+	while (i < str.size())
+	{
+		if (!std::isalnum(str[i]))
+			return (true);
+#ifdef DEBUG
+		else
+			std::cout << str[i] << "is number or alpha\n";
+#endif
+		++i;
+	}
+	return (false);
+}
+
 bool	Server::is_valid_pwd(std::string pwd)
 {
 	//TODO : 특수문자가 패스워드로 등록이 불가능 하도록
 	if (pwd.length() == 0)
+		return (false);
+	if (isSpecialCharactor(pwd))
 		return (false);
 	return (true);
 }
