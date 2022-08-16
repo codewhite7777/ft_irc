@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.cpp                                         :+:      :+:    :+:   */
+/*   monitor_client.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/15 16:11:18 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 19:23:13 by alee             ###   ########.fr       */
+/*   Created: 2022/08/16 19:43:49 by alee              #+#    #+#             */
+/*   Updated: 2022/08/17 00:47:03 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,13 @@
 #include <cstring>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 typedef int	SOCKET;
 
 int	main(void)
 {
-	std::cout << "Test Client" << std::endl;
+	std::cout << "monitor Client" << std::endl;
 
 	//input port
 	unsigned short	s_port;
@@ -62,19 +63,16 @@ int	main(void)
 		return (1);
 	}
 
+
+	// set client_sock O_NONBLOCK
+	fcntl(client_sock, F_SETFL, O_NONBLOCK);
+
 	while (1)
 	{
-		std::string	msg;
-		std::cout << "Input Msg : " << std::endl;
-		std::cin >> msg;
-		int	send_result = send(client_sock, msg.c_str(), msg.length(), 0);
-		if (send_result != msg.length() || send_result == -1)
-		{
-			std::cerr << "Error : send(...)" << std::endl;
-			break ;
-		}
-		std::cout << "send " << send_result << "byte" << std::endl;
-		msg.clear();
+		char	buf[1000] = {0,};
+		int recv_result = recv(client_sock, buf, sizeof(buf), 0);
+		if (recv_result > 0)
+			std::cout << buf << std::endl;
 	}
 	return (0);
 }

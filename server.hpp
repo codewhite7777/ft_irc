@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 19:03:16 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/17 05:30:12 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 # define SERVER_HPP
 # include <iostream>
 # include <netinet/in.h>
-# include <list>
+# include "client.hpp"
+# include <map>
 
 typedef int	SOCKET;
 
@@ -36,22 +37,21 @@ typedef enum e_port
 class Server
 {
 private:
-	std::string	raw_port_;
-	std::string	raw_pwd_;
-	bool		status_;
+	std::string					raw_port_;
+	std::string					raw_pwd_;
+	bool						status_;
 
 	//network
-	SOCKET				listen_sock_;
-	struct sockaddr_in	s_addr_in_;
-	unsigned short		s_port_;
-	std::string			s_ip_;
-
-	int					client_max;
+	SOCKET						listen_sock_;
+	struct sockaddr_in			s_addr_in_;
+	unsigned short				s_port_;
+	std::string					s_ip_;
 
 	//client
-	std::list<SOCKET>	client_list_;
-	fd_set				read_set;
-	fd_set				write_set;
+	unsigned int				current_sock;
+	std::map<SOCKET, Client *>	client_map_;
+	fd_set						read_set;
+	fd_set						write_set;
 
 public:
 	Server(int argc, char *argv[]);
@@ -77,6 +77,8 @@ public:
 
 	//network process
 	void	accept_client(SOCKET listen_sock);
+	void	recv_client(std::map<SOCKET, Client *>::iterator &iter);
+	void	send_client(Client& c_session);
 
 	//status
 	bool	getStatus(void);

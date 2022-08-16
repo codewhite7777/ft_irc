@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 19:09:48 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/17 06:59:03 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include <sys/time.h>
 
 Server::Server(int argc, char *argv[])
-	: status_(true)
+	: status_(true), current_sock(0)
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -151,9 +151,7 @@ void	Server::network_init(void)
 	}
 
 	// set listen_sock_ O_NONBLOCK
-	int flags = fcntl(listen_sock_, F_GETFL);
-	flags |= O_NONBLOCK;
-	fcntl(listen_sock_, F_SETFL, flags);
+	fcntl(listen_sock_, F_SETFL, O_NONBLOCK);
 
 	// set listen_sock_ SO_REUSEADDR
 	//struct timeval optval = {0, 1000};
@@ -171,7 +169,8 @@ void	Server::network_init(void)
 	// unset Nagle algorithm
 	//int optval = 1;
 	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
-	if (retval == -1) {
+	if (retval == -1)
+	{
 		#ifdef DEBUG
 		std::cout << "setsockopt() for TCP_NODELAY failed\n";
 		#endif
@@ -180,7 +179,7 @@ void	Server::network_init(void)
 	}
 
 	// bind
-	memset(&s_addr_in_, 0, sizeof(s_addr_in_));
+	memset(&s_addr_in_, 0x00, sizeof(s_addr_in_));
 	s_addr_in_.sin_family = AF_INET;
 	s_addr_in_.sin_addr.s_addr = htonl(INADDR_ANY);
 	s_addr_in_.sin_port = htons(s_port_); // SERVERPORT
@@ -203,6 +202,9 @@ void	Server::network_init(void)
 		return ;
 	}
 
+	//client count
+	current_sock += 1;
+
 	std::cout << "IRC Server started" << std::endl;
 	return ;
 }
@@ -216,10 +218,10 @@ void	Server::network_close(void)
 int	Server::getMaxFD(SOCKET sock)
 {
 	int	max_fd = sock;
-	for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 	{
-		if (max_fd < *iter)
-			max_fd = *iter;
+		if (max_fd < iter->first)
+			max_fd = iter->first;
 	}
 	return (max_fd);
 }
@@ -235,11 +237,25 @@ void	Server::accept_client(SOCKET listen_sock)
 	if (client_sock == -1)
 		return ;
 
-	//push client socket
-	client_list_.push_back(client_sock);
+	//select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
+	if (current_sock >= FD_SETSIZE)
+	{
+		close(client_sock);
+		return ;
+	}
 
-	//TODO : select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
+	// set client_sock O_NONBLOCK
+	fcntl(client_sock, F_SETFL, O_NONBLOCK);
+
 	//TODO : 클라이언트 세션 생성 및 데이터 초기화
+	Client*	new_client = new Client(client_sock);
+
+	//push client socket
+	// client_map_.push_back(new_client);
+	client_map_.insert(std::make_pair(client_sock, new_client));
+
+	//client count
+	current_sock += 1;
 
 	//display client network info
 	std::cout << "-------------------" << std::endl;
@@ -250,6 +266,56 @@ void	Server::accept_client(SOCKET listen_sock)
 	std::cout << "-------------------" << std::endl;
 	return ;
 }
+
+void	Server::recv_client(std::map<SOCKET, Client *>::iterator &iter)
+{
+	// unsigned char	buf[c_session.getRecvBuf().npos];
+	unsigned char	buf[1000];
+	int	recv_ret = recv(iter->second->getSocket(), buf, sizeof(buf), 0);
+	//disconnect
+	if (recv_ret == 0)
+	{
+		std::cout << iter->first << " : Disconnected" << std::endl;
+		close(iter->first);
+		iter = client_map_.erase(iter);
+		current_sock -= 1;
+	}
+	else if (recv_ret > 0)
+	{
+		std::cout << recv_ret << std::endl;
+	}
+
+	//old
+	// char	buf[1000] = {0,};
+
+	// int	recv_result = recv(client_sock, buf, sizeof(buf), 0);
+	// std::cout << "-------------------" << std::endl;
+	// std::cout << "socket : " << client_sock << std::endl;
+	// std::cout << "recv : " << recv_result << "byte" << std::endl;
+	// std::cout << "msg : " << buf << std::endl;
+	// std::cout << "-------------------" << std::endl;
+
+	// int	buf_len = strlen(buf);
+	// for (int i = 0; i < buf_len; i++)
+	// 	std::cout << '[' << (char)buf[i] << ']' << std::endl;
+
+	// for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+	// {
+	// 	if (*iter != client_sock)
+	// 	{
+	// 		int send_result = send(*iter, buf, strlen(buf), 0);
+	// 		std::cout << send_result << "byte send" << std::endl;
+	// 	}
+	// }
+	return ;
+}
+
+void	Server::send_client(Client& client_session)
+{
+	(void)client_session;
+	return ;
+}
+
 
 bool	Server::getStatus(void)
 {
@@ -266,10 +332,10 @@ void	Server::Run(void)
 	FD_SET(listen_sock_, &read_set);
 
 	//client socket add(read_set, write_set)
-	for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 	{
-		FD_SET(*iter, &read_set);
-		FD_SET(*iter, &write_set);
+		FD_SET(iter->first, &read_set);
+		// FD_SET(iter->first, &write_set);
 	}
 
 	//set timeout
@@ -285,16 +351,14 @@ void	Server::Run(void)
 		if (FD_ISSET(listen_sock_, &read_set))
 			accept_client(listen_sock_);
 		//old client
-		for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
+		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
 		{
-			if (FD_ISSET(*iter, &read_set))
+			if (FD_ISSET(iter->first, &read_set))
 			{
-
+				recv_client(iter);
 			}
-			// if (FD_ISSET(*iter, &write_set))
-			// {
-
-			// }
+			else
+				iter++;
 		}
 	}
 	return ;

@@ -1,21 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/15 12:47:12 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 06:37:44 by alee             ###   ########.fr       */
+/*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
+/*   Updated: 2022/08/17 02:05:48 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
+# include <iostream>
 
-int	main(int argc, char *argv[])
+typedef int	SOCKET;
+
+class Client
 {
-	Server	irc_server(argc, argv);
-	while (irc_server.getStatus())
-		irc_server.Run();
-	return (0);
-}
+private:
+	std::string	s_buf_;
+	std::string	r_buf_;
+	SOCKET		client_sock_;
+	std::string	nick_name_;
+	std::string	user_name_;
+public:
+	Client(SOCKET s);
+	~Client(void);
+
+	//client getter
+	SOCKET&			getSocket(void);
+	std::string&	getSendBuf(void);
+	std::string&	getRecvBuf(void);
+};
+
+#endif

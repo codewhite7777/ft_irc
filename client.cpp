@@ -1,21 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/15 12:47:12 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 06:37:44 by alee             ###   ########.fr       */
+/*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
+/*   Updated: 2022/08/17 02:09:02 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "client.hpp"
 
-int	main(int argc, char *argv[])
+Client::Client(SOCKET s)
 {
-	Server	irc_server(argc, argv);
-	while (irc_server.getStatus())
-		irc_server.Run();
-	return (0);
+	client_sock_ = s;
+	return ;
+}
+
+Client::~Client(void)
+{
+	return ;
+}
+
+SOCKET&	Client::getSocket(void)
+{
+	return (this->client_sock_);
+}
+
+std::string&	Client::getSendBuf(void)
+{
+	return (this->s_buf_);
+}
+
+std::string&	Client::getRecvBuf(void)
+{
+	return (this->r_buf_);
 }
