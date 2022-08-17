@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 05:30:12 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/17 15:08:19 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ typedef enum e_port
 	INVALID_PORT,
 }			t_port;
 
+typedef enum e_buf
+{
+	BUFFER_MAX = 1024 << 4,
+}			t_buf;
+
 class Server
 {
 private:
@@ -48,7 +53,7 @@ private:
 	std::string					s_ip_;
 
 	//client
-	unsigned int				current_sock;
+	unsigned int				sock_count;
 	std::map<SOCKET, Client *>	client_map_;
 	fd_set						read_set;
 	fd_set						write_set;

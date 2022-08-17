@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 07:10:02 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/17 16:19:09 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,13 @@
 #include <sys/time.h>
 
 Server::Server(int argc, char *argv[])
-	: status_(true), current_sock(0)
+	: status_(true), sock_count(0)
 {
 	//argument check (port, pwd)
 	if (argc != 3)
 	{
 		std::cerr << "Error : Invalid Argument" << std::endl;
+		std::cerr << "./ircserv <port> <server_pwd>" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -202,7 +203,7 @@ void	Server::network_init(void)
 	}
 
 	//client count
-	current_sock += 1;
+	sock_count += 1;
 
 	std::cout << "IRC Server started" << std::endl;
 	return ;
@@ -237,7 +238,7 @@ void	Server::accept_client(SOCKET listen_sock)
 		return ;
 
 	//select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
-	if (current_sock >= FD_SETSIZE)
+	if (sock_count >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
@@ -254,7 +255,7 @@ void	Server::accept_client(SOCKET listen_sock)
 	client_map_.insert(std::make_pair(client_sock, new_client));
 
 	//client count
-	current_sock += 1;
+	sock_count += 1;
 
 	//display client network info
 	std::cout << "-------------------" << std::endl;
@@ -268,44 +269,24 @@ void	Server::accept_client(SOCKET listen_sock)
 
 void	Server::recv_client(std::map<SOCKET, Client *>::iterator &iter)
 {
-	// unsigned char	buf[c_session.getRecvBuf().npos];
-	unsigned char	buf[1000];
-	int	recv_ret = recv(iter->second->getSocket(), buf, sizeof(buf), 0);
+	unsigned char	buf[BUFFER_MAX];
+	int	recv_ret = recv(iter->first, (void *)buf, sizeof(buf), 0);
+	// int	recv_ret = recv(iter->first, const_cast<char *>(iter->second->getRecvBuf().c_str()), iter->second->getRecvBuf().npos, 0);
 	//disconnect
 	if (recv_ret == 0)
 	{
 		std::cout << iter->first << " : Disconnected" << std::endl;
 		close(iter->first);
 		iter = client_map_.erase(iter);
-		current_sock -= 1;
+		delete iter->second;
+		sock_count -= 1;
 	}
 	else if (recv_ret > 0)
 	{
-		std::cout << recv_ret << std::endl;
+		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
+		std::cout << recv_ret << "byte recv" << std::endl;
+		std::cout << "msg : " << '[' << buf << ']' << std::endl;
 	}
-
-	//old
-	// char	buf[1000] = {0,};
-
-	// int	recv_result = recv(client_sock, buf, sizeof(buf), 0);
-	// std::cout << "-------------------" << std::endl;
-	// std::cout << "socket : " << client_sock << std::endl;
-	// std::cout << "recv : " << recv_result << "byte" << std::endl;
-	// std::cout << "msg : " << buf << std::endl;
-	// std::cout << "-------------------" << std::endl;
-
-	// int	buf_len = strlen(buf);
-	// for (int i = 0; i < buf_len; i++)
-	// 	std::cout << '[' << (char)buf[i] << ']' << std::endl;
-
-	// for (std::list<SOCKET>::iterator iter = client_list_.begin(); iter != client_list_.end(); iter++)
-	// {
-	// 	if (*iter != client_sock)
-	// 	{
-	// 		int send_result = send(*iter, buf, strlen(buf), 0);
-	// 		std::cout << send_result << "byte send" << std::endl;
-	// 	}
-	// }
 	return ;
 }
 
@@ -353,12 +334,12 @@ void	Server::Run(void)
 		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
 		{
 			if (FD_ISSET(iter->first, &read_set))
-			{
 				recv_client(iter);
-			}
 			else
 				iter++;
 		}
 	}
+	//클라이언트에 대한 마샬링 -> 패킷 커맨드에 대해서 분석 후 해당하는 로직을 처리한다.
+	//packet_marsharing(...)
 	return ;
 }
