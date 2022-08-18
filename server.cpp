@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 05:08:32 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 05:14:19 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -382,17 +382,21 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	std::string	command;
 	std::string	param;
 
+	//erase newline
 	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
 	{
 		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
+		//erase carrige return
+		if (packet_buf.find('\r') != std::string::npos && packet_buf.length() > 1)
+			packet_buf.erase(packet_buf.begin() + packet_buf.find('\r'));
 	}
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));
 		param = packet_buf.substr(packet_buf.find(' ') + 1);
 	}
-	// std::cout << "command : " << '<' << command << '>' << std::endl;
-	// std::cout << "param : " << '<' << param << '>' << std::endl;
+	std::cout << "command : " << '<' << command << '>' << std::endl;
+	std::cout << "param : " << '<' << param << '>' << std::endl;
 	//PASS에 대한 처리
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
@@ -412,9 +416,12 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, std::string&
 		return ;
 	}
 	if (this->raw_pwd_ == param)
+	{
 		iter->second->setPassFlag(true);
+		insertSendBuffer(iter->second, "info) Successful Authentication.\n");
+	}
 	else
-		insertSendBuffer(iter->second, "Wrong password.\n");
+		insertSendBuffer(iter->second, "info) Wrong password.\n");
 	return ;
 }
 
