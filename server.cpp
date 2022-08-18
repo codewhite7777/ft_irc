@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 16:19:09 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 15:18:49 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,33 +31,38 @@ Server::Server(int argc, char *argv[])
 		return ;
 	}
 	//verify port, config port
-	if (config_port(argv[1]) == false)
+	if (configPort(argv[1]) == false)
 	{
 		std::cerr << "Error : Invalid Port" << std::endl;
 		status_ = false;
 		return ;
 	}
 	//verify pwd, config pwd
-	if (config_pwd(argv[2]) == false)
+	if (configPwd(argv[2]) == false)
 	{
 		std::cerr << "Error : Invalid password" << std::endl;
 		status_ = false;
 		return ;
 	}
-	network_init();
+
+	//set operator pwd
+	s_operator_pwd_ = "admin";
+
+	//network init
+	networkInit();
 	return ;
 }
 
 Server::~Server(void)
 {
-	network_close();
+	networkClose();
 	return ;
 }
 
-bool	Server::config_port(std::string port)
+bool	Server::configPort(std::string port)
 {
 	int	retPort;
-	if (is_valid_port(port) == false)
+	if (isValidPort(port) == false)
 		return (false);
 	if (getPortNumber(port.c_str(), &retPort) == false)
 		return (false);
@@ -65,7 +70,7 @@ bool	Server::config_port(std::string port)
 	return (true);
 }
 
-bool	Server::is_valid_port(std::string port)
+bool	Server::isValidPort(std::string port)
 {
 	return (port.find_first_not_of("0123456789") == std::string::npos);
 }
@@ -99,9 +104,9 @@ bool	Server::getPortNumber(const char *str, int *o_value)
 	return (true);
 }
 
-bool	Server::config_pwd(std::string pwd)
+bool	Server::configPwd(std::string pwd)
 {
-	if (is_valid_pwd(pwd) == false)
+	if (isValidPwd(pwd) == false)
 		return (false);
 	raw_pwd_ = pwd;
 	return (true);
@@ -127,7 +132,7 @@ bool	isSpecialCharactor(std::string str)
 	return (false);
 }
 
-bool	Server::is_valid_pwd(std::string pwd)
+bool	Server::isValidPwd(std::string pwd)
 {
 	if (pwd.length() == 0)
 		return (false);
@@ -136,7 +141,7 @@ bool	Server::is_valid_pwd(std::string pwd)
 	return (true);
 }
 
-void	Server::network_init(void)
+void	Server::networkInit(void)
 {
 	int retval;
 
@@ -209,7 +214,7 @@ void	Server::network_init(void)
 	return ;
 }
 
-void	Server::network_close(void)
+void	Server::networkClose(void)
 {
 	close(listen_sock_);
 	return ;
@@ -226,7 +231,53 @@ int	Server::getMaxFD(SOCKET sock)
 	return (max_fd);
 }
 
-void	Server::accept_client(SOCKET listen_sock)
+void	Server::networkProcess(void)
+{
+	//FD ZERO
+	FD_ZERO(&read_set_);
+	FD_ZERO(&write_set_);
+
+	//listen socket add(read_set)
+	FD_SET(listen_sock_, &read_set_);
+
+	//client socket add(read_set, write_set)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		FD_SET(iter->first, &read_set_);
+		// FD_SET(iter->first, &write_set_);
+	}
+
+	//set timeout
+	struct timeval	time_out;
+	time_out.tv_sec = 0;
+	time_out.tv_usec = 0;
+
+	//select
+	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
+	if (select_result > 0)
+	{
+		//new client
+		if (FD_ISSET(listen_sock_, &read_set_))
+		{
+			acceptClient(listen_sock_);
+			// if (select_result == 1)
+			// 	return ;
+		}
+		//old client
+		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
+		{
+			if (FD_ISSET(iter->first, &read_set_))
+				recvClient(iter);
+			if (FD_ISSET(iter->first, &write_set) && s_buf.length() != 0)
+				send_client(iter);
+			else
+				iter++;
+		}
+	}
+	return ;
+}
+
+void	Server::acceptClient(SOCKET listen_sock)
 {
 	SOCKET				client_sock;
 	struct sockaddr_in	c_addr_in;
@@ -267,35 +318,86 @@ void	Server::accept_client(SOCKET listen_sock)
 	return ;
 }
 
-void	Server::recv_client(std::map<SOCKET, Client *>::iterator &iter)
+void	Server::recvClient(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int	recv_ret = recv(iter->first, (void *)buf, sizeof(buf), 0);
-	// int	recv_ret = recv(iter->first, const_cast<char *>(iter->second->getRecvBuf().c_str()), iter->second->getRecvBuf().npos, 0);
 	//disconnect
 	if (recv_ret == 0)
 	{
 		std::cout << iter->first << " : Disconnected" << std::endl;
 		close(iter->first);
-		iter = client_map_.erase(iter);
 		delete iter->second;
+		iter = client_map_.erase(iter);
 		sock_count -= 1;
 	}
 	else if (recv_ret > 0)
 	{
+		//TODO : 클라이언트 r_buf에 데이터 복사
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-		std::cout << recv_ret << "byte recv" << std::endl;
-		std::cout << "msg : " << '[' << buf << ']' << std::endl;
+		std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
+		std::cout << "Msg : " << '[' << buf << ']' << std::endl;
+		std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
+		iter++;
 	}
 	return ;
 }
 
-void	Server::send_client(Client& client_session)
+void	Server::sendClient(Client& client_session)
 {
 	(void)client_session;
 	return ;
 }
 
+
+void	Server::packetMarshalling(void)
+{
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		// std::cout << "client : " << iter->first << std::endl;
+		if (iter->second->getRecvBuf().length() != 0)
+		{
+			std::cout << "client : " << iter->first << "\n" << "packet_marshalling" << std::endl;
+			packetAnalysis(iter);
+			iter->second->getRecvBuf().clear();
+		}
+	}
+	return ;
+}
+
+void Server::insertSendBuffer(Client* target_client, const std::string& msg)
+{
+	target_client->getSendBuf().append(msg);
+	return ;
+}
+
+void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
+{
+	std::string	packet_buf = iter->second->getRecvBuf();
+	std::string	command;
+	std::string	param;
+
+	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
+	{
+		std::cout << "before : " << '[' << packet_buf << ']' << std::endl;
+		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
+		std::cout << "after  : " << '[' << packet_buf << ']' << std::endl;
+	}
+	if (packet_buf.find(' ') != std::string::npos)
+	{
+		command = packet_buf.substr(0, packet_buf.find(' '));
+		param = packet_buf.substr(packet_buf.find(' ') + 1);
+	}
+	std::cout << "command : " << '<' << command << '>' << std::endl;
+	std::cout << "param : " << '<' << param << '>' << std::endl;
+
+	//PASS에 대한 처리
+	if (iter->second->isSetPass() == false)
+	{
+		insertSendBuffer(iter->second, "you have to input password");
+	}
+	return ;
+}
 
 bool	Server::getStatus(void)
 {
@@ -304,42 +406,7 @@ bool	Server::getStatus(void)
 
 void	Server::Run(void)
 {
-	//FD ZERO
-	FD_ZERO(&read_set);
-	FD_ZERO(&write_set);
-
-	//listen socket add(read_set)
-	FD_SET(listen_sock_, &read_set);
-
-	//client socket add(read_set, write_set)
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
-	{
-		FD_SET(iter->first, &read_set);
-		// FD_SET(iter->first, &write_set);
-	}
-
-	//set timeout
-	struct timeval	time_out;
-	time_out.tv_sec = 0;
-	time_out.tv_usec = 0;
-
-	//select
-	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set, &write_set, NULL, &time_out);
-	if (select_result > 0)
-	{
-		//new client
-		if (FD_ISSET(listen_sock_, &read_set))
-			accept_client(listen_sock_);
-		//old client
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
-		{
-			if (FD_ISSET(iter->first, &read_set))
-				recv_client(iter);
-			else
-				iter++;
-		}
-	}
-	//클라이언트에 대한 마샬링 -> 패킷 커맨드에 대해서 분석 후 해당하는 로직을 처리한다.
-	//packet_marsharing(...)
+	networkProcess();
+	packetMarshalling();
 	return ;
 }

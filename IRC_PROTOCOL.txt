@@ -3,23 +3,41 @@
 
 
       Command: PASS
+      명령 : PASS
    Parameters: <password>
+   명령 인자 : <password>
 
-   The PASS command is used to set a 'connection password'.  The
-   password can and must be set before any attempt to register the
-   connection is made.  Currently this requires that clients send a PASS
-   command before sending the NICK/USER combination and servers *must*
-   send a PASS command before any SERVER command.  The password supplied
-   must match the one contained in the C/N lines (for servers) or I
-   lines (for clients).  It is possible to send multiple PASS commands
-   before registering but only the last one sent is used for
-   verification and it may not be changed once registered.  Numeric
-   Replies:
+   The PASS command is used to set a 'connection password'.
+   PASS 명령은 '연결 비밀번호'를 설정하기 위해 사용됩니다.
 
-           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+   The password can and must be set before any attempt to register the
+   connection is made.
+   비밀번호는 연결 등록을 시도하기 전에 반드시 설정되어야 합니다.
+
+   Currently this requires that clients send a PASS command before sending the NICK/USER combination
+   and servers *must* send a PASS command before any SERVER command.
+   현재 연결을 위해서는 클라이언트가 NICK/USER 조합을 보내기 전에 PASS 명령을 보내야 합니다.
+   그리고 서버는 *반드시* SERVER 명령보다 PASS 명령을 먼저 보냅니다.
+
+   The password supplied must match the one contained in the C/N lines (for servers) or I
+   lines (for clients).
+   제공된 비밀번호는 반드시 C/N 라인(서버용)에 포함된 비밀번호와 일치해야 합니다.
+   라인(클라이언트용).
+
+   It is possible to send multiple PASS commands before registering
+   but only the last one sent is used for
+   verification and it may not be changed once registered.
+   연결 등록하기 전에 PASS 명령을 여러번 보낼 수 있습니다.
+   하지만 마지막으로 보낸 것만 확인을 위해 사용합니다.
+   그리고 한번 등록되면 변경할 수 없습니다.
+
+   Numeric Replies:
+   다음의 값을 반환합니다.
+
+   ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
 
    Example:
-
+   예시 :
            PASS secretpasswordhere
 //===================================================================================================
 4.1.2 Nick message

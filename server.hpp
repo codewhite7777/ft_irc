@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 15:08:19 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 14:53:16 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,13 @@ typedef enum e_buf
 class Server
 {
 private:
+	//config value
 	std::string					raw_port_;
 	std::string					raw_pwd_;
+
+	//server info
 	bool						status_;
+	std::string					s_operator_pwd_;
 
 	//network
 	SOCKET						listen_sock_;
@@ -55,41 +59,49 @@ private:
 	//client
 	unsigned int				sock_count;
 	std::map<SOCKET, Client *>	client_map_;
-	fd_set						read_set;
-	fd_set						write_set;
+	fd_set						read_set_;
+	fd_set						write_set_;
 
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
 
 	//configure port
-	bool	config_port(std::string port);
-	bool	is_valid_port(std::string port);
+	bool	configPort(std::string port);
+	bool	isValidPort(std::string port);
 	bool	getPortNumber(const char *str, int *o_value);
 	t_port	getPortType(int value);
 
 	//configure pwd
-	bool	config_pwd(std::string pwd);
-	bool	is_valid_pwd(std::string pwd);
+	bool	configPwd(std::string pwd);
+	bool	isValidPwd(std::string pwd);
 
 
 	//network init, close
-	void	network_init(void);
-	void	network_close(void);
+	void	networkInit(void);
+	void	networkClose(void);
 
 	//select
 	int		getMaxFD(SOCKET sock);
 
 	//network process
-	void	accept_client(SOCKET listen_sock);
-	void	recv_client(std::map<SOCKET, Client *>::iterator &iter);
-	void	send_client(Client& c_session);
+	void	networkProcess(void);
+	void	acceptClient(SOCKET listen_sock);
+	void	recvClient(std::map<SOCKET, Client *>::iterator &iter);
+	void	sendClient(Client& c_session);
+
+	//network packet marshalling
+	void	packetMarshalling(void);
+	void	packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
 
 	//status
 	bool	getStatus(void);
 
 	//run
 	void	Run(void);
+
+private:
+	void insertSendBuffer(Client* target_client, const std::string& msg);
 };
 
 #endif
