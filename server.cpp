@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/17 16:19:09 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 11:40:56 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,11 @@ Server::Server(int argc, char *argv[])
 		status_ = false;
 		return ;
 	}
+
+	//set operator pwd
+	s_operator_pwd_ = "admin";
+
+	//network init
 	network_init();
 	return ;
 }
@@ -226,6 +231,48 @@ int	Server::getMaxFD(SOCKET sock)
 	return (max_fd);
 }
 
+void	Server::network_process(void)
+{
+	//FD ZERO
+	FD_ZERO(&read_set);
+	FD_ZERO(&write_set);
+
+	//listen socket add(read_set)
+	FD_SET(listen_sock_, &read_set);
+
+	//client socket add(read_set, write_set)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		FD_SET(iter->first, &read_set);
+		// FD_SET(iter->first, &write_set);
+	}
+
+	//set timeout
+	struct timeval	time_out;
+	time_out.tv_sec = 0;
+	time_out.tv_usec = 0;
+
+	//select
+	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set, &write_set, NULL, &time_out);
+	if (select_result > 0)
+	{
+		//new client
+		if (FD_ISSET(listen_sock_, &read_set))
+			accept_client(listen_sock_);
+		//old client
+		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
+		{
+			if (FD_ISSET(iter->first, &read_set))
+				recv_client(iter);
+			// if (FD_ISSET(iter->first, &write_set))
+			// 	send_client(iter);
+			else
+				iter++;
+		}
+	}
+	return ;
+}
+
 void	Server::accept_client(SOCKET listen_sock)
 {
 	SOCKET				client_sock;
@@ -271,7 +318,6 @@ void	Server::recv_client(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int	recv_ret = recv(iter->first, (void *)buf, sizeof(buf), 0);
-	// int	recv_ret = recv(iter->first, const_cast<char *>(iter->second->getRecvBuf().c_str()), iter->second->getRecvBuf().npos, 0);
 	//disconnect
 	if (recv_ret == 0)
 	{
@@ -283,9 +329,12 @@ void	Server::recv_client(std::map<SOCKET, Client *>::iterator &iter)
 	}
 	else if (recv_ret > 0)
 	{
+		//TODO : 클라이언트 r_buf에 데이터 복사
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-		std::cout << recv_ret << "byte recv" << std::endl;
-		std::cout << "msg : " << '[' << buf << ']' << std::endl;
+		std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
+		std::cout << "Msg : " << '[' << buf << ']' << std::endl;
+		std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
+		iter++;
 	}
 	return ;
 }
@@ -297,6 +346,58 @@ void	Server::send_client(Client& client_session)
 }
 
 
+void	Server::packet_marshalling(void)
+{
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		// std::cout << "client : " << iter->first << std::endl;
+		if (iter->second->getRecvBuf().length() != 0)
+		{
+			std::cout << "client : " << iter->first << "\n" << "packet_marshalling" << std::endl;
+			packet_analysis(iter);
+			iter->second->getRecvBuf().clear();
+		}
+	}
+	return ;
+}
+
+void	Server::packet_analysis(std::map<SOCKET, Client *>::iterator& iter)
+{
+	std::string	packet_buf = iter->second->getRecvBuf();
+	std::string	command;
+	std::string	param;
+
+	//
+	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
+	{
+		std::cout << "before : " << '[' << packet_buf << ']' << std::endl;
+		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
+		std::cout << "after  : " << '[' << packet_buf << ']' << std::endl;
+	}
+	if (packet_buf.find(' ') != std::string::npos)
+	{
+		command = packet_buf.substr(0, packet_buf.find(' '));
+		param = packet_buf.substr(packet_buf.find(' ') + 1);
+	}
+	std::cout << "command : " << '<' << command << '>' << std::endl;
+	std::cout << "param : " << '<' << param << '>' << std::endl;
+
+	if (iter->second->isSetPass() == false)
+	{
+		//PASS를 기다리는 처리
+		// std::cout << "no pass " << std::endl;
+		send(iter->first, "you have to input password", strlen("you have to input password"), 0);
+		iter->second->getSendBuf().append("you have to input password");
+	}
+	else if(iter->second->isSetOperator() ==false)
+	{
+		send(iter->first, "you have to right to be password", strlen("you have to input password"), 0);
+		iter->second->getSendBuf().append("you have to input password");
+	}
+
+	return ;
+}
+
 bool	Server::getStatus(void)
 {
 	return (this->status_);
@@ -304,42 +405,7 @@ bool	Server::getStatus(void)
 
 void	Server::Run(void)
 {
-	//FD ZERO
-	FD_ZERO(&read_set);
-	FD_ZERO(&write_set);
-
-	//listen socket add(read_set)
-	FD_SET(listen_sock_, &read_set);
-
-	//client socket add(read_set, write_set)
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
-	{
-		FD_SET(iter->first, &read_set);
-		// FD_SET(iter->first, &write_set);
-	}
-
-	//set timeout
-	struct timeval	time_out;
-	time_out.tv_sec = 0;
-	time_out.tv_usec = 0;
-
-	//select
-	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set, &write_set, NULL, &time_out);
-	if (select_result > 0)
-	{
-		//new client
-		if (FD_ISSET(listen_sock_, &read_set))
-			accept_client(listen_sock_);
-		//old client
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
-		{
-			if (FD_ISSET(iter->first, &read_set))
-				recv_client(iter);
-			else
-				iter++;
-		}
-	}
-	//클라이언트에 대한 마샬링 -> 패킷 커맨드에 대해서 분석 후 해당하는 로직을 처리한다.
-	//packet_marsharing(...)
+	network_process();
+	packet_marshalling();
 	return ;
 }
