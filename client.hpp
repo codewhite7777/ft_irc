@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 11:51:52 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 17:01:28 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ private:
 	SOCKET		client_sock_;	//network socket
 	std::string	nick_name_;
 	std::string	user_name_;
+	bool		disconnect_flag;
 	bool		pass_flag;
 	bool		nick_flag;
 	bool		user_flag;
@@ -36,10 +37,13 @@ public:
 	SOCKET&			getSocket(void);
 	std::string&	getSendBuf(void);
 	std::string&	getRecvBuf(void);
-	bool			isSetPass(void) const;
-	bool			isSetNick(void) const;
-	bool			isSetUserName(void) const;
-	bool			isSetOperator(void) const;
+	bool			getDisconnectFlag(void) const;
+	void			setDisconnectFlag(bool flag);
+	void			setPassFlag(bool flag);
+	bool			getPassFlag(void) const;
+	bool			getNickFlag(void) const;
+	bool			getUserNameFlag(void) const;
+	bool			getOperatorFlag(void) const;
 };
 
 #endif

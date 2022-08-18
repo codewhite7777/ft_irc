@@ -6,12 +6,12 @@
 #    By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/17 07:01:17 by alee              #+#    #+#              #
-#    Updated: 2022/08/17 07:09:27 by alee             ###   ########.fr        #
+#    Updated: 2022/08/18 16:23:55 by alee             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror
+CXXFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 CXX_VERSION = -std=c++98
 RM = rm -f
 

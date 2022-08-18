@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 14:53:16 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 17:27:47 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ typedef enum e_port
 
 typedef enum e_buf
 {
-	BUFFER_MAX = 1024 << 4,
+	// BUFFER_MAX = 1024 << 4,
+	BUFFER_MAX = 100,
 }			t_buf;
 
 class Server
@@ -76,7 +77,6 @@ public:
 	bool	configPwd(std::string pwd);
 	bool	isValidPwd(std::string pwd);
 
-
 	//network init, close
 	void	networkInit(void);
 	void	networkClose(void);
@@ -87,12 +87,16 @@ public:
 	//network process
 	void	networkProcess(void);
 	void	acceptClient(SOCKET listen_sock);
-	void	recvClient(std::map<SOCKET, Client *>::iterator &iter);
-	void	sendClient(Client& c_session);
+	void	recvPacket(std::map<SOCKET, Client *>::iterator &iter);
+	void	sendPacket(std::map<SOCKET, Client *>::iterator &iter);
 
 	//network packet marshalling
 	void	packetMarshalling(void);
 	void	packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
+
+	//
+	void	requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 
 	//status
 	bool	getStatus(void);

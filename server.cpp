@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 15:18:49 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/18 18:11:52 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <cstring>
 
 Server::Server(int argc, char *argv[])
 	: status_(true), sock_count(0)
@@ -244,7 +245,7 @@ void	Server::networkProcess(void)
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 	{
 		FD_SET(iter->first, &read_set_);
-		// FD_SET(iter->first, &write_set_);
+		FD_SET(iter->first, &write_set_);
 	}
 
 	//set timeout
@@ -260,18 +261,18 @@ void	Server::networkProcess(void)
 		if (FD_ISSET(listen_sock_, &read_set_))
 		{
 			acceptClient(listen_sock_);
-			// if (select_result == 1)
-			// 	return ;
+			if (select_result == 1)
+				return ;
 		}
 		//old client
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
+		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
-				recvClient(iter);
-			if (FD_ISSET(iter->first, &write_set) && s_buf.length() != 0)
-				send_client(iter);
-			else
-				iter++;
+				recvPacket(iter);
+			if ((iter->second->getDisconnectFlag() == false) \
+			&& FD_ISSET(iter->first, &write_set_) \
+			&& iter->second->getSendBuf().length() > 0)
+				sendPacket(iter);
 		}
 	}
 	return ;
@@ -318,34 +319,40 @@ void	Server::acceptClient(SOCKET listen_sock)
 	return ;
 }
 
-void	Server::recvClient(std::map<SOCKET, Client *>::iterator &iter)
+void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
-	int	recv_ret = recv(iter->first, (void *)buf, sizeof(buf), 0);
+	int	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
 	//disconnect
 	if (recv_ret == 0)
-	{
-		std::cout << iter->first << " : Disconnected" << std::endl;
-		close(iter->first);
-		delete iter->second;
-		iter = client_map_.erase(iter);
-		sock_count -= 1;
-	}
+		iter->second->setDisconnectFlag(true);
 	else if (recv_ret > 0)
 	{
-		//TODO : 클라이언트 r_buf에 데이터 복사
+		buf[recv_ret] = '\0';
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
 		std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
 		std::cout << "Msg : " << '[' << buf << ']' << std::endl;
 		std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
-		iter++;
 	}
 	return ;
 }
 
-void	Server::sendClient(Client& client_session)
+void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
-	(void)client_session;
+	std::cout << "sendPacket Called " << std::endl;
+	std::cout << "sendPacket : " << '[' << iter->second->getSendBuf() << ']' << std::endl;
+	unsigned char	buf[BUFFER_MAX];
+	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
+	// buf[iter->second->getSendBuf().length()] = '\0';
+	std::cout << "sendPacket buf : " << '[' << buf << ']' << std::endl;
+	int	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
+	if (send_ret == -1)
+	{
+		iter->second->setDisconnectFlag(true);
+		return ;
+	}
+	//iter->second->getSendBuf().erase(0, send_ret);
+	iter->second->getSendBuf().clear();
 	return ;
 }
 
@@ -354,7 +361,6 @@ void	Server::packetMarshalling(void)
 {
 	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 	{
-		// std::cout << "client : " << iter->first << std::endl;
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			std::cout << "client : " << iter->first << "\n" << "packet_marshalling" << std::endl;
@@ -378,11 +384,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	std::string	param;
 
 	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
-	{
-		std::cout << "before : " << '[' << packet_buf << ']' << std::endl;
 		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
-		std::cout << "after  : " << '[' << packet_buf << ']' << std::endl;
-	}
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));
@@ -390,12 +392,29 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	}
 	std::cout << "command : " << '<' << command << '>' << std::endl;
 	std::cout << "param : " << '<' << param << '>' << std::endl;
-
 	//PASS에 대한 처리
-	if (iter->second->isSetPass() == false)
+	if (iter->second->getPassFlag() == false)
 	{
-		insertSendBuffer(iter->second, "you have to input password");
+		requestAuth(iter, command, param);
+		//TODO : 커맨드 확인, 패스워드 확인, 플래그 변경, 틀린경우 샌드 데이터 버퍼에 데이터 삽입
 	}
+	//NICK에 대한 처리
+
+	//USER_NAMe에 대한 처리
+	return ;
+}
+
+void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
+{
+	if (command != "PASS")
+	{
+		insertSendBuffer(iter->second, "ex) <PASS> <password>\n");
+		return ;
+	}
+	if (this->raw_pwd_ == param)
+		iter->second->setPassFlag(true);
+	else
+		insertSendBuffer(iter->second, "Wrong password.\n");
 	return ;
 }
 
@@ -408,5 +427,13 @@ void	Server::Run(void)
 {
 	networkProcess();
 	packetMarshalling();
+	//TODO : map loop -> disconnect flag check -> close process
+	// {
+		// std::cout << iter->first << " : Disconnected" << std::endl;
+		// close(iter->first);
+		// delete iter->second;
+		// iter = client_map_.erase(iter);
+		// sock_count -= 1;
+	// }
 	return ;
 }
