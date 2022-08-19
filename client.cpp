@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 17:02:07 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 06:42:13 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,18 @@ bool	Client::getPassFlag(void) const
 bool	Client::getNickFlag(void) const
 {
 	return (this->nick_flag);
+}
+
+void	Client::setNickName(bool flag, std::string& nickname)
+{
+	this->nick_flag = flag;
+	this->nick_name_ = nickname;
+	return ;
+}
+
+std::string&	Client::getNickName(void)
+{
+	return (this->nick_name_);
 }
 
 bool	Client::getUserNameFlag(void) const

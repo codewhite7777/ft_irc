@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 17:01:28 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 06:42:18 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,27 @@ public:
 	Client(SOCKET s);
 	~Client(void);
 
-	//client getter
+	//client socket
 	SOCKET&			getSocket(void);
+
+	//client network buf
 	std::string&	getSendBuf(void);
 	std::string&	getRecvBuf(void);
+
+	//client disconnect getter/setter
 	bool			getDisconnectFlag(void) const;
 	void			setDisconnectFlag(bool flag);
+
+	//client pass getter/setter
 	void			setPassFlag(bool flag);
 	bool			getPassFlag(void) const;
+
+	//client nickname getter/setter
 	bool			getNickFlag(void) const;
+	void			setNickName(bool flag, std::string& nickname);
+	std::string&	getNickName(void);
+
+	//
 	bool			getUserNameFlag(void) const;
 	bool			getOperatorFlag(void) const;
 };

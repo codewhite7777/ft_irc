@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 05:14:19 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 14:46:19 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,11 +329,11 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 	{
 		buf[recv_ret] = '\0';
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-		std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
-		std::cout << "Msg : " << '[' << buf << ']' << std::endl;
-		std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
-		for(int i=0; i<recv_ret; i++)
-			std::cout << '[' << (int)buf[i] << ']' << ',' << '[' << buf[i] << ']' << std::endl;
+		// std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
+		// std::cout << "Msg : " << '[' << buf << ']' << std::endl;
+		// std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
+		// for(int i=0; i<recv_ret; i++)
+			// std::cout << '[' << (int)buf[i] << ']' << ',' << '[' << buf[i] << ']' << std::endl;
 	}
 	return ;
 }
@@ -376,11 +376,9 @@ void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 	return ;
 }
 
-void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
+std::string	Server::packetTrim(std::string& packet)
 {
-	std::string	packet_buf = iter->second->getRecvBuf();
-	std::string	command;
-	std::string	param;
+	std::string	packet_buf = packet;
 
 	//erase newline
 	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
@@ -390,25 +388,37 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		if (packet_buf.find('\r') != std::string::npos && packet_buf.length() > 1)
 			packet_buf.erase(packet_buf.begin() + packet_buf.find('\r'));
 	}
+	return (packet_buf);
+}
+
+void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
+{
+	std::string	packet_buf;
+	std::string	command;
+	std::string	param;
+
+	packet_buf = packetTrim(iter->second->getRecvBuf());
+	std::cout << "packet : " << "[" << packet_buf << "]" << std::endl;
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));
 		param = packet_buf.substr(packet_buf.find(' ') + 1);
 	}
-	std::cout << "command : " << '<' << command << '>' << std::endl;
-	std::cout << "param : " << '<' << param << '>' << std::endl;
-	//PASS에 대한 처리
+	//request PASS
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
-	// if (iter->second->getNickFlag() == false)
-		// requestSetNickName(iter, command, param);
-	//NICK에 대한 처리
-
-	//USER_NAMe에 대한 처리
+	else
+	{
+		//request NICK
+		requestSetNickName(iter, command, param);
+		//request USER
+		// request
+	}
 	return ;
 }
 
-void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
+void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
+							std::string& command, std::string& param)
 {
 	if (command != "PASS")
 	{
@@ -419,10 +429,75 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, std::string&
 	{
 		iter->second->setPassFlag(true);
 		insertSendBuffer(iter->second, "info) Successful Authentication.\n");
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << iter->first << " Client Successful Authentication." << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
 	}
 	else
 		insertSendBuffer(iter->second, "info) Wrong password.\n");
 	return ;
+}
+
+void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	bool	setFlag;
+
+	setFlag = false;
+	//닉네임 인증을 받지 않은 상태
+	if (iter->second->getNickFlag() == false)
+	{
+		//커맨드 확인
+		if (command != "NICK")
+		{
+			insertSendBuffer(iter->second, "ex) <NICK> <nickname>\n");
+			return ;
+		}
+		//닉네임 중복 확인
+		if (isOverlapNickName(param) == true)
+		{
+			insertSendBuffer(iter->second, "info) This nickname is already taken.\n");
+			return ;
+		}
+		setFlag = true;
+	}
+	//닉네임을 재 설정하는 상태
+	//TODO	1) 첫번째 커맨드가 자신의 닉네임
+	//		2) 두번째 닉네임에 NICK
+	//		3) 세번째 바꾸고자 하는 닉네임이 중복되면 안된다.
+	// if (isResetNickName(param) == true)
+		// setFlag = true;
+	if (setFlag)
+	{
+		iter->second->setNickName(true, param);
+		insertSendBuffer(iter->second, "info) Successful nickname.\n");
+		insertSendBuffer(iter->second, "info) Nick Name : " + iter->second->getNickName() + "\n");
+
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << iter->first << " Client Successful Set NickName" << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
+	}
+	return ;
+}
+
+bool	Server::isResetNickName(std::string& param)
+{
+	(void)param;
+	//닉네임을 재 설정하는 상태
+	//TODO	1) 첫번째 커맨드가 자신의 닉네임
+	//		2) 두번째 닉네임에 NICK
+	//		3) 세번째 바꾸고자 하는 닉네임이 중복되면 안된다.
+	return (true);
+}
+
+bool	Server::isOverlapNickName(std::string& search_nick)
+{
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		if (iter->second->getNickName() == search_nick)
+			return (true);
+	}
+	return (false);
 }
 
 void	Server::clientDisconnect(void)
