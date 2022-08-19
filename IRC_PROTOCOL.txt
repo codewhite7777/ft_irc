@@ -151,7 +151,7 @@
    If the client sending the OPER command supplies the correct password
    for the given user, the server then informs the rest of the network
    of the new operator by issuing a "MODE +o" for the clients nickname.
-   만약에...
+   
 
    The OPER message is client-server only.
    OPER 명령은 클라이언트-서버 전용입니다.

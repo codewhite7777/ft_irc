@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 06:42:18 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 16:17:13 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ private:
 	SOCKET		client_sock_;	//network socket
 	std::string	nick_name_;
 	std::string	user_name_;
-	bool		disconnect_flag;
-	bool		pass_flag;
-	bool		nick_flag;
-	bool		user_flag;
-	bool		operator_flag;
+	bool		disconnect_flag_;
+	bool		pass_flag_;
+	bool		nick_flag_;
+	bool		user_flag_;
+	bool		operator_flag_;
 public:
 	Client(SOCKET s);
 	~Client(void);

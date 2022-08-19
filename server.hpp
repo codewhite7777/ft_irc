@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 13:35:26 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 16:16:34 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ private:
 	std::string					s_ip_;
 
 	//client
-	unsigned int				sock_count;
+	unsigned int				sock_count_;
 	std::map<SOCKET, Client *>	client_map_;
 	fd_set						read_set_;
 	fd_set						write_set_;

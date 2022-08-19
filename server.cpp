@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 14:46:19 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 16:20:55 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <cstring>
 
 Server::Server(int argc, char *argv[])
-	: status_(true), sock_count(0)
+	: status_(true), sock_count_(0)
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -209,7 +209,7 @@ void	Server::networkInit(void)
 	}
 
 	//client count
-	sock_count += 1;
+	sock_count_ += 1;
 
 	std::cout << "IRC Server started" << std::endl;
 	return ;
@@ -290,7 +290,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 		return ;
 
 	//select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
-	if (sock_count >= FD_SETSIZE)
+	if (sock_count_ >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
@@ -306,7 +306,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 	client_map_.insert(std::make_pair(client_sock, new_client));
 
 	//client count
-	sock_count += 1;
+	sock_count_ += 1;
 
 	//display client network info
 	std::cout << "-------------------" << std::endl;
@@ -510,7 +510,7 @@ void	Server::clientDisconnect(void)
 			close(iter->first);
 			delete iter->second;
 			iter = client_map_.erase(iter);
-			sock_count -= 1;
+			sock_count_ -= 1;
 		}
 		else
 			iter++;
