@@ -6,36 +6,44 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 15:22:31 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 18:57:54 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRC_PROTOCOL_HPP
 # define IRC_PROTOCOL_HPP
-//-------------------------------------------------------
-//|						PASS							|
-//-------------------------------------------------------
 
-// 461     ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
-// Returned by the server by numerous commands to indicate to the client that
-// it didn't supply enough parameters.
-#define ERR_NEEDMOREPARAMS "461"
+// RPL
+# define RPL_NONE "300"
+# define RPL_AWAY "301"
+# define RPL_TOPIC "332"
+# define RPL_INVITING "341"
+# define RPL_YOUREOPER "381"
 
-// 462     ERR_ALREADYREGISTRED ":You may not reregister"
-// Returned by the server to any link which tries to change part of the registered details
-// (such as password or user details from second USER message).
-#define ERR_ALREADYREGISTRED "462"
-
-
-#define ERR_PASSWDMISMATCH "464"
-// 464    ERR_PASSWDMISMATCH ":Password incorrect"
-//Returned to indicate a failed attempt at registering
-//a connection for which a password was required and
-//was either not given or incorrect.
-
-
-//-------------------------------------------------------
-//|						-							|
-//-------------------------------------------------------
+// ERR
+# define ERR_NOSUCHNICK "401"
+# define ERR_NOSUCHCHANNEL "403"
+# define ERR_CANNOTSENDTOCHAN "404"
+# define ERR_TOOMANYCHANNELS "405"
+# define ERR_TOOMANYTARGETS "407"
+# define ERR_NORECIPIENT "411"
+# define ERR_NOTEXTTOSEND "412"
+# define ERR_NOTOPLEVEL "413"
+# define ERR_WILDTOPLEVEL "414"
+# define ERR_NONICKNAMEGIVEN "431"
+# define ERR_ERRONEUSNICKNAME "432"
+# define ERR_NICKNAMEINUSE "433"
+# define ERR_NICKCOLLISION "436"
+# define ERR_NOTONCHANNEL "442"
+# define ERR_USERONCHANNEL "443"
+# define ERR_NEEDMOREPARAMS "461"
+# define ERR_ALREADYREGISTRED "462"
+# define ERR_PASSWDMISMATCH "464"
+# define ERR_CHANNELISFULL "471"
+# define ERR_INVITEONLYCHAN "473"
+# define ERR_BANNEDFROMCHAN "474"
+# define ERR_BADCHANNELKEY "475"
+# define ERR_CHANOPRIVSNEEDED "482"
+# define ERR_NOOPERHOST "491"
 
 #endif

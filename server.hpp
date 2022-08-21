@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 14:30:19 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 19:15:37 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ public:
 	//packet request :: NICK
 	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
-	bool		isResetNickName(std::string& param);
 	bool		isOverlapNickName(std::string& search_nick);
 
 	//disconnect client
@@ -116,8 +115,8 @@ public:
 
 private:
 	void		insertSendBuffer(Client* target_client, const std::string& msg);
-	std::string	buildErrReplyPacket(std::string errCode, std::string user_name, std::string replies);
-
+	std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
+	std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
 };
 
 #endif

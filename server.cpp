@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 17:12:15 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 19:19:35 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,10 +373,17 @@ void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 	return ;
 }
 
-std::string	Server::buildErrReplyPacket(std::string err_code, std::string user_name, std::string replies)
+std::string	Server::buildErrPacket(std::string err_code, std::string user_name, std::string err_msg)
 {
 	std::string	packet;
-	packet = err_code + " " + user_name + " " + replies;
+	packet = err_code + " " + user_name + " " + err_msg;
+	return (packet);
+}
+
+std::string	Server::buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg)
+{
+	std::string	packet;
+	packet = reply_code + " " + user_name + " " + reply_msg;
 	return (packet);
 }
 
@@ -408,6 +415,11 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		command = packet_buf.substr(0, packet_buf.find(' '));
 		param = packet_buf.substr(packet_buf.find(' ') + 1);
 	}
+	else
+	{
+		command = "";
+		param = packet_buf;
+	}
 	//request PASS
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
@@ -426,19 +438,19 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 {
 	if (command != "PASS")
 	{
-		insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <PASS> <password>\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <PASS> <password>\r\n"));
 		return ;
 	}
 	if (this->raw_pwd_ == param)
 	{
 		iter->second->setPassFlag(true);
-		insertSendBuffer(iter->second, "info) Successful Authentication.\n");
+		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", ":info) Successful Authentication.\r\n"));
 		std::cout << "-----------------------------------" << std::endl;
 		std::cout << iter->first << " Client Successful Authentication." << std::endl;
 		std::cout << "-----------------------------------" << std::endl;
 	}
 	else
-		insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":info> Wrong password\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":info> Wrong password\r\n"));
 	return ;
 }
 
@@ -454,44 +466,33 @@ void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 		//커맨드 확인
 		if (command != "NICK")
 		{
-			insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
+			insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
 			return ;
 		}
 		//닉네임 중복 확인
 		if (isOverlapNickName(param) == true)
 		{
-			insertSendBuffer(iter->second, "info) This nickname is already taken.\n");
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
+			return ;
+		}
+		//유효하지 않은 닉네임
+		if (param == "\"\"")
+		{
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
 			return ;
 		}
 		setFlag = true;
 	}
-	//닉네임을 재 설정하는 상태
-	//TODO	1) 첫번째 커맨드가 자신의 닉네임
-	//		2) 두번째 닉네임에 NICK
-	//		3) 세번째 바꾸고자 하는 닉네임이 중복되면 안된다.
-	// if (isResetNickName(param) == true)
-		// setFlag = true;
 	if (setFlag)
 	{
 		iter->second->setNickName(true, param);
-		insertSendBuffer(iter->second, "info) Successful nickname.\n");
-		insertSendBuffer(iter->second, "info) Nick Name : " + iter->second->getNickName() + "\n");
-
+		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
+		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
 		std::cout << "-----------------------------------" << std::endl;
 		std::cout << iter->first << " Client Successful Set NickName" << std::endl;
 		std::cout << "-----------------------------------" << std::endl;
 	}
 	return ;
-}
-
-bool	Server::isResetNickName(std::string& param)
-{
-	(void)param;
-	//닉네임을 재 설정하는 상태
-	//TODO	1) 첫번째 커맨드가 자신의 닉네임
-	//		2) 두번째 닉네임에 NICK
-	//		3) 세번째 바꾸고자 하는 닉네임이 중복되면 안된다.
-	return (true);
 }
 
 bool	Server::isOverlapNickName(std::string& search_nick)
