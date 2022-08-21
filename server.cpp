@@ -323,6 +323,9 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
+	// for (int i = 0 ; i < recv_ret ; ++i)
+	// 	printf(" %d", buf[i]);
+	// printf("\n");
 	//disconnect
 	if (recv_ret == 0)
 		iter->second->setDisconnectFlag(true);
@@ -342,9 +345,10 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	std::cout << "sendPacket Called " << std::endl;
 	std::cout << "sendPacket : " << '[' << iter->second->getSendBuf() << ']' << std::endl;
 	unsigned char	buf[BUFFER_MAX];
-	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
+	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().size() + 1);
 	// buf[iter->second->getSendBuf().length()] = '\0';
 	std::cout << "sendPacket buf : " << '[' << buf << ']' << std::endl;
+	std::cout << "size test:" << strlen(reinterpret_cast<char *>(buf)) << ' ' << iter->second->getSendBuf().size() << '\n';
 	int	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 	{
@@ -373,6 +377,9 @@ void	Server::packetMarshalling(void)
 
 void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 {
+	std::cout << "TEST\n";
+	std::cout << target_client->getSendBuf().size() << ' ' << target_client->getSendBuf()<<'\n';
+	std::cout << "TEST\n";
 	target_client->getSendBuf().append(msg);
 	return ;
 }
@@ -385,13 +392,18 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 
 	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
 		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
+
+	std::cout << "packetBUF: ({" << packet_buf << "})\n";
+
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));
 		param = packet_buf.substr(packet_buf.find(' ') + 1);
 	}
-	std::cout << "command : " << '<' << command << '>' << std::endl;
-	std::cout << "param : " << '<' << param << '>' << std::endl;
+
+	std::cout << "command : " << '(' << command << ')' << std::endl;
+	std::cout << "param : " << '(' << param << ')' << std::endl;
+
 	//PASS에 대한 처리
 	if (iter->second->getPassFlag() == false)
 	{
@@ -399,8 +411,26 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		//TODO : 커맨드 확인, 패스워드 확인, 플래그 변경, 틀린경우 샌드 데이터 버퍼에 데이터 삽입
 	}
 	//NICK에 대한 처리
+	else if (iter->second->getNickFlag() == false)
+	{
+		nickSetting(iter, command, param);
+	}
 
 	//USER_NAMe에 대한 처리
+	else if (iter->second->getUserNameFlag() == false)
+	{
+		userSetting(iter, command, param);
+		std::cout << "welcome msg\n";
+		std::string msg = "001 hena :welcome to the Internet Relay Network \r\n";
+		// msg += "";
+		// msg += "\r\n";
+		std::cout << msg << '\n';
+		insertSendBuffer(iter->second, msg);
+	}
+	else {
+		if (command == "JOIN")
+			joinChannel(iter, command, param);
+	}
 	return ;
 }
 
@@ -411,10 +441,54 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, std::string&
 		insertSendBuffer(iter->second, "ex) <PASS> <password>\n");
 		return ;
 	}
+	std::cout << "PASS TEST size: " << param.size() << "PASS PARAM: " << param << '\n';
+	param.pop_back();
 	if (this->raw_pwd_ == param)
 		iter->second->setPassFlag(true);
 	else
 		insertSendBuffer(iter->second, "Wrong password.\n");
+	return ;
+}
+
+void	Server::nickSetting(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
+{
+	std::cout << "NICK CHECK---------------------\n";
+	if (command != "NICK")
+	{
+		insertSendBuffer(iter->second, "ex) <NICK> <parameter>\r\n");
+		return ;
+	}
+	if (param.size() > 10)
+	{
+		insertSendBuffer(iter->second, "Too Long Nickname\r\n");
+		return ;
+	}
+	iter->second->setNickFlag(true, param);
+	std::cout << iter->second->getNickFlag() << '\n';
+	return ;
+}
+
+void	Server::userSetting(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
+{
+	std::cout << "USER CHECK---------------------\n";
+	if (command != "USER")
+		return ;
+	param.pop_back();
+	iter->second->setUserFlag(true, param);
+	std::cout << iter->second->getUserNameFlag() << '\n';
+	return ;
+}
+
+void	Server::joinChannel(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
+{
+	param = "";
+	if (command != "JOIN")
+		return ;
+	std::cout << "join\n";
+	std::string msg = "332 ";
+	msg += "hena ";
+	msg += ":waht asdfjhjksdf\r\n";
+	insertSendBuffer(iter->second, msg);
 	return ;
 }
 

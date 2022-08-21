@@ -77,6 +77,7 @@
 
       Command: USER
    Parameters: <username> <hostname> <servername> <realname>
+hena * mgo alee
 
    The USER message is used at the beginning of connection to specify
    the username, hostname, servername and realname of s new user.  It is

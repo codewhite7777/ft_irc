@@ -60,6 +60,20 @@ void	Client::setPassFlag(bool flag)
 	return ;
 }
 
+void	Client::setNickFlag(bool flag, std::string param)
+{
+	this->nick_flag = flag;
+	this->nick_name_ = param;
+	return ;
+}
+
+void	Client::setUserFlag(bool flag, std::string param)
+{
+	this->user_flag = flag;
+	this->user_name_ = param;
+	return ;
+}
+
 bool	Client::getPassFlag(void) const
 {
 	return (this->pass_flag);

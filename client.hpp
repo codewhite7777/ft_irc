@@ -13,6 +13,7 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 # include <iostream>
+#include <string>
 
 typedef int	SOCKET;
 
@@ -40,6 +41,8 @@ public:
 	bool			getDisconnectFlag(void) const;
 	void			setDisconnectFlag(bool flag);
 	void			setPassFlag(bool flag);
+	void			setNickFlag(bool flag, std::string param);
+	void			setUserFlag(bool flag, std::string param);
 	bool			getPassFlag(void) const;
 	bool			getNickFlag(void) const;
 	bool			getUserNameFlag(void) const;

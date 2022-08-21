@@ -97,7 +97,15 @@ public:
 	//
 	void	requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
+	void	nickSetting(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	void	userSetting(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 
+
+	// hena
+	void	joinChannel(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 	//status
 	bool	getStatus(void);
 
@@ -106,6 +114,7 @@ public:
 
 private:
 	void insertSendBuffer(Client* target_client, const std::string& msg);
+	
 };
 
 #endif
