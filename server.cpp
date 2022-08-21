@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 16:20:55 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 17:12:15 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <cstring>
+#include "irc_protocol.hpp"
 
 Server::Server(int argc, char *argv[])
 	: status_(true), sock_count_(0)
@@ -253,7 +254,7 @@ void	Server::networkProcess(void)
 	time_out.tv_sec = 0;
 	time_out.tv_usec = 0;
 
-	//select
+	//select(...)
 	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
 	if (select_result > 0)
 	{
@@ -264,7 +265,7 @@ void	Server::networkProcess(void)
 			if (select_result == 1)
 				return ;
 		}
-		//old client
+		//current client
 		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
@@ -289,17 +290,17 @@ void	Server::acceptClient(SOCKET listen_sock)
 	if (client_sock == -1)
 		return ;
 
-	//select에서 처리할 수 있는 최대 set의 개수를 넘어서는 경우 접속을 끊는다.
+	//if current client's counts are over select function's set socket max counts, accepted socket is closed.
 	if (sock_count_ >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
 	}
 
-	// set client_sock O_NONBLOCK
+	//set client_sock O_NONBLOCK
 	fcntl(client_sock, F_SETFL, O_NONBLOCK);
 
-	//TODO : 클라이언트 세션 생성 및 데이터 초기화
+	//create client session
 	Client*	new_client = new Client(client_sock);
 
 	//push client socket
@@ -340,12 +341,8 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 
 void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
-	// std::cout << "sendPacket Called " << std::endl;
-	// std::cout << "sendPacket : " << '[' << iter->second->getSendBuf() << ']' << std::endl;
 	unsigned char	buf[BUFFER_MAX];
 	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
-	// buf[iter->second->getSendBuf().length()] = '\0';
-	// std::cout << "sendPacket buf : " << '[' << buf << ']' << std::endl;
 	int	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 	{
@@ -374,6 +371,13 @@ void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 {
 	target_client->getSendBuf().append(msg);
 	return ;
+}
+
+std::string	Server::buildErrReplyPacket(std::string err_code, std::string user_name, std::string replies)
+{
+	std::string	packet;
+	packet = err_code + " " + user_name + " " + replies;
+	return (packet);
 }
 
 std::string	Server::packetTrim(std::string& packet)
@@ -422,7 +426,7 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 {
 	if (command != "PASS")
 	{
-		insertSendBuffer(iter->second, "ex) <PASS> <password>\n");
+		insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <PASS> <password>\r\n"));
 		return ;
 	}
 	if (this->raw_pwd_ == param)
@@ -434,7 +438,7 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 		std::cout << "-----------------------------------" << std::endl;
 	}
 	else
-		insertSendBuffer(iter->second, "info) Wrong password.\n");
+		insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":info> Wrong password\r\n"));
 	return ;
 }
 
@@ -450,7 +454,7 @@ void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 		//커맨드 확인
 		if (command != "NICK")
 		{
-			insertSendBuffer(iter->second, "ex) <NICK> <nickname>\n");
+			insertSendBuffer(iter->second, buildErrReplyPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
 			return ;
 		}
 		//닉네임 중복 확인

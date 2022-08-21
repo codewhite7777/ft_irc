@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 15:21:04 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 15:22:31 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,11 @@
 #define ERR_ALREADYREGISTRED "462"
 
 
-
+#define ERR_PASSWDMISMATCH "464"
+// 464    ERR_PASSWDMISMATCH ":Password incorrect"
+//Returned to indicate a failed attempt at registering
+//a connection for which a password was required and
+//was either not given or incorrect.
 
 
 //-------------------------------------------------------

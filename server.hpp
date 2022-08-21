@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 16:16:34 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 14:30:19 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,8 @@ public:
 
 private:
 	void		insertSendBuffer(Client* target_client, const std::string& msg);
+	std::string	buildErrReplyPacket(std::string errCode, std::string user_name, std::string replies);
+
 };
 
 #endif
