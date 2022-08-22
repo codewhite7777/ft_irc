@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 19:15:37 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 11:29:48 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,11 @@ public:
 	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 	bool		isOverlapNickName(std::string& search_nick);
+
+
+	//packet request :: USER
+	void	requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 
 	//disconnect client
 	void		clientDisconnect(void);

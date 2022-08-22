@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 19:19:35 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 15:26:39 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include <cstring>
 #include "irc_protocol.hpp"
+#include <sstream>
 
 Server::Server(int argc, char *argv[])
 	: status_(true), sock_count_(0)
@@ -420,15 +421,20 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		command = "";
 		param = packet_buf;
 	}
-	//request PASS
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
+	else if (iter->second->getNickFlag() == false)
+		requestSetNickName(iter, command, param);
+	else if (iter->second->getUserNameFlag() == false)
+	{
+		std::cout << "set : user name " << std::endl;
+		std::cout << "command : " << '[' << command << ']' << std::endl;
+		std::cout << "param : " << '[' << param << ']' << std::endl;
+		requestSetUserName(iter, command, param);
+	}
 	else
 	{
-		//request NICK
-		requestSetNickName(iter, command, param);
-		//request USER
-		// request
+		//모든 인증을 다 받은 상태
 	}
 	return ;
 }
@@ -457,41 +463,31 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	bool	setFlag;
+	//커맨드 확인
+	if (command != "NICK")
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
+		return ;
+	}
+	//닉네임 중복 확인
+	if (isOverlapNickName(param) == true)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
+		return ;
+	}
+	//유효하지 않은 닉네임
+	if (param == "\"\"")
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
+		return ;
+	}
 
-	setFlag = false;
-	//닉네임 인증을 받지 않은 상태
-	if (iter->second->getNickFlag() == false)
-	{
-		//커맨드 확인
-		if (command != "NICK")
-		{
-			insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
-			return ;
-		}
-		//닉네임 중복 확인
-		if (isOverlapNickName(param) == true)
-		{
-			insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
-			return ;
-		}
-		//유효하지 않은 닉네임
-		if (param == "\"\"")
-		{
-			insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
-			return ;
-		}
-		setFlag = true;
-	}
-	if (setFlag)
-	{
-		iter->second->setNickName(true, param);
-		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
-		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << iter->first << " Client Successful Set NickName" << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-	}
+	iter->second->setNickName(true, param);
+	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
+	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
+	std::cout << "-----------------------------------" << std::endl;
+	std::cout << iter->first << " Client Successful Set NickName" << std::endl;
+	std::cout << "-----------------------------------" << std::endl;
 	return ;
 }
 
@@ -503,6 +499,26 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 			return (true);
 	}
 	return (false);
+}
+
+void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	std::string	user;
+	std::string	mode;
+	std::string	unused;
+	std::string	realname;
+
+	if (command != "USER")
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
+		return ;
+	}
+	else
+	{
+		(void)param;
+	}
+	return ;
 }
 
 void	Server::clientDisconnect(void)
