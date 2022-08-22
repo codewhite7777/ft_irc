@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 19:38:26 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 20:31:41 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # define ERR_NOTEXTTOSEND "412"
 # define ERR_NOTOPLEVEL "413"
 # define ERR_WILDTOPLEVEL "414"
+# define ERR_UNKNOWNCOMMAND "421"
 # define ERR_NONICKNAMEGIVEN "431"
 # define ERR_ERRONEUSNICKNAME "432"
 # define ERR_NICKNAMEINUSE "433"

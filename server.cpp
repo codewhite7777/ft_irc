@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 19:48:45 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 22:52:27 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -429,9 +429,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	else if (iter->second->getUserNameFlag() == false)
 		requestSetUserName(iter, command, param);
 	else
-	{
-		//모든 인증을 다 받은 상태
-	}
+		requestCommand(iter, command, param);
 	return ;
 }
 
@@ -499,14 +497,13 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 
 std::vector<std::string> split(std::string str, char delimiter)
 {
-	std::vector<std::string> internal;
-	std::stringstream ss(str);
-	std::string temp;
+	std::vector<std::string>	internal;
+	std::stringstream			ss(str);
+	std::string					temp;
+
 	while (getline(ss, temp, delimiter))
-	{
 		internal.push_back(temp);
-	}
-	return internal;
+	return (internal);
 }
 
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
@@ -539,6 +536,27 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			#endif
 		}
 	}
+	return ;
+}
+
+void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	(void)param;
+	if (command == "PASS" || command == "USER")
+		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
+	else if (command == "JOIN")
+	{
+		std::cout << "command : join " << std::endl;
+	}
+	// else if (command == "PART")
+	// else if (command == "QUIT")
+	// else if (command == "PRIVMSG" || command == "NOTICE")
+	// else if (command == "OPER")
+	// else if (command == "KICK")
+	// else if (command == "INVITE")
+	else
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;
 }
 
