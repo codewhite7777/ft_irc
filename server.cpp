@@ -501,6 +501,19 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
+#include <vector>
+std::vector<std::string> split(std::string str, char delimiter) 
+{
+	std::vector<std::string> internal;
+	std::stringstream ss(str);
+	std::string temp;
+	while (getline(ss, temp, delimiter)) 
+	{
+		internal.push_back(temp);
+	}
+	return internal;
+}
+
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
@@ -516,7 +529,25 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 	}
 	else
 	{
-		(void)param;
+		std::vector<std::string> splitVector = split(param, ' ');
+		if (splitVector.size() != 4)
+		{
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
+			return ;
+		}
+		else 
+		{
+			user = splitVector[0];
+			mode = splitVector[1];
+			unused = splitVector[2];
+			realname = splitVector[3];
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
+
+			#ifdef DEBUG
+				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
+			#endif
+		}
 	}
 	return ;
 }
