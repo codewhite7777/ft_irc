@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 16:17:13 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 19:24:46 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,14 @@ private:
 	SOCKET		client_sock_;	//network socket
 	std::string	nick_name_;
 	std::string	user_name_;
+	std::string	mode_;
+	std::string	unused_;
+	std::string	user_real_name_;
 	bool		disconnect_flag_;
 	bool		pass_flag_;
 	bool		nick_flag_;
 	bool		user_flag_;
+	bool		user_real_name_flag_;
 	bool		operator_flag_;
 public:
 	Client(SOCKET s);
@@ -53,8 +57,22 @@ public:
 	void			setNickName(bool flag, std::string& nickname);
 	std::string&	getNickName(void);
 
-	//
+	//client user getter/setter
 	bool			getUserNameFlag(void) const;
+	void			setUserName(bool flag, std::string &username);
+	std::string&	getUserName(void);
+
+	//client user mode setter
+	void			setMode(std::string &mode);
+
+	//client user unused setter
+	void			setUnused(std::string &unused);
+
+	//client realname getter/setter
+	bool			getUserRealNameFlag(void) const;
+	void			setUserRealName(bool flag, std::string &realname);
+	std::string&	getUserRealName(void);
+
 	bool			getOperatorFlag(void) const;
 };
 

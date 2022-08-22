@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/08/19 16:17:13 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 19:25:29 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Client::Client(SOCKET s)
 	nick_flag_ = 0;
 	user_flag_ = 0;
 	operator_flag_ = 0;
+	user_real_name_flag_ = 0;
 	return ;
 }
 
@@ -85,6 +86,48 @@ std::string&	Client::getNickName(void)
 bool	Client::getUserNameFlag(void) const
 {
 	return (this->user_flag_);
+}
+
+
+void	Client::setUserName(bool flag, std::string &username)
+{
+	this->user_flag_ = flag;
+	this->user_name_ = username;
+	return ;
+}
+
+std::string&	Client::getUserName(void)
+{
+	return (this->user_name_);
+}
+
+void	Client::setMode(std::string &mode)
+{
+	this->mode_ = mode;
+	return ;
+}
+
+void	Client::setUnused(std::string &unused)
+{
+	this->unused_ = unused;
+	return ;
+}
+
+bool	Client::getUserRealNameFlag(void) const
+{
+	return (this->user_real_name_flag_);
+}
+
+void	Client::setUserRealName(bool flag, std::string &realname)
+{
+	this->user_real_name_flag_ = flag;
+	this->user_real_name_ = realname;
+	return ;
+}
+
+std::string&	Client::getUserRealName(void)
+{
+	return (this->user_real_name_);
 }
 
 bool	Client::getOperatorFlag(void) const

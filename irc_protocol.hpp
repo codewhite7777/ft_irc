@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/08/21 18:57:54 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 19:38:26 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define IRC_PROTOCOL_HPP
 
 // RPL
+# define RPL_WELCOME "001"
 # define RPL_NONE "300"
 # define RPL_AWAY "301"
 # define RPL_TOPIC "332"

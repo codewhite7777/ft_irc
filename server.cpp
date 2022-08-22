@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 15:26:39 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 19:48:45 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <cstring>
 #include "irc_protocol.hpp"
 #include <sstream>
+#include <vector>
 
 Server::Server(int argc, char *argv[])
 	: status_(true), sock_count_(0)
@@ -426,12 +427,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	else if (iter->second->getNickFlag() == false)
 		requestSetNickName(iter, command, param);
 	else if (iter->second->getUserNameFlag() == false)
-	{
-		std::cout << "set : user name " << std::endl;
-		std::cout << "command : " << '[' << command << ']' << std::endl;
-		std::cout << "param : " << '[' << param << ']' << std::endl;
 		requestSetUserName(iter, command, param);
-	}
 	else
 	{
 		//모든 인증을 다 받은 상태
@@ -501,13 +497,12 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-#include <vector>
-std::vector<std::string> split(std::string str, char delimiter) 
+std::vector<std::string> split(std::string str, char delimiter)
 {
 	std::vector<std::string> internal;
 	std::stringstream ss(str);
 	std::string temp;
-	while (getline(ss, temp, delimiter)) 
+	while (getline(ss, temp, delimiter))
 	{
 		internal.push_back(temp);
 	}
@@ -517,11 +512,6 @@ std::vector<std::string> split(std::string str, char delimiter)
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::string	user;
-	std::string	mode;
-	std::string	unused;
-	std::string	realname;
-
 	if (command != "USER")
 	{
 		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
@@ -535,15 +525,15 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
 			return ;
 		}
-		else 
+		else
 		{
-			user = splitVector[0];
-			mode = splitVector[1];
-			unused = splitVector[2];
-			realname = splitVector[3];
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
-
+			iter->second->setUserName(true, splitVector[0]);
+			iter->second->setMode(splitVector[1]);
+			iter->second->setUnused(splitVector[2]);
+			iter->second->setUserRealName(true, splitVector[3]);
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
 			#ifdef DEBUG
 				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
 			#endif
@@ -574,6 +564,7 @@ bool	Server::getStatus(void)
 {
 	return (this->status_);
 }
+extern int g_count;
 
 void	Server::Run(void)
 {

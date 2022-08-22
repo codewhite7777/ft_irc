@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 11:29:48 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/22 19:42:53 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ typedef enum e_port
 
 typedef enum e_buf
 {
-	// BUFFER_MAX = 1024 << 4,
-	BUFFER_MAX = 100,
+	BUFFER_MAX = 1024 << 4,
+	// BUFFER_MAX = 100,
 }			t_buf;
 
 class Server
