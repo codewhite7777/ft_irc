@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 17:01:28 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/19 16:17:13 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,38 @@ private:
 	SOCKET		client_sock_;	//network socket
 	std::string	nick_name_;
 	std::string	user_name_;
-	bool		disconnect_flag;
-	bool		pass_flag;
-	bool		nick_flag;
-	bool		user_flag;
-	bool		operator_flag;
+	bool		disconnect_flag_;
+	bool		pass_flag_;
+	bool		nick_flag_;
+	bool		user_flag_;
+	bool		operator_flag_;
 public:
 	Client(SOCKET s);
 	~Client(void);
 
-	//client getter
+	//client socket
 	SOCKET&			getSocket(void);
+
+	//client network buf
 	std::string&	getSendBuf(void);
 	std::string&	getRecvBuf(void);
+
+	//client disconnect getter/setter
 	bool			getDisconnectFlag(void) const;
 	void			setDisconnectFlag(bool flag);
+
+	//client pass getter/setter
 	void			setPassFlag(bool flag);
 	void			setNickFlag(bool flag, std::string param);
 	void			setUserFlag(bool flag, std::string param);
 	bool			getPassFlag(void) const;
+
+	//client nickname getter/setter
 	bool			getNickFlag(void) const;
+	void			setNickName(bool flag, std::string& nickname);
+	std::string&	getNickName(void);
+
+	//
 	bool			getUserNameFlag(void) const;
 	bool			getOperatorFlag(void) const;
 };

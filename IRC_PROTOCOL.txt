@@ -1,9 +1,8 @@
 //===================================================================================================
 4.1.1 Password message
 
-
-      Command: PASS
-      명령 : PASS
+   Command: PASS
+   명령 : PASS
    Parameters: <password>
    명령 인자 : <password>
 
@@ -42,20 +41,36 @@
 //===================================================================================================
 4.1.2 Nick message
 
-      Command: NICK
+   Command: NICK
+   명령 : NICK
    Parameters: <nickname> [ <hopcount> ]
+   명령 인자 : <nickname>
 
    NICK message is used to give user a nickname or change the previous
-   one.  The <hopcount> parameter is only used by servers to indicate
-   how far away a nick is from its home server.  A local connection has
-   a hopcount of 0.  If supplied by a client, it must be ignored.
+   one.
+   NICK 명령은 유저의 닉네임을 설정 또는 이전의 닉네임을 변경하기 위해 사용됩니다.
+
+   The <hopcount> parameter is only used by servers to indicate
+   how far away a nick is from its home server.
+   hopcount 인자는 닉네임을 가진 유저가 서버로부터 얼마나 떨어져 있는지 나타나기 위해서만 사용됩니다.
+
+   A local connection has a hopcount of 0.
+   로컬 연결은 0의 hopcount를 가집니다.
+
+   If supplied by a client, it must be ignored.
+   클라이언트에서 제공되는 경우, 이 값은 무시됩니다.
 
    If a NICK message arrives at a server which already knows about an
    identical nickname for another client, a nickname collision occurs.
+   서버에 이미 존재하는 클라이언트의 닉네임에 대해 동일한 닉네임이
+   NICK 메시지를 통해 서버에 도착하면, 닉네임 충돌이 발생합니다.
+
    As a result of a nickname collision, all instances of the nickname
    are removed from the server's database, and a KILL command is issued
-   to remove the nickname from all other server's database. If the NICK
-   message causing the collision was a nickname change, then the
+   to remove the nickname from all other server's database.
+   닉네임 충돌의 결과로, ??(해당 클라이언트의 정보가 사라지고 킬 명령어를 받는다?)
+
+   If the NICK message causing the collision was a nickname change, then the
    original (old) nick must be removed as well.
 
    If the server recieves an identical NICK from a client which is
@@ -75,13 +90,15 @@
 //===================================================================================================
 4.1.3 User message
 
-      Command: USER
+   Command: USER
+   명령 : USER
    Parameters: <username> <hostname> <servername> <realname>
-hena * mgo alee
+   명령 인자 : <username> <hostname> <servername> <realname>
 
    The USER message is used at the beginning of connection to specify
-   the username, hostname, servername and realname of s new user.  It is
-   also used in communication between servers to indicate new user
+   the username, hostname, servername and realname of s new user.
+
+   It is also used in communication between servers to indicate new user
    arriving on IRC, since only after both USER and NICK have been
    received from a client does a user become registered.
 
@@ -121,18 +138,23 @@ hena * mgo alee
 //===================================================================================================
 4.1.5 Oper
 
-      Command: OPER
+   Command: OPER
    Parameters: <user> <password>
 
    OPER message is used by a normal user to obtain operator privileges.
+   OPER 명령은 일반 사용자가 운영자 권한을 얻기 위해 사용됩니다.
+
    The combination of <user> and <password> are required to gain
    Operator privileges.
+   운영자 권한을 얻기 위해서는 <user> <password> 형식의 입력이 필요합니다.
 
    If the client sending the OPER command supplies the correct password
    for the given user, the server then informs the rest of the network
    of the new operator by issuing a "MODE +o" for the clients nickname.
+   
 
    The OPER message is client-server only.
+   OPER 명령은 클라이언트-서버 전용입니다.
 
    Numeric Replies:
 
@@ -147,7 +169,7 @@ hena * mgo alee
 //===================================================================================================
 4.1.6 Quit
 
-      Command: QUIT
+   Command: QUIT
    Parameters: [<Quit message>]
 
    A client session is ended with a quit message.  The server must close
@@ -177,7 +199,7 @@ hena * mgo alee
 //===================================================================================================
 4.2.1 Join message
 
-      Command: JOIN
+   Command: JOIN
    Parameters: <channel>{,<channel>} [<key>{,<key>}]
 
    The JOIN command is used by client to start listening a specific
@@ -233,7 +255,7 @@ hena * mgo alee
 //===================================================================================================
 4.2.2 Part message
 
-      Command: PART
+   Command: PART
    Parameters: <channel>{,<channel>}
 
    The PART message causes the client sending the message to be removed
@@ -254,7 +276,7 @@ hena * mgo alee
 //===================================================================================================
 4.2.8 Kick command
 
-      Command: KICK
+   Command: KICK
    Parameters: <channel> <user> [<comment>]
 
    The KICK command can be  used  to  forcibly  remove  a  user  from  a
@@ -290,7 +312,7 @@ following:
 //===================================================================================================
 4.4.1 Private messages
 
-      Command: PRIVMSG
+   Command: PRIVMSG
    Parameters: <receiver>{,<receiver>} <text to be sent>
 
    PRIVMSG is used to send private messages between users.  <receiver>
@@ -337,7 +359,7 @@ PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
 //===================================================================================================
 4.4.2 Notice
 
-      Command: NOTICE
+   Command: NOTICE
    Parameters: <nickname> <text>
 
    The NOTICE message is used similarly to PRIVMSG.  The difference
@@ -355,7 +377,7 @@ PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
 //===================================================================================================
 4.6.1 Kill message
 
-      Command: KILL
+   Command: KILL
    Parameters: <nickname> <comment>
 
    The KILL message is used to cause a client-server connection to be

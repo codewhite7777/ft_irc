@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/18 17:27:47 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/21 14:30:19 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ private:
 	std::string					s_ip_;
 
 	//client
-	unsigned int				sock_count;
+	unsigned int				sock_count_;
 	std::map<SOCKET, Client *>	client_map_;
 	fd_set						read_set_;
 	fd_set						write_set_;
@@ -68,34 +68,35 @@ public:
 	~Server(void);
 
 	//configure port
-	bool	configPort(std::string port);
-	bool	isValidPort(std::string port);
-	bool	getPortNumber(const char *str, int *o_value);
-	t_port	getPortType(int value);
+	bool		configPort(std::string port);
+	bool		isValidPort(std::string port);
+	bool		getPortNumber(const char *str, int *o_value);
+	t_port		getPortType(int value);
 
 	//configure pwd
-	bool	configPwd(std::string pwd);
-	bool	isValidPwd(std::string pwd);
+	bool		configPwd(std::string pwd);
+	bool		isValidPwd(std::string pwd);
 
 	//network init, close
-	void	networkInit(void);
-	void	networkClose(void);
+	void		networkInit(void);
+	void		networkClose(void);
 
 	//select
-	int		getMaxFD(SOCKET sock);
+	int			getMaxFD(SOCKET sock);
 
 	//network process
-	void	networkProcess(void);
-	void	acceptClient(SOCKET listen_sock);
-	void	recvPacket(std::map<SOCKET, Client *>::iterator &iter);
-	void	sendPacket(std::map<SOCKET, Client *>::iterator &iter);
+	void		networkProcess(void);
+	void		acceptClient(SOCKET listen_sock);
+	void		recvPacket(std::map<SOCKET, Client *>::iterator &iter);
+	void		sendPacket(std::map<SOCKET, Client *>::iterator &iter);
 
 	//network packet marshalling
-	void	packetMarshalling(void);
-	void	packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
+	void		packetMarshalling(void);
+	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
+	std::string	packetTrim(std::string& packet);
 
-	//
-	void	requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
+	//packet request :: PASS
+	void		requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 	void	nickSetting(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
@@ -106,15 +107,25 @@ public:
 	// hena
 	void	joinChannel(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
+	//packet request :: NICK
+	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	bool		isResetNickName(std::string& param);
+	bool		isOverlapNickName(std::string& search_nick);
+
+	//disconnect client
+	void		clientDisconnect(void);
+
 	//status
-	bool	getStatus(void);
+	bool		getStatus(void);
 
 	//run
-	void	Run(void);
+	void		Run(void);
 
 private:
-	void insertSendBuffer(Client* target_client, const std::string& msg);
-	
+	void		insertSendBuffer(Client* target_client, const std::string& msg);
+	std::string	buildErrReplyPacket(std::string errCode, std::string user_name, std::string replies);
+
 };
 
 #endif
