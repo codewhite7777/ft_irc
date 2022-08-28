@@ -19,7 +19,10 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <cstring>
+#include "client.hpp"
 #include "irc_protocol.hpp"
+
+#include "channel.hpp"
 
 Server::Server(int argc, char *argv[])
 	: status_(true), sock_count_(0)
@@ -375,9 +378,7 @@ void	Server::packetMarshalling(void)
 
 void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 {
-	std::cout << "TEST\n";
 	std::cout << target_client->getSendBuf().size() << ' ' << target_client->getSendBuf()<<'\n';
-	std::cout << "TEST\n";
 	target_client->getSendBuf().append(msg);
 	return ;
 }
@@ -402,6 +403,18 @@ std::string	Server::packetTrim(std::string& packet)
 			packet_buf.erase(packet_buf.begin() + packet_buf.find('\r'));
 	}
 	return (packet_buf);
+}
+
+void	Server::privMessage(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	if (command != "PRIVMSG")
+		return ;
+	std::cout << "PRIVMSG\n";
+	std::string msg = "hena!hena@ircserv 301 test :";
+	msg += param + "\r\n";
+	insertSendBuffer(iter->second, msg);
+	return ;
 }
 
 void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
@@ -445,7 +458,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	{
 		userSetting(iter, command, param);
 		std::cout << "welcome msg\n";
-		std::string msg = "001 hena :welcome to the Internet Relay Network \r\n";
+		std::string msg = ":ircserv 001 hena :welcome to the Internet Relay Network\r\n";
 		// msg += "";
 		// msg += "\r\n";
 		std::cout << msg << '\n';
@@ -454,6 +467,8 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	else {
 		if (command == "JOIN")
 			joinChannel(iter, command, param);
+		if (command == "PRIVMSG")
+			privMessage(iter, command, param);
 	}
 	return ;
 }
@@ -569,7 +584,7 @@ void	Server::nickSetting(std::map<SOCKET, Client*>::iterator &iter, std::string&
 		insertSendBuffer(iter->second, "ex) <NICK> <parameter>\r\n");
 		return ;
 	}
-	if (param.size() > 10)
+	if (param.size() > 50)
 	{
 		insertSendBuffer(iter->second, "Too Long Nickname\r\n");
 		return ;
@@ -590,15 +605,33 @@ void	Server::userSetting(std::map<SOCKET, Client*>::iterator &iter, std::string&
 	return ;
 }
 
+
 void	Server::joinChannel(std::map<SOCKET, Client*>::iterator &iter, std::string& command, std::string& param)
 {
-	param = "";
+	(void) iter;
 	if (command != "JOIN")
 		return ;
-	std::cout << "join\n";
-	std::string msg = "332 ";
-	msg += "hena ";
-	msg += ":waht asdfjhjksdf\r\n";
+	std::cout << "join TEST\n";
+	std::cout << "command: " << command << ' ' <<"param:" << param << '\n';
+
+	
+	// if (param.size() && param[0] == '#')
+	// {
+	// 	IsExistChannel(param);
+	// }
+	// std::string msg = ":ircserv 332 ";
+	// msg += "hena ";
+	// msg += ":waht asdfjhjksdf\r\n";
+	std::string msg = "hena!hena@ircserv JOIN #asdf\r\n";
+	insertSendBuffer(iter->second, msg);
+	// msg = ":ircserv 332 hena #test :TEST1\r\n";
+	// insertSendBuffer(iter->second, msg);
+	// msg = ":ircserv 353 hena = #test :@hena\r\n";
+	// insertSendBuffer(iter->second, msg);
+	// msg = ":ircserv 366 hena #test :End of Names list\r\n";
+	// insertSendBuffer(iter->second, msg);
+	msg = "hena!hena@ircserv PRIVMSG #asdf :";
+	msg += "JOIN hi\r\n";
 	insertSendBuffer(iter->second, msg);
 	return ;
 }

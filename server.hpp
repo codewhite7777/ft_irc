@@ -36,8 +36,8 @@ typedef enum e_port
 
 typedef enum e_buf
 {
-	// BUFFER_MAX = 1024 << 4,
-	BUFFER_MAX = 100,
+	BUFFER_MAX = 1024 << 4,
+	// BUFFER_MAX = 100,
 }			t_buf;
 
 class Server
@@ -106,6 +106,8 @@ public:
 
 	// hena
 	void	joinChannel(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	void	privMessage(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 	//packet request :: NICK
 	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
