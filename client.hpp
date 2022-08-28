@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 19:24:46 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 11:50:42 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ private:
 	std::string	mode_;
 	std::string	unused_;
 	std::string	user_real_name_;
+	std::string	host_name_;
 	bool		disconnect_flag_;
 	bool		pass_flag_;
 	bool		nick_flag_;
@@ -34,7 +35,7 @@ private:
 	bool		user_real_name_flag_;
 	bool		operator_flag_;
 public:
-	Client(SOCKET s);
+	Client(SOCKET s, std::string host_name);
 	~Client(void);
 
 	//client socket
@@ -72,6 +73,9 @@ public:
 	bool			getUserRealNameFlag(void) const;
 	void			setUserRealName(bool flag, std::string &realname);
 	std::string&	getUserRealName(void);
+
+	//client user host getter
+	std::string&	getHostName(void);
 
 	bool			getOperatorFlag(void) const;
 };

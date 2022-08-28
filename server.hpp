@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 20:21:02 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 11:51:34 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,6 @@
 # include <map>
 
 typedef int	SOCKET;
-
-/* ************************************************************************** */
-/*   멤버 변수                                                                */
-/*   Ex) int	value_;                                                       */
-/*       SOCKET	sock_;                                                        */
-/*                                                                            */
-/* ************************************************************************** */
 
 typedef enum e_port
 {
@@ -105,12 +98,17 @@ public:
 	bool		isOverlapNickName(std::string& search_nick);
 
 	//packet request :: USER
-	void	requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
+	void		requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
 	//packet request :: COMMAND
-	void	requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
+	void		requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
+
+	//packet request :: PRIVMSG
+	void		requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+
 
 	//disconnect client
 	void		clientDisconnect(void);
@@ -125,6 +123,8 @@ private:
 	void		insertSendBuffer(Client* target_client, const std::string& msg);
 	std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
 	std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
+	std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
+
 };
 
 #endif

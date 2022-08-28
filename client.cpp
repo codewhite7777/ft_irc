@@ -6,13 +6,13 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/08/22 19:25:29 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 11:50:38 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "client.hpp"
 
-Client::Client(SOCKET s)
+Client::Client(SOCKET s, std::string host_name)
 {
 	client_sock_ = s;
 	disconnect_flag_ = 0;
@@ -21,6 +21,7 @@ Client::Client(SOCKET s)
 	user_flag_ = 0;
 	operator_flag_ = 0;
 	user_real_name_flag_ = 0;
+	this->host_name_ = host_name;
 	return ;
 }
 
@@ -128,6 +129,11 @@ void	Client::setUserRealName(bool flag, std::string &realname)
 std::string&	Client::getUserRealName(void)
 {
 	return (this->user_real_name_);
+}
+
+std::string&	Client::getHostName(void)
+{
+	return (this->host_name_);
 }
 
 bool	Client::getOperatorFlag(void) const
