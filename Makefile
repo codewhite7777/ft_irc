@@ -6,7 +6,7 @@
 #    By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/17 07:01:17 by alee              #+#    #+#              #
-#    Updated: 2022/08/18 16:23:55 by alee             ###   ########.fr        #
+#    Updated: 2022/08/28 18:32:48 by alee             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ RM = rm -f
 
 NAME = ircserv
 
-SRC_FILE = main.cpp server.cpp client.cpp
+SRC_FILE = main.cpp server.cpp client.cpp channel.cpp
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 

@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 13:48:16 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 18:31:22 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -570,9 +570,10 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 		std::cout << "command : privmsg" << std::endl;
 		requestPrivateMsg(iter, command, param);
 	}
-	else if (command == "OPER")
+	else if (command == "MODE")
 	{
-		std::cout << "command : OPER " << std::endl;
+		std::cout << "command : " << command << ", param : " << param << std::endl;
+		requestMode(iter, command, param);
 	}
 	else if (command == "KICK")
 	{
@@ -590,7 +591,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::string	recv_nick = param.substr(0, param.find(' '));
+	std::string	tar_nick = param.substr(0, param.find(' '));
 	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
 
 	//채널 메시지
@@ -599,7 +600,7 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 	//개인 메시지
 	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
 	{
-		if (c_iter->second->getNickName() == recv_nick)
+		if (c_iter->second->getNickName() == tar_nick)
 		{
 			msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
 				+ " PRIVMSG " + iter->second->getNickName() + " :" + msg;
@@ -608,11 +609,51 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 		}
 	}
 	//존재하지 않는 닉네임 메시지 처리
-	insertSendBuffer(iter->second, buildErrPacket(ERR_NOSUCHNICK, iter->second->getUserName(), recv_nick + ": No such nick \r\n"));
+	//TODO : notice의 경우 에러 메시지를 처리하지 않는다.
+	insertSendBuffer(iter->second, buildErrPacket(ERR_NOSUCHNICK, iter->second->getUserName(), tar_nick + ": No such nick \r\n"));
 	(void)command;
 	return ;
 }
 
+void		Server::requestMode(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	std::string	cp_param;
+	std::string	tar_nick;
+	std::string	option;
+	size_t		pos;
+
+	cp_param = param;
+	pos = cp_param.find(' ');
+	if (pos == std::string::npos)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, iter->second->getUserName(), ":info) Not enough parameter\r\n"));
+		return ;
+	}
+	tar_nick = param.substr(0, pos);
+	option = cp_param.erase(0, pos + 1);
+
+	std::cout << "target : " << tar_nick << std::endl;
+	std::cout << "option : " << option << std::endl;
+
+	//채널에서 해당 타겟 클라이언트가 존재하는지 확인 -> 없다? -> Error(401): +o No such nick
+
+
+	if (option == "-o")
+	{
+
+	}
+	else
+	{
+
+	}
+
+	//OPER <Name> <Pass>
+	(void)command;
+	(void)iter;
+	(void)param;
+	return ;
+}
 
 void	Server::clientDisconnect(void)
 {

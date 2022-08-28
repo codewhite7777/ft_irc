@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 11:51:34 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 18:40:10 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <netinet/in.h>
 # include "client.hpp"
 # include <map>
+# include "channel.hpp"
 
 typedef int	SOCKET;
 
@@ -55,6 +56,9 @@ private:
 	std::map<SOCKET, Client *>	client_map_;
 	fd_set						read_set_;
 	fd_set						write_set_;
+
+	//channel
+	std::map<std::string, Channel *>	channel_map_;
 
 public:
 	Server(int argc, char *argv[]);
@@ -109,6 +113,9 @@ public:
 	void		requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
+	//packet request :: OPER
+	void		requestMode(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 
 	//disconnect client
 	void		clientDisconnect(void);
