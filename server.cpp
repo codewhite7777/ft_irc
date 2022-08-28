@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 13:20:19 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/28 13:48:16 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -553,6 +553,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
 	{
+		//TODO : 채널 구조 구상 및 구현
 		std::cout << "command : join " << std::endl;
 	}
 	else if (command == "PART")
@@ -593,6 +594,7 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
 
 	//채널 메시지
+	//루프 -> 유효한 방 -> 리스트 명단 -> 보내기
 
 	//개인 메시지
 	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
