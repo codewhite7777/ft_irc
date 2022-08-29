@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 18:31:22 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/29 15:22:51 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -363,7 +363,8 @@ void	Server::packetMarshalling(void)
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			packetAnalysis(iter);
-			iter->second->getRecvBuf().clear();
+			// iter->second->getRecvBuf().clear();
+			// iter->second->getRecvBuf().erase(0, iter->second->getWritePos());
 		}
 	}
 	return ;
@@ -410,24 +411,66 @@ std::string	Server::packetTrim(std::string& packet)
 	return (packet_buf);
 }
 
+bool	Server::packetTokenize(std::string& packet_buf, std::string& o_command, std::string& o_param, \
+						size_t&	o_carridge_pos, const char *str)
+{
+	bool	ret;
+	size_t	carridge_tok;
+
+	ret = true;
+	carridge_tok = packet_buf.find(str);
+	if (carridge_tok != std::string::npos)
+	{
+		size_t	space_tok = packet_buf.find(' ', carridge_tok);
+		if (space_tok == std::string::npos)
+		{
+			o_carridge_pos = carridge_tok + strlen(str);
+			ret = false;
+		}
+		else
+		{
+			o_command = packet_buf.substr(0, space_tok);
+			o_param = packet_buf.substr(space_tok + 1);
+			std::cout << "packetToke(...) : " << '[' << o_command << ']' << std::endl;
+			std::cout << "packetToke(...) : " << '[' << o_param << ']' << std::endl;
+			o_carridge_pos = carridge_tok + strlen(str);
+			ret = false;
+		}
+	}
+	else
+	{
+		o_carridge_pos = packet_buf.length();
+		ret = false;
+	}
+	return (ret);
+}
+
 void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 {
 	std::string	packet_buf;
 	std::string	command;
 	std::string	param;
+	size_t		write_pos;
 
-	packet_buf = packetTrim(iter->second->getRecvBuf());
+	// packet_buf = packetTrim(iter->second->getRecvBuf());
+	packet_buf = iter->second->getRecvBuf();
+	if (packetTokenize(packet_buf, command, param, write_pos, "\r\n") == false)
+		iter->second->getRecvBuf().erase(write_pos);
+
+	// if (packet_buf.find(' ') != std::string::npos)
+	// {
+	// 	command = packet_buf.substr(0, packet_buf.find(' '));
+	// 	param = packet_buf.substr(packet_buf.find(' ') + 1);
+	// }
+	// else
+	// {
+	// 	command = "";
+	// 	param = packet_buf;
+	// }
+
 	std::cout << "packet : " << "[" << packet_buf << "]" << std::endl;
-	if (packet_buf.find(' ') != std::string::npos)
-	{
-		command = packet_buf.substr(0, packet_buf.find(' '));
-		param = packet_buf.substr(packet_buf.find(' ') + 1);
-	}
-	else
-	{
-		command = "";
-		param = packet_buf;
-	}
+	std::cout << "command : " << "[" << command << "]" << std::endl;
+	std::cout << "param : " << "[" << param << "]" << std::endl;
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
 	else if (iter->second->getNickFlag() == false)
@@ -442,8 +485,21 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 							std::string& command, std::string& param)
 {
+	if (command == "CAP")
+	{
+		size_t	pos = param.find("PASS");
+		if (pos == std::string::npos)
+		{
+
+			return ;
+		}
+		param.erase(0, pos);//command + param = packet_buf만큼 write_pos를 이동시킨다.
+		// packetTokenize(param, command, param, ' ');
+	}
 	if (command != "PASS")
 	{
+		//command + param = packet_buf만큼 write_pos를 이동시킨다.
+		// iter->second->setWritePos(total_length);
 		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <PASS> <password>\r\n"));
 		return ;
 	}
@@ -451,12 +507,16 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		iter->second->setPassFlag(true);
 		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", ":info) Successful Authentication.\r\n"));
+		// iter->second->setWritePos(total_length);
 		std::cout << "-----------------------------------" << std::endl;
 		std::cout << iter->first << " Client Successful Authentication." << std::endl;
 		std::cout << "-----------------------------------" << std::endl;
 	}
 	else
+	{
+		//PASS & NICK 같이 오는 케이스
 		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":info> Wrong password\r\n"));
+	}
 	return ;
 }
 
@@ -515,6 +575,7 @@ std::vector<std::string> split(std::string str, char delimiter)
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
+	std::cout << "requestSetUserName called " << std::endl;
 	if (command != "USER")
 	{
 		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));

@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 16:11:18 by alee              #+#    #+#             */
-/*   Updated: 2022/08/16 19:23:13 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/29 13:11:34 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,11 @@ int	main(void)
 
 	while (1)
 	{
-		std::string	msg;
-		std::cout << "Input Msg : " << std::endl;
-		std::cin >> msg;
+		std::string	msg = "CAP LS 302\r\nPASS 1234\r\n";
+		std::cout << "Msg : " << std::endl;
+
+		// std::cin >> msg;
+
 		int	send_result = send(client_sock, msg.c_str(), msg.length(), 0);
 		if (send_result != msg.length() || send_result == -1)
 		{
@@ -74,6 +76,10 @@ int	main(void)
 			break ;
 		}
 		std::cout << "send " << send_result << "byte" << std::endl;
+		while (1)
+		{
+
+		}
 		msg.clear();
 	}
 	return (0);

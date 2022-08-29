@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 18:40:10 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/29 15:16:08 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ public:
 	void		packetMarshalling(void);
 	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
 	std::string	packetTrim(std::string& packet);
+	bool		packetTokenize(std::string& packet_buf, std::string& o_command, std::string& o_param, \
+						size_t&	o_carridge_pos, const char *str);
 
 	//packet request :: PASS
 	void		requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
