@@ -458,9 +458,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	{
 		userSetting(iter, command, param);
 		std::cout << "welcome msg\n";
-		std::string msg = ":ircserv 001 hena :welcome to the Internet Relay Network\r\n";
-		// msg += "";
-		// msg += "\r\n";
+		std::string msg = ":bar.example.com 001 hena :welcome to the Internet Relay Network hena!hena@127.0.0.1\r\n";
 		std::cout << msg << '\n';
 		insertSendBuffer(iter->second, msg);
 	}
@@ -469,6 +467,10 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 			joinChannel(iter, command, param);
 		if (command == "PRIVMSG")
 			privMessage(iter, command, param);
+		if (command == "PONG")
+		{
+			
+		}
 	}
 	return ;
 }
@@ -613,7 +615,7 @@ void	Server::joinChannel(std::map<SOCKET, Client*>::iterator &iter, std::string&
 		return ;
 	std::cout << "join TEST\n";
 	std::cout << "command: " << command << ' ' <<"param:" << param << '\n';
-
+	// static int a = 0;
 	
 	// if (param.size() && param[0] == '#')
 	// {
@@ -622,17 +624,24 @@ void	Server::joinChannel(std::map<SOCKET, Client*>::iterator &iter, std::string&
 	// std::string msg = ":ircserv 332 ";
 	// msg += "hena ";
 	// msg += ":waht asdfjhjksdf\r\n";
-	std::string msg = "hena!hena@ircserv JOIN #asdf\r\n";
+	std::string msg = "";
+	msg = "hena!hena@127.0.0.1 JOIN #asdf\r\n";
 	insertSendBuffer(iter->second, msg);
-	// msg = ":ircserv 332 hena #test :TEST1\r\n";
-	// insertSendBuffer(iter->second, msg);
-	// msg = ":ircserv 353 hena = #test :@hena\r\n";
-	// insertSendBuffer(iter->second, msg);
-	// msg = ":ircserv 366 hena #test :End of Names list\r\n";
-	// insertSendBuffer(iter->second, msg);
-	msg = "hena!hena@ircserv PRIVMSG #asdf :";
-	msg += "JOIN hi\r\n";
+	sendPacket(iter);
+
+	msg = ":bar.example.com 332 hena #asdf :TEST1\r\n";
 	insertSendBuffer(iter->second, msg);
+	sendPacket(iter);
+
+
+	msg = ":bar.example.com 353 hena = #asdf :@hena\r\n";
+	insertSendBuffer(iter->second, msg);
+	sendPacket(iter);
+
+	msg = ":bar.example.com 366 hena #asdf :End of Names list\r\n";
+	insertSendBuffer(iter->second, msg);
+	sendPacket(iter);
+
 	return ;
 }
 
