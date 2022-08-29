@@ -18,9 +18,20 @@
 class Channel
 {
 private:
-	std::vector<Client *>	clients_;
-	std::vector<Client *>	operators_;
+	std::vector<Client*>	users_;
+	std::vector<Client*>	operators_;
+
+	//std::string				name_; // tmp... considering to remove
+	
+	//int					count_users;
+
 public:
+	Channel(void);
+	~Channel(void);
+	// todo: OCCF
+
+	void	assignUser(Client* new_user);
+
 };
 
 #endif

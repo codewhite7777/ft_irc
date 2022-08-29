@@ -545,6 +545,31 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 	return ;
 }
 
+void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+
+
+	// find map key according channel name
+	for (std::map<std::string, Channel*>::iterator chann_iter = chann_map_.begin()\
+		; chann_iter != chann_map_.end()\
+		; ++chann_iter)
+	{
+		if (chann_iter->first == param)
+		{
+			chann_iter->second->assignUser(iter->second);
+			return ;
+		}
+	}
+
+	// if no, create new channel
+	Channel* new_chann = new Channel();
+	chann_map_.insert(std::make_pair(param, new_chann));
+	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
+
+	(void)command;
+}
+
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
@@ -555,6 +580,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		//TODO : 채널 구조 구상 및 구현
 		std::cout << "command : join " << std::endl;
+		requestJoin(iter, command, param);
 	}
 	else if (command == "PART")
 	{

@@ -58,7 +58,7 @@ private:
 	fd_set						write_set_;
 
 	//channel
-	std::map<std::string, Channel *>	channel_map_;
+	std::map<std::string, Channel *>	chann_map_;
 
 public:
 	Server(int argc, char *argv[]);
@@ -111,6 +111,10 @@ public:
 
 	//packet request :: PRIVMSG
 	void		requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+
+	//packet request :: JOIN
+	void		requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
 	//packet request :: OPER
