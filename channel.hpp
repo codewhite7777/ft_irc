@@ -19,18 +19,21 @@ class Channel
 {
 private:
 	std::vector<Client*>	users_;
-	std::vector<Client*>	operators_;
+	std::vector<Client*>	opers_;
 
 	std::string				name_; // tmp... considering to remove
 	
 	//int					count_users;
 
 public:
+	Channel(std::string name); // todo: use reference?
 	Channel(void);
 	~Channel(void);
 	// todo: OCCF
 
 	void	assignUser(Client* new_user);
+	void	assignOper(Client* user);
+
 	void	setName(std::string &name);
 
 };

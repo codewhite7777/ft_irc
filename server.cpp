@@ -548,9 +548,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-
-
-	// find map key according channel name
+	// find channel name in chann_map
 	for (std::map<std::string, Channel*>::iterator chann_iter = chann_map_.begin()\
 		; chann_iter != chann_map_.end()\
 		; ++chann_iter)
@@ -561,15 +559,15 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 			return ;
 		}
 	}
-
-	// if no, create new channel
-	Channel* new_chann = new Channel();
-	new_chann->setName(param);
+	// create new channel
+	Channel* new_chann = new Channel(param);
+	//new_chann->setName(param);
 	chann_map_.insert(std::make_pair(param, new_chann));
-	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
-	new_chann->assignUser(iter->second);
-	//iter->second->getSendBuf().append(":" + iter->second->getNickName() + " JOIN " + param + "\r\n");
 
+	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
+
+	new_chann->assignUser(iter->second);
+	//new_chann->assignOper(iter->second);
 	(void)command;
 }
 
