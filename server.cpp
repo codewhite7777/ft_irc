@@ -49,7 +49,7 @@ Server::Server(int argc, char *argv[])
 		status_ = false;
 		return ;
 	}
-
+	serv_hostname_ = inet_ntoa(s_addr_in_.sin_addr);
 	//set operator pwd
 	s_operator_pwd_ = "admin";
 
@@ -288,10 +288,12 @@ void	Server::acceptClient(SOCKET listen_sock)
 	struct sockaddr_in	c_addr_in;
 	socklen_t			c_addr_len = sizeof(c_addr_in);
 	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
+	
 	//accept(...)
 	client_sock = accept(listen_sock, reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
 	if (client_sock == -1)
 		return ;
+	std::string tmp = inet_ntoa(c_addr_in.sin_addr);
 
 	//if current client's counts are over select function's set socket max counts, accepted socket is closed.
 	if (sock_count_ >= FD_SETSIZE)
@@ -304,8 +306,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 	fcntl(client_sock, F_SETFL, O_NONBLOCK);
 
 	//create client session
-	Client*	new_client = new Client(client_sock);
-
+	Client*	new_client = new Client(client_sock, tmp);
 	//push client socket
 	client_map_.insert(std::make_pair(client_sock, new_client));
 
@@ -624,21 +625,21 @@ void	Server::joinChannel(std::map<SOCKET, Client*>::iterator &iter, std::string&
 	// std::string msg = ":ircserv 332 ";
 	// msg += "hena ";
 	// msg += ":waht asdfjhjksdf\r\n";
+	std::string test = ":hena!hena@" + iter->second->getHostName();
 	std::string msg = "";
-	msg = "hena!hena@127.0.0.1 JOIN #asdf\r\n";
+	msg = test + " JOIN #asdf \r\n";
 	insertSendBuffer(iter->second, msg);
 	sendPacket(iter);
 
-	msg = ":bar.example.com 332 hena #asdf :TEST1\r\n";
+	msg = ":" + serv_hostname_ +" 332 "+test+" #asdf :TEST1 \r\n";
 	insertSendBuffer(iter->second, msg);
 	sendPacket(iter);
 
-
-	msg = ":bar.example.com 353 hena = #asdf :@hena\r\n";
+	msg = ":" + serv_hostname_ +" 353 "+test+" = #asdf :@hena \r\n";
 	insertSendBuffer(iter->second, msg);
 	sendPacket(iter);
 
-	msg = ":bar.example.com 366 hena #asdf :End of Names list\r\n";
+	msg = ":" + serv_hostname_ +" 366 "+test+" #asdf :End of Names list \r\n";
 	insertSendBuffer(iter->second, msg);
 	sendPacket(iter);
 

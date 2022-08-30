@@ -12,7 +12,7 @@
 
 #include "client.hpp"
 
-Client::Client(SOCKET s)
+Client::Client(SOCKET s, std::string hostname)
 {
 	client_sock_ = s;
 	disconnect_flag_ = 0;
@@ -20,6 +20,7 @@ Client::Client(SOCKET s)
 	nick_flag_ = 0;
 	user_flag_ = 0;
 	operator_flag_ = 0;
+	hostname_ = hostname;
 	return ;
 }
 
@@ -104,4 +105,8 @@ bool	Client::getUserNameFlag(void) const
 bool	Client::getOperatorFlag(void) const
 {
 	return (this->operator_flag_);
+}
+std::string	Client::getHostName(void) const
+{
+	return this->hostname_;
 }

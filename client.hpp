@@ -30,8 +30,9 @@ private:
 	bool		nick_flag_;
 	bool		user_flag_;
 	bool		operator_flag_;
+	std::string	hostname_;
 public:
-	Client(SOCKET s);
+	Client(SOCKET s, std::string hostname_);
 	~Client(void);
 
 	//client socket
@@ -50,11 +51,13 @@ public:
 	void			setNickFlag(bool flag, std::string param);
 	void			setUserFlag(bool flag, std::string param);
 	bool			getPassFlag(void) const;
+	
 
 	//client nickname getter/setter
 	bool			getNickFlag(void) const;
 	void			setNickName(bool flag, std::string& nickname);
 	std::string&	getNickName(void);
+	std::string	getHostName(void) const;
 
 	//
 	bool			getUserNameFlag(void) const;

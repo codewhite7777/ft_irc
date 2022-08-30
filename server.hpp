@@ -63,6 +63,7 @@ private:
 	fd_set						read_set_;
 	fd_set						write_set_;
 
+	std::string					serv_hostname_;
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
