@@ -582,6 +582,10 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		std::cout << "command : INVITE " << std::endl;
 	}
+	else if (command == "PING")
+	{
+		
+	}
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;
