@@ -584,7 +584,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	}
 	else if (command == "PING")
 	{
-		
+		requestPing(iter, command);
 	}
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));

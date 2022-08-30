@@ -17,7 +17,7 @@ RM = rm -f
 
 NAME = ircserv
 
-SRC_FILE = main.cpp server.cpp client.cpp
+SRC_FILE = main.cpp server.cpp client.cpp pingpong.cpp
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 

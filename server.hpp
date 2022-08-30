@@ -109,6 +109,10 @@ public:
 	void		requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
+	//packet request :: PING
+	void		requestPing(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command);
+
 
 	//disconnect client
 	void		clientDisconnect(void);
