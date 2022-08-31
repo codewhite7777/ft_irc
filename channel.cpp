@@ -37,16 +37,19 @@ void	Channel::assignUser(Client* new_user) {
 							+ "!" + new_user->getUserName() \
 							+ "@" + new_user->getHostName();
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
+
+
 	std::string proto_to_send;
 
 	proto_to_send = user_info + proto_join;
 	new_user->getSendBuf().append(proto_to_send);
+	// sendPacket(iter);
 	std::cout << "Channel: send JOIN protocol to client\n"; // 보내니까 클라에 has joined 뜸
 
 	// todo: set and use server hostname
 	// what serv_hostname_?
 	// 임시로 server hostname을 127.0.0.1 로 하드코딩함
-	std::string	tmp_servhostname = "127.0.0.1";
+	std::string	tmp_servhostname = "bar.example.com";
 
 	// ":127.0.0.1 332 :nick!user@host #channName :TEST1\r\n"
 	proto_to_send = ":" + tmp_servhostname + " 332 " + user_info \
@@ -56,7 +59,7 @@ void	Channel::assignUser(Client* new_user) {
 
 	// ":127.0.0.1 353 :nick!user@host #channName :@host\r\n"
 	proto_to_send = ":" + tmp_servhostname + " 353 " + user_info \
-					+ " = " + name_ + " :@" + new_user->getHostName() + " \r\n";
+					+ " = " + name_ + " :@" + new_user->getNickName() + " \r\n"; // consider: userName or nickName
 	new_user->getSendBuf().append(proto_to_send);
 	std::cout << "Channel: send 353 protocol to client\n"; // 클라에 Names: 라고 뜸
 

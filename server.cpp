@@ -534,9 +534,12 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			iter->second->setMode(splitVector[1]);
 			iter->second->setUnused(splitVector[2]);
 			iter->second->setUserRealName(true, splitVector[3]);
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
+			// 내 맘임!
+			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
+			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
+			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
+			std::string tmp = ":bar.example.com 001 " + iter->second->getUserName() + " :welcome to the Internet Relay Network \r\n";
+			insertSendBuffer(iter->second, tmp);
 			#ifdef DEBUG
 				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
 			#endif
