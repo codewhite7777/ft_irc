@@ -562,11 +562,8 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 			return ;
 		}
 	}
-	// create new channel
 	Channel* new_chann = new Channel(param);
-	//new_chann->setName(param);
 	chann_map_.insert(std::make_pair(param, new_chann));
-
 	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
 
 	new_chann->assignUser(iter->second);

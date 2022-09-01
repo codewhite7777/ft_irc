@@ -43,6 +43,17 @@ void	Channel::assignUser(Client* new_user)
 	#ifdef DEBUG
 	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
 	#endif
+	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
+	{
+		if ((*user_it)->getNickName() == new_user->getNickName())
+			continue ;
+		//todo: set user info function
+		user_info = ":" + (*user_it)->getNickName() \
+					+ "!" + (*user_it)->getUserName() \
+					+ "@" + (*user_it)->getHostName();
+		proto_to_send = user_info + proto_join;
+		new_user->getSendBuf().append(proto_to_send);
+	}
 }
 
 void	Channel::setName(std::string &name)
