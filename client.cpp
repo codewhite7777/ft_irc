@@ -140,3 +140,8 @@ bool	Client::getOperatorFlag(void) const
 {
 	return (this->operator_flag_);
 }
+
+void	Client::addChannel(Channel& new_chann)
+{
+	chann_list_.push_back(new_chann);
+}

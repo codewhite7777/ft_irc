@@ -29,6 +29,7 @@ void	Channel::assignUser(Client* new_user)
 	std::cout << "assign new client user in channel\n"; // test
 	#endif
 	users_.push_back(new_user);
+	new_user->addChannel(*this);
 	//"":nickName!userName@hostName JOIN #channName\r\n"
 	std::string	user_info = ":" + new_user->getNickName() \
 							+ "!" + new_user->getUserName() \
@@ -54,6 +55,15 @@ void	Channel::assignUser(Client* new_user)
 		proto_to_send = user_info + proto_join;
 		new_user->getSendBuf().append(proto_to_send);
 	}
+}
+
+void	Channel::assignOper(Client* user)
+{
+	opers_.push_back(user);
+}
+
+void	Channel::removeUser(Client* user)
+{
 }
 
 void	Channel::setName(std::string &name)

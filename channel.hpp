@@ -34,6 +34,8 @@ public:
 	void	assignUser(Client* new_user);
 	void	assignOper(Client* user);
 
+	void	removeUser(Client* user);
+
 	void	setName(std::string &name);
 
 };

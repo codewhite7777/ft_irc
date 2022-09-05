@@ -12,11 +12,12 @@
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-# include <iostream>
-# include <netinet/in.h>
+
 # include "client.hpp"
-# include <map>
 # include "channel.hpp"
+# include <iostream>
+# include <map>
+# include <netinet/in.h>
 
 typedef int	SOCKET;
 

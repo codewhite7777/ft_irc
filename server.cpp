@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "server.hpp"
+#include "irc_protocol.hpp"
 #include <arpa/inet.h>
 #include <cctype>
 #include <fcntl.h>
@@ -19,7 +20,6 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <cstring>
-#include "irc_protocol.hpp"
 #include <sstream>
 #include <vector>
 
@@ -713,3 +713,4 @@ void	Server::Run(void)
 	clientDisconnect();
 	return ;
 }
+ 
