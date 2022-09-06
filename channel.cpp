@@ -29,7 +29,7 @@ void	Channel::assignUser(Client* new_user)
 	std::cout << "assign new client user in channel\n"; // test
 	#endif
 	users_.push_back(new_user);
-	new_user->addChannel(*this);
+	new_user->addChannel(this); // in client session
 	//"":nickName!userName@hostName JOIN #channName\r\n"
 	std::string	user_info = ":" + new_user->getNickName() \
 							+ "!" + new_user->getUserName() \
@@ -64,9 +64,15 @@ void	Channel::assignOper(Client* user)
 
 void	Channel::removeUser(Client* user)
 {
+	for (std::vector<Cleint*>iterator it = users_.begin())
 }
 
 void	Channel::setName(std::string &name)
 {
 	name_ = name;
+}
+
+const std::string&	Channel::getName(void) const
+{
+	return name_;
 }

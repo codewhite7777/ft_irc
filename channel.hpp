@@ -36,7 +36,8 @@ public:
 
 	void	removeUser(Client* user);
 
-	void	setName(std::string &name);
+	void				setName(std::string &name);
+	const std::string&	getName(void) const;
 
 };
 

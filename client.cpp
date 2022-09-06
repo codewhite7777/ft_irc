@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "client.hpp"
+#include "channel.hpp" // consider to remove
 
 Client::Client(SOCKET s, std::string host_name)
 {
@@ -141,7 +142,20 @@ bool	Client::getOperatorFlag(void) const
 	return (this->operator_flag_);
 }
 
-void	Client::addChannel(Channel& new_chann)
+void	Client::addChannel(Channel* new_chann)
 {
 	chann_list_.push_back(new_chann);
+}
+
+void	Client::removeChannel(Channel* chann_to_del)
+{
+	for (std::list<Channel*>::iterator chnn_it = chann_list_.begin()
+		; chnn_it != chann_list_.end()
+		; ++chnn_it)
+	{
+		if ((*chnn_it)->getName() == chann_to_del->getName())
+		{
+			chann_list_.erase(chnn_it);
+		}
+	}
 }

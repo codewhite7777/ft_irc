@@ -38,7 +38,7 @@ private:
 	bool					user_flag_;
 	bool					user_real_name_flag_;
 	bool					operator_flag_;
-	std::list<Channel&>		chann_list_;
+	std::list<Channel*>		chann_list_;
 
 public:
 	Client(SOCKET s, std::string host_name);
@@ -85,7 +85,8 @@ public:
 
 	bool			getOperatorFlag(void) const;
 
-	void			addChannel(Channel& new_chann);
+	void			addChannel(Channel* new_chann);
+	void			removeChannel(Channel* chann_to_del);
 };
 
 #endif
