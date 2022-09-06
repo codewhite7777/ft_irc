@@ -35,6 +35,7 @@ public:
 	void	assignOper(Client* user);
 
 	void	removeUser(Client* user);
+	void	removeOper(Client* oper); // todo
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;

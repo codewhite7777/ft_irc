@@ -64,7 +64,15 @@ void	Channel::assignOper(Client* user)
 
 void	Channel::removeUser(Client* user)
 {
-	for (std::vector<Cleint*>iterator it = users_.begin())
+	for (std::vector<Client*>::iterator it = users_.begin()
+		; it != users_.end()
+		; ++it)
+	{
+		if ((*it)->getNickName() == user->getNickName())
+		{
+			users_.erase(it);
+		}
+	}
 }
 
 void	Channel::setName(std::string &name)
