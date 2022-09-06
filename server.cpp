@@ -362,7 +362,6 @@ void	Server::packetMarshalling(void)
 	{
 		if (iter->second->getRecvBuf().length() != 0)
 		{
-			std::cout << "socket id ?" <<iter->second->getSocket() << std::endl;
 			packetAnalysis(iter);
 			iter->second->getRecvBuf().clear();
 		}
@@ -569,6 +568,8 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 
 	new_chann->assignUser(iter->second);
 	//new_chann->assignOper(iter->second);
+	// 한명일때 오퍼레이터 줘야함.
+	iter->second->getChannelList().push_back(param);
 	(void)command;
 }
 
@@ -589,7 +590,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		std::cout << "command : PART " << std::endl;
 		{
-			//partTest(iter, command, param);	
+			partTest(iter, command, param);	
 		}
 	}
 	else if (command == "QUIT")

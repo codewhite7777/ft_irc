@@ -21,7 +21,7 @@ Client::Client(SOCKET s, std::string host_name)
 	user_flag_ = 0;
 	operator_flag_ = 0;
 	user_real_name_flag_ = 0;
-	this->host_name_ = host_name;
+	host_name_ = host_name;
 	return ;
 }
 
@@ -139,4 +139,9 @@ std::string&	Client::getHostName(void)
 bool	Client::getOperatorFlag(void) const
 {
 	return (this->operator_flag_);
+}
+
+std::vector<std::string>& Client::getChannelList()
+{
+	return channelList;
 }

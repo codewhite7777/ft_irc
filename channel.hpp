@@ -33,9 +33,13 @@ public:
 
 	void	assignUser(Client* new_user);
 	void	assignOper(Client* user);
-
 	void	setName(std::string &name);
 
+
+	std::vector<Client*> getUsers();
+	std::vector<Client*> getOpers_();
+	void eraseUser(int index);
+	void eraseOper(int sd);
 };
 
 #endif

@@ -60,3 +60,27 @@ void	Channel::setName(std::string &name)
 {
 	name_ = name;
 }
+
+std::vector<Client*> Channel::getUsers()
+{
+	return users_;
+}
+
+std::vector<Client*> Channel::getOpers_()
+{
+	return opers_;
+}
+void Channel::eraseUser(int index)
+{
+	users_.erase(users_.begin() + index);
+}
+
+void Channel::eraseOper(int sd)
+{
+	for (unsigned int i = 0 ; i < opers_.size() ; ++i)
+		if (sd == opers_[i]->getSocket())
+		{
+			opers_.erase(opers_.begin() + i);
+			break;
+		}
+}

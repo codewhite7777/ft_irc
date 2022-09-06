@@ -13,7 +13,7 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 # include <iostream>
-
+#include <vector>
 typedef int	SOCKET;
 
 class Client
@@ -34,6 +34,8 @@ private:
 	bool		user_flag_;
 	bool		user_real_name_flag_;
 	bool		operator_flag_;
+	std::vector<std::string> channelList;
+
 public:
 	Client(SOCKET s, std::string host_name);
 	~Client(void);
@@ -78,6 +80,10 @@ public:
 	std::string&	getHostName(void);
 
 	bool			getOperatorFlag(void) const;
+
+
+	// test
+	std::vector<std::string>& getChannelList();
 };
 
 #endif
