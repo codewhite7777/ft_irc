@@ -18,6 +18,7 @@ Channel::Channel(void) : users_(), opers_() {}
 
 Channel::~Channel(void) {}
 
+#include <iterator>
 void	Channel::assignUser(Client* new_user)
 {
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
@@ -38,14 +39,24 @@ void	Channel::assignUser(Client* new_user)
 	std::string proto_to_send;
 	proto_to_send = user_info + proto_join;
 
+	std::string	tmp0 = ":bar.example.org 332 ";
+	tmp0 += new_user->getNickName() + name_ + " :tmpTopic\r\n";
+	std::cout << tmp0 << '\n';
 
-	std::string tmp1 = ":bar.example.com 353 ";
-	tmp1 += user_info;
-	tmp1 += " = " +  name_ + " :\r\n";
+	std::string tmp1 = ":bar.example.org 353 ";
+	tmp1 += new_user->getNickName() + " = " + name_ +" :";
+	//std::cout << "test : " << users_.size() << '\n';
+	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
+	{
+		std::string tmpName = (*user_it)->getNickName();
+		tmp1 += tmpName + " ";
+	}
+	tmp1 += "\r\n";
+	std::cout << tmp1 << '\n';
 
-	std::string tmp2 = ":bar.example.com 366 ";
-	tmp2 += user_info;
-	tmp2 += " " +  name_ + " :\r\n";
+	std::string tmp2 = ":bar.example.org 366 ";
+	tmp2 += new_user->getNickName();
+	tmp2 += " " +  name_ + " :End of Names list\r\n";
 
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
 	{
