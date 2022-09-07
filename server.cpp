@@ -548,30 +548,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 	return ;
 }
 
-void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	// find channel name in chann_map
-	for (std::map<std::string, Channel*>::iterator chann_iter = chann_map_.begin()\
-		; chann_iter != chann_map_.end()\
-		; ++chann_iter)
-	{
-		if (chann_iter->first == param)
-		{
-			chann_iter->second->assignUser(iter->second);
-			return ;
-		}
-	}
-	Channel* new_chann = new Channel(param);
-	chann_map_.insert(std::make_pair(param, new_chann));
-	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
 
-	new_chann->assignUser(iter->second);
-	//new_chann->assignOper(iter->second);
-	// 한명일때 오퍼레이터 줘야함.
-	iter->second->getChannelList().push_back(param);
-	(void)command;
-}
 
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
@@ -630,19 +607,40 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 	std::string	tar_nick = param.substr(0, param.find(' '));
 	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
 
-	//채널 메시지
-	//루프 -> 유효한 방 -> 리스트 명단 -> 보내기
-	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
+	std::cout << tar_nick << '\n';
+	// 채널 메시지
+	// 루프 -> 유효한 방 -> 리스트 명단 -> 보내기
+	if (tar_nick[0] == '#')
 	{
-		if (c_iter->second->getNickName() == tar_nick)
+		for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
 		{
-			msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), "bar.example.com") \
-				+ " PRIVMSG " + iter->second->getNickName() + " :" + msg;
-			insertSendBuffer(c_iter->second, msg);
-			return ;
+			std::cout << "name Test: " << c_iter->second->getNickName() <<' ' << tar_nick << '\n';
+			if (c_iter->second->getNickName() != iter->second->getNickName())
+			{
+				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+					+ " PRIVMSG " + tar_nick + " :" + msg;
+				msg += "\r\n";
+				std::cout << msg << '\n';
+				insertSendBuffer(c_iter->second, msg);
+				return ;
+			}
 		}
 	}
-	
+	else {
+		for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
+		{
+			std::cout << "name Test: " << c_iter->second->getNickName() <<' ' << tar_nick << '\n';
+			if (c_iter->second->getNickName() == tar_nick)
+			{
+				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+					+ " PRIVMSG " + tar_nick + " :" + msg;
+				msg += "\r\n";
+				std::cout << msg << '\n';
+				insertSendBuffer(c_iter->second, msg);
+				return ;
+			}
+		}
+	}
 }
 
 void		Server::requestMode(std::map<SOCKET, Client*>::iterator &iter, \

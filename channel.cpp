@@ -34,26 +34,36 @@ void	Channel::assignUser(Client* new_user)
 							+ "!" + new_user->getUserName() \
 							+ "@" + new_user->getHostName();
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
+
+
 	std::string proto_to_send;
 	proto_to_send = user_info + proto_join;
+	std::cout << "send msg [" << proto_to_send << "]\n";
+	std::cout << "memeber size: [" << users_.size() << "]\n";
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
 	{
+		std::cout << "memeber: [" << (*user_it)->getNickName() << "]\n";
 		(*user_it)->getSendBuf().append(proto_to_send);
 	}
+	std::string host = ":bar.example.com ";
+	// std::string re1 = host + "332 " + new_user->getNickName()+ ' ' + name_ + " :\r\n";
+	// new_user->getSendBuf().append(re1);
+	std::string re2 = host + "353 " + new_user->getNickName()+ " = " + name_ + " :";
+	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
+	{
+		re2 += (*user_it)->getNickName() + " ";
+	}
+	re2 += "\r\n";
+	new_user->getSendBuf().append(re2);
+	std::string re3 = host + "366 " + new_user->getNickName()+ " " + name_ + " :End of NAMES list\r\n";
+	new_user->getSendBuf().append(re3);
+	// std::cout << re1 << '\n';
+	std::cout << re2 << '\n';
+	std::cout << re3 << '\n';
 	#ifdef DEBUG
 	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
 	#endif
-	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
-	{
-		if ((*user_it)->getNickName() == new_user->getNickName())
-			continue ;
-		//todo: set user info function
-		user_info = ":" + (*user_it)->getNickName() \
-					+ "!" + (*user_it)->getUserName() \
-					+ "@" + (*user_it)->getHostName();
-		proto_to_send = user_info + proto_join;
-		new_user->getSendBuf().append(proto_to_send);
-	}
+	
 }
 
 void	Channel::setName(std::string &name)

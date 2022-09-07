@@ -17,7 +17,7 @@ RM = rm -f
 
 NAME = ircserv
 
-SRC_FILE = main.cpp server.cpp client.cpp channel.cpp part.cpp
+SRC_FILE = main.cpp join.cpp server.cpp client.cpp channel.cpp part.cpp 
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 
