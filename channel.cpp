@@ -37,13 +37,26 @@ void	Channel::assignUser(Client* new_user)
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
 	std::string proto_to_send;
 	proto_to_send = user_info + proto_join;
+
+
+	std::string tmp1 = ":bar.example.com 353 ";
+	tmp1 += user_info;
+	tmp1 += " = " +  name_ + " :\r\n";
+
+	std::string tmp2 = ":bar.example.com 366 ";
+	tmp2 += user_info;
+	tmp2 += " " +  name_ + " :\r\n";
+
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
 	{
 		(*user_it)->getSendBuf().append(proto_to_send);
 	}
+	new_user->getSendBuf().append(tmp1);
+	new_user->getSendBuf().append(tmp2);
 	#ifdef DEBUG
 	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
 	#endif
+	/*
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
 	{
 		if ((*user_it)->getNickName() == new_user->getNickName())
@@ -55,6 +68,7 @@ void	Channel::assignUser(Client* new_user)
 		proto_to_send = user_info + proto_join;
 		new_user->getSendBuf().append(proto_to_send);
 	}
+	*/
 }
 
 void	Channel::assignOper(Client* user)
@@ -78,6 +92,11 @@ void	Channel::removeUser(Client* user)
 void	Channel::setName(std::string &name)
 {
 	name_ = name;
+}
+
+const std::string&	Channel::getName(void) const
+{
+	return name_;
 }
 
 std::vector<Client*> Channel::getUsers()

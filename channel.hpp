@@ -34,8 +34,7 @@ public:
 	void	assignUser(Client* new_user);
 	void	assignOper(Client* user);
 
-	void	removeUser(Client* user);
-	void	removeOper(Client* oper); // todo
+	
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
@@ -43,8 +42,11 @@ public:
 
 	std::vector<Client*> getUsers();
 	std::vector<Client*> getOpers_();
-	void eraseUser(int index);
-	void eraseOper(int sd);
+	void eraseUser(int index);	//void	removeUser(Client* user);
+	void eraseOper(int sd);		//void	removeOper(Client* oper); // todo
+	void	removeUser(Client* user);
+	void	removeOper(Client* oper); // todo
+	
 };
 
 #endif

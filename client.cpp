@@ -160,6 +160,7 @@ void	Client::removeChannel(Channel* chann_to_del)
 		if ((*chnn_it)->getName() == chann_to_del->getName())
 		{
 			chann_list_.erase(chnn_it);
+			break ;
 		}
 	}
 }

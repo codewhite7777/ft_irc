@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#define STRING std::string
+
 #include "server.hpp"
 #include "irc_protocol.hpp"
 #include <arpa/inet.h>
@@ -569,7 +571,7 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 	new_chann->assignUser(iter->second);
 	//new_chann->assignOper(iter->second);
 	// 한명일때 오퍼레이터 줘야함.
-	iter->second->getChannelList().push_back(param);
+	//iter->second->getChannelList().push_back(param);
 	(void)command;
 }
 

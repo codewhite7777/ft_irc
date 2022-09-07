@@ -51,7 +51,7 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
     }
     //oper 삭제
     channelIter->second->eraseOper(partSocket);
-    
+    iter->second->removeChannel(channelIter->second);
     // 나가기
     requestPartMsg(iter , command, param);
 }
