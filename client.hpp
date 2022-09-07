@@ -17,7 +17,7 @@
 # include <list>
 
 class Channel;
-
+#include <vector>
 typedef int	SOCKET;
 
 class Client
@@ -39,6 +39,8 @@ private:
 	bool					user_real_name_flag_;
 	bool					operator_flag_;
 	std::list<Channel*>		chann_list_;
+
+	std::vector<std::string> channelList;
 
 public:
 	Client(SOCKET s, std::string host_name);
@@ -87,6 +89,10 @@ public:
 
 	void			addChannel(Channel* new_chann);
 	void			removeChannel(Channel* chann_to_del);
+
+
+	// test
+	std::vector<std::string>& getChannelList();
 };
 
 #endif

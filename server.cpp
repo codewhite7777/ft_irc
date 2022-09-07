@@ -568,13 +568,16 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
 
 	new_chann->assignUser(iter->second);
 	//new_chann->assignOper(iter->second);
+	// 한명일때 오퍼레이터 줘야함.
+	iter->second->getChannelList().push_back(param);
 	(void)command;
 }
 
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	if (command != "PONG")
+		std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
@@ -586,6 +589,9 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "PART")
 	{
 		std::cout << "command : PART " << std::endl;
+		{
+			partTest(iter, command, param);	
+		}
 	}
 	else if (command == "QUIT")
 	{
@@ -618,28 +624,25 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
+	std::cout << "test\n";
+	std::cout << command << ' ' << param << '\n';
+	std::cout << "test\n";
 	std::string	tar_nick = param.substr(0, param.find(' '));
 	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
 
 	//채널 메시지
 	//루프 -> 유효한 방 -> 리스트 명단 -> 보내기
-
-	//개인 메시지
 	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
 	{
 		if (c_iter->second->getNickName() == tar_nick)
 		{
-			msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+			msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), "bar.example.com") \
 				+ " PRIVMSG " + iter->second->getNickName() + " :" + msg;
 			insertSendBuffer(c_iter->second, msg);
 			return ;
 		}
 	}
-	//존재하지 않는 닉네임 메시지 처리
-	//TODO : notice의 경우 에러 메시지를 처리하지 않는다.
-	insertSendBuffer(iter->second, buildErrPacket(ERR_NOSUCHNICK, iter->second->getUserName(), tar_nick + ": No such nick \r\n"));
-	(void)command;
-	return ;
+	
 }
 
 void		Server::requestMode(std::map<SOCKET, Client*>::iterator &iter, \

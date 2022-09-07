@@ -137,6 +137,14 @@ private:
 	std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
 	std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
 
-};
 
+public:	void partTest(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+public: void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+public:	void kickTest(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+public: void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+};
 #endif

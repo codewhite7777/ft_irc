@@ -40,6 +40,11 @@ public:
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
 
+
+	std::vector<Client*> getUsers();
+	std::vector<Client*> getOpers_();
+	void eraseUser(int index);
+	void eraseOper(int sd);
 };
 
 #endif

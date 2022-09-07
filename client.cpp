@@ -22,7 +22,7 @@ Client::Client(SOCKET s, std::string host_name)
 	user_flag_ = 0;
 	operator_flag_ = 0;
 	user_real_name_flag_ = 0;
-	this->host_name_ = host_name;
+	host_name_ = host_name;
 	return ;
 }
 
@@ -142,6 +142,10 @@ bool	Client::getOperatorFlag(void) const
 	return (this->operator_flag_);
 }
 
+std::vector<std::string>& Client::getChannelList()
+{
+	return channelList;
+}
 void	Client::addChannel(Channel* new_chann)
 {
 	chann_list_.push_back(new_chann);
