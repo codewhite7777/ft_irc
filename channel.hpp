@@ -23,7 +23,8 @@ private:
 
 	std::string				name_; // tmp... considering to remove
 	
-	//int					count_users;
+	//hena
+	unsigned short			channelMode;
 
 public:
 	Channel(std::string name); // todo: use reference?

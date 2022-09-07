@@ -145,5 +145,9 @@ public:	void kickTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 public: void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
+
+
+public: void ChannelMode(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& name, int signal, std::string& mode);
 };
 #endif

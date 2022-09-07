@@ -12,7 +12,7 @@
 
 #include "channel.hpp"
 
-Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
+Channel::Channel(std::string name) : users_(), opers_(), name_(name), channelMode(15) {}
 
 Channel::Channel(void) : users_(), opers_() {}
 
