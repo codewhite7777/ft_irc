@@ -10,9 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#define STRING std::string
-
 #include "server.hpp"
+#include "client.hpp"
 #include "irc_protocol.hpp"
 #include <arpa/inet.h>
 #include <cctype>
@@ -22,7 +21,6 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <cstring>
-#include "client.hpp"
 #include <sstream>
 #include <vector>
 
@@ -74,40 +72,6 @@ bool	Server::configPort(std::string port)
 	if (getPortNumber(port.c_str(), &retPort) == false)
 		return (false);
 	s_port_ = static_cast<unsigned short>(retPort);
-	return (true);
-}
-
-bool	Server::isValidPort(std::string port)
-{
-	return (port.find_first_not_of("0123456789") == std::string::npos);
-}
-
-t_port	Server::getPortType(int value)
-{
-	if (value >= 0 && value < 1024)
-		return (WELL_KNOWN_PORT);
-	else if (value < 49152)
-		return (REGISTERED_PORT);
-	else if (value < 65536)
-		return (DYNAMIC_PORT);
-	return (INVALID_PORT);
-}
-
-bool	Server::getPortNumber(const char *str, int *o_value)
-{
-	long long total = 0;
-
-	while (*str)
-	{
-		total = total * 10 + *str - '0';
-		if (total > 2147483647 || total < -2147483648)
-			return (false);
-		str++;
-	}
-	t_port	retPort = getPortType(total);
-	if (retPort == WELL_KNOWN_PORT || retPort == INVALID_PORT)
-		return (false);
-	*o_value = total;
 	return (true);
 }
 

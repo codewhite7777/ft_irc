@@ -15,25 +15,10 @@
 
 # include "client.hpp"
 # include "channel.hpp"
+# include "utils.hpp"
 # include <iostream>
 # include <map>
 # include <netinet/in.h>
-
-typedef int	SOCKET;
-
-typedef enum e_port
-{
-	WELL_KNOWN_PORT,
-	REGISTERED_PORT,
-	DYNAMIC_PORT,
-	INVALID_PORT,
-}			t_port;
-
-typedef enum e_buf
-{
-	BUFFER_MAX = 1024 << 4,
-	// BUFFER_MAX = 100,
-}			t_buf;
 
 class Server
 {
@@ -67,9 +52,9 @@ public:
 
 	//configure port
 	bool		configPort(std::string port);
-	bool		isValidPort(std::string port);
-	bool		getPortNumber(const char *str, int *o_value);
-	t_port		getPortType(int value);
+	//bool		isValidPort(std::string port);
+	//bool		getPortNumber(const char *str, int *o_value);
+	//t_port		getPortType(int value);
 
 	//configure pwd
 	bool		configPwd(std::string pwd);
