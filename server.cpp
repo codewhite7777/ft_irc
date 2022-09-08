@@ -352,6 +352,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	std::string	command;
 	std::string	param;
 
+	// parsing
 	std::cout << "recvBuf(origin): [" << iter->second->getRecvBuf() << "]\n";
 	packet_buf = takeFirstProtocol(iter->second->getRecvBuf());
 	std::cout << "packet_buf: [" << packet_buf << "]\n";
@@ -366,6 +367,8 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		command = "";
 		param = packet_buf;
 	}
+
+	// executing
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
 	else if (iter->second->getNickFlag() == false)

@@ -72,8 +72,6 @@ public:
 	//network packet marshalling
 	void		packetMarshalling(void);
 	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
-	std::string	packetTrim(std::string& packet);
-
 	std::string	takeFirstProtocol(std::string& packet);
 
 	//packet request :: PASS
