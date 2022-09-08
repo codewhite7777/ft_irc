@@ -224,6 +224,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 	SOCKET				client_sock;
 	struct sockaddr_in	c_addr_in;
 	socklen_t			c_addr_len = sizeof(c_addr_in);
+
 	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
 	//accept(...)
 	client_sock = accept(listen_sock, reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
@@ -263,18 +264,12 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
-	//disconnect
 	if (recv_ret == 0)
 		iter->second->setDisconnectFlag(true);
 	else if (recv_ret > 0)
 	{
 		buf[recv_ret] = '\0';
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-		// std::cout << "client : " << iter->first << "\n" << recv_ret << "Byte Msg Recv" << std::endl;
-		// std::cout << "Msg : " << '[' << buf << ']' << std::endl;
-		// std::cout << "current size : " << iter->second->getRecvBuf().length() << std::endl;
-		// for(int i=0; i<recv_ret; i++)
-			// std::cout << '[' << (int)buf[i] << ']' << ',' << '[' << buf[i] << ']' << std::endl;
 	}
 	return ;
 }
@@ -285,14 +280,11 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
 	int	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
-	{
 		iter->second->setDisconnectFlag(true);
-		return ;
-	}
-	iter->second->getSendBuf().erase(0, send_ret);
+	else if (send_ret > 0)
+		iter->second->getSendBuf().erase(0, send_ret);
 	return ;
 }
-
 
 void	Server::packetMarshalling(void)
 {
@@ -354,8 +346,9 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	std::string	command;
 	std::string	param;
 
+	std::cout << "packet(pure) : " << "[" << packet_buf << "]" << std::endl;
 	packet_buf = packetTrim(iter->second->getRecvBuf());
-	std::cout << "packet : " << "[" << packet_buf << "]" << std::endl;
+	std::cout << "packet(trimmed) : " << "[" << packet_buf << "]" << std::endl;
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));
