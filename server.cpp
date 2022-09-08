@@ -19,6 +19,7 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <cstring>
+#include "client.hpp"
 #include "irc_protocol.hpp"
 #include <sstream>
 #include <vector>
@@ -612,19 +613,28 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 	// 루프 -> 유효한 방 -> 리스트 명단 -> 보내기
 	if (tar_nick[0] == '#')
 	{
-		for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
+		std::map<std::string, Channel*>::iterator chanIter = chann_map_.find(tar_nick);
+		if (chanIter == chann_map_.end())
 		{
-			std::cout << "name Test: " << c_iter->second->getNickName() <<' ' << tar_nick << '\n';
-			if (c_iter->second->getNickName() != iter->second->getNickName())
+			std::cout << "not found \n";
+		}
+		else {
+			std::vector<Client*> clientVector = chanIter->second->getUsers();
+			std::cout << "now client count: " << clientVector.size() << '\n';
+			for (std::vector<Client*>::iterator it = clientVector.begin() ; it != clientVector.end() ; ++it)
 			{
-				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
-					+ " PRIVMSG " + tar_nick + " :" + msg;
-				msg += "\r\n";
-				std::cout << msg << '\n';
-				insertSendBuffer(c_iter->second, msg);
-				return ;
+				std::cout << (*it)->getNickName() << ' ' << iter->second->getNickName() << '\n';
+				if ((*it)->getNickName() != iter->second->getNickName())
+				{
+					std::string message = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+						+ " PRIVMSG " + tar_nick + " :" + msg;
+					message += "\r\n";
+					std::cout << message << '\n';
+					insertSendBuffer((*it), message);
+				}
 			}
 		}
+		
 	}
 	else {
 		for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)

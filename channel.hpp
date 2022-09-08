@@ -36,8 +36,8 @@ public:
 	void	setName(std::string &name);
 
 
-	std::vector<Client*> getUsers();
-	std::vector<Client*> getOpers_();
+	std::vector<Client*>& getUsers();
+	std::vector<Client*>& getOpers_();
 	void eraseUser(int index);
 	void eraseOper(int sd);
 };

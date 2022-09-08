@@ -71,12 +71,12 @@ void	Channel::setName(std::string &name)
 	name_ = name;
 }
 
-std::vector<Client*> Channel::getUsers()
+std::vector<Client*>& Channel::getUsers()
 {
 	return users_;
 }
 
-std::vector<Client*> Channel::getOpers_()
+std::vector<Client*>& Channel::getOpers_()
 {
 	return opers_;
 }
