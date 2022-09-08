@@ -29,6 +29,11 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
     // 검색
     std::string channelName = param;
     std::map<std::string, Channel *>::iterator channelIter = chann_map_.find(channelName);
+    if (channelIter == chann_map_.end())
+    {
+        std::cout << "tq";
+        exit(0);
+    }
     int partSocket = iter->second->getSocket();
 
 
@@ -37,10 +42,11 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
     std::cout << "partSocket :  [" << partSocket << "]\n";
     
     std::vector<Client*> ClientList = channelIter->second->getUsers();
-
+    std::cout << ClientList.size() << '\n';
     //channel에서 삭제
     for (unsigned int i = 0 ; i < ClientList.size() ; ++i)
     {
+        std::cout << i << '\n';
         // 삭제 로직
         if (partSocket == ClientList[i]->getSocket())
         {

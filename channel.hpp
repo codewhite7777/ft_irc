@@ -40,13 +40,10 @@ public:
 	const std::string&	getName(void) const;
 
 
-	std::vector<Client*> getUsers();
-	std::vector<Client*> getOpers_();
+	std::vector<Client*>& getUsers();
+	std::vector<Client*>& getOpers_();
 	void eraseUser(int index);	//void	removeUser(Client* user);
 	void eraseOper(int sd);		//void	removeOper(Client* oper); // todo
-	void	removeUser(Client* user);
-	void	removeOper(Client* oper); // todo
-	
 };
 
 #endif
