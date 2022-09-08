@@ -293,7 +293,7 @@ void	Server::packetMarshalling(void)
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			packetAnalysis(iter);
-			iter->second->getRecvBuf().clear();
+			//iter->second->getRecvBuf().clear();
 		}
 	}
 	return ;
