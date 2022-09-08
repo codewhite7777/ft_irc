@@ -46,3 +46,24 @@ bool	getPortNumber(const char *str, int *o_value)
 	*o_value = total;
 	return (true);
 }
+
+bool	isSpecialCharactor(const std::string& str)
+{
+	size_t i = 0;
+	while (i < str.size())
+	{
+		if (!std::isalnum(str[i]))
+			return (true);
+		++i;
+	}
+	return (false);
+}
+
+bool	isValidPwd(const std::string& pwd)
+{
+	if (pwd.length() == 0)
+		return (false);
+	if (isSpecialCharactor(pwd))
+		return (false);
+	return (true);
+}

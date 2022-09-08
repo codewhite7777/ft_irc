@@ -31,9 +31,13 @@ typedef enum e_buf
 	// BUFFER_MAX = 100,
 }			t_buf;
 
-//configure port
+// configure port
 bool	isValidPort(const std::string& port);
 t_port	getPortType(int value);
 bool	getPortNumber(const char *str, int *o_value);
+
+// configure pwd
+bool	isValidPwd(const std::string& pwd);
+bool	isSpecialCharactor(const std::string& str);
 
 #endif

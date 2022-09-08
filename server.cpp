@@ -83,35 +83,6 @@ bool	Server::configPwd(std::string pwd)
 	return (true);
 }
 
-bool	isSpecialCharactor(std::string str)
-{
-	size_t i = 0;
-#ifdef DEBUG
-	std::cout << str << '\n';
-	std::cout << "size: " << str.size() << '\n';
-#endif
-	while (i < str.size())
-	{
-		if (!std::isalnum(str[i]))
-			return (true);
-#ifdef DEBUG
-		else
-			std::cout << str[i] << "is number or alpha\n";
-#endif
-		++i;
-	}
-	return (false);
-}
-
-bool	Server::isValidPwd(std::string pwd)
-{
-	if (pwd.length() == 0)
-		return (false);
-	if (isSpecialCharactor(pwd))
-		return (false);
-	return (true);
-}
-
 void	Server::networkInit(void)
 {
 	int retval;

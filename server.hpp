@@ -52,13 +52,9 @@ public:
 
 	//configure port
 	bool		configPort(std::string port);
-	//bool		isValidPort(std::string port);
-	//bool		getPortNumber(const char *str, int *o_value);
-	//t_port		getPortType(int value);
 
 	//configure pwd
 	bool		configPwd(std::string pwd);
-	bool		isValidPwd(std::string pwd);
 
 	//network init, close
 	void		networkInit(void);
