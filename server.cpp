@@ -325,19 +325,25 @@ std::string	Server::getUserInfo(std::string nickname, std::string username, std:
 	return (msg);
 }
 
-std::string	Server::packetTrim(std::string& packet)
-{
-	std::string	packet_buf = packet;
+/*
+	take first protocol from packet
 
-	//erase newline
-	if (packet_buf.find('\n') != std::string::npos && packet_buf.at(packet_buf.length() - 1) == '\n')
+	1) [one protocol] If no more behind \r\n, just return pure packet.
+	2) [more than one protocol] If something behind \r\n, split packet by first \r\n and return only first protocol.
+	3) [no protocol] If no \r\n, return empty.
+*/
+std::string	Server::takeFirstProtocol(std::string& packet)
+{
+	std::string	first_proto("");
+	size_t		found(0);
+
+	found = packet.find("\r\n");
+	if (found != std::string::npos)
 	{
-		packet_buf.erase(packet_buf.begin() + packet_buf.find('\n'));
-		//erase carrige return
-		if (packet_buf.find('\r') != std::string::npos && packet_buf.length() > 1)
-			packet_buf.erase(packet_buf.begin() + packet_buf.find('\r'));
+		first_proto = packet.substr(0, found);
+		packet.erase(0, found + 2);
 	}
-	return (packet_buf);
+	return (first_proto);
 }
 
 void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
@@ -346,9 +352,10 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	std::string	command;
 	std::string	param;
 
-	std::cout << "packet(pure) : " << "[" << packet_buf << "]" << std::endl;
-	packet_buf = packetTrim(iter->second->getRecvBuf());
-	std::cout << "packet(trimmed) : " << "[" << packet_buf << "]" << std::endl;
+	std::cout << "recvBuf(origin): [" << iter->second->getRecvBuf() << "]\n";
+	packet_buf = takeFirstProtocol(iter->second->getRecvBuf());
+	std::cout << "packet_buf: [" << packet_buf << "]\n";
+	std::cout << "recvBuf(after): [" <<	iter->second->getRecvBuf() << "]\n";
 	if (packet_buf.find(' ') != std::string::npos)
 	{
 		command = packet_buf.substr(0, packet_buf.find(' '));

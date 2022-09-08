@@ -74,6 +74,8 @@ public:
 	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
 	std::string	packetTrim(std::string& packet);
 
+	std::string	takeFirstProtocol(std::string& packet);
+
 	//packet request :: PASS
 	void		requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
