@@ -464,7 +464,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 	else
 	{
 		std::vector<std::string> splitVector = split(param, ' ');
-		if (splitVector.size() != 4)
+		if (splitVector.size() < 4)
 		{
 			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
 			return ;
@@ -474,7 +474,18 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			iter->second->setUserName(true, splitVector[0]);
 			iter->second->setMode(splitVector[1]);
 			iter->second->setUnused(splitVector[2]);
-			iter->second->setUserRealName(true, splitVector[3]);
+
+			std::string	tmp_user_name;
+			for (std::size_t i = 3; i < splitVector.size(); ++i)
+			{
+				tmp_user_name += splitVector[i];
+			}
+			std::size_t	found = tmp_user_name.find_first_of(':');
+			if (found != std::string::npos)
+			{
+				tmp_user_name.erase(found);
+			}
+			iter->second->setUserRealName(true, tmp_user_name);
 			// 내 맘임!
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
