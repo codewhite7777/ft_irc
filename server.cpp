@@ -431,16 +431,16 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-std::vector<std::string> split(std::string str, char delimiter)
-{
-	std::vector<std::string>	internal;
-	std::stringstream			ss(str);
-	std::string					temp;
+// std::vector<std::string> split(std::string str, char delimiter)
+// {
+// 	std::vector<std::string>	internal;
+// 	std::stringstream			ss(str);
+// 	std::string					temp;
 
-	while (getline(ss, temp, delimiter))
-		internal.push_back(temp);
-	return (internal);
-}
+// 	while (getline(ss, temp, delimiter))
+// 		internal.push_back(temp);
+// 	return (internal);
+// }
 
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
@@ -591,46 +591,6 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 			}
 		}
 	}
-}
-
-void		Server::requestMode(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	std::string	cp_param;
-	std::string	tar_nick;
-	std::string	option;
-	size_t		pos;
-
-	cp_param = param;
-	pos = cp_param.find(' ');
-	if (pos == std::string::npos)
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, iter->second->getUserName(), ":info) Not enough parameter\r\n"));
-		return ;
-	}
-	tar_nick = param.substr(0, pos);
-	option = cp_param.erase(0, pos + 1);
-
-	std::cout << "target : " << tar_nick << std::endl;
-	std::cout << "option : " << option << std::endl;
-
-	//채널에서 해당 타겟 클라이언트가 존재하는지 확인 -> 없다? -> Error(401): +o No such nick
-
-
-	if (option == "-o")
-	{
-
-	}
-	else
-	{
-
-	}
-
-	//OPER <Name> <Pass>
-	(void)command;
-	(void)iter;
-	(void)param;
-	return ;
 }
 
 void	Server::clientDisconnect(void)

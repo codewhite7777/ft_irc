@@ -14,7 +14,7 @@
 # define CHANNEL_HPP
 # include <vector>
 # include "client.hpp"
-
+# include "mode.hpp"
 class Channel
 {
 private:
@@ -22,8 +22,7 @@ private:
 	std::vector<Client*>	opers_;
 
 	std::string				name_; // tmp... considering to remove
-	
-	//int					count_users;
+	Mode					mode;//add my
 
 public:
 	Channel(std::string name); // todo: use reference?
@@ -44,6 +43,11 @@ public:
 	std::vector<Client*>& getOpers_();
 	void eraseUser(int index);	//void	removeUser(Client* user);
 	void eraseOper(int sd);		//void	removeOper(Client* oper); // todo
+
+	Mode& getChannelState()
+	{
+		return mode;
+	}
 };
 
 #endif

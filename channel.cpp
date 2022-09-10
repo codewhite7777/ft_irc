@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include "channel.hpp"
+#include "mode.hpp"
 
-Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
+Channel::Channel(std::string name) : users_(), opers_(), name_(name),mode(CHANNEL_MODE) {}
 
-Channel::Channel(void) : users_(), opers_() {}
+Channel::Channel(void) : users_(), opers_(), mode(CHANNEL_MODE) {}
 
 Channel::~Channel(void) {}
 
@@ -78,7 +79,7 @@ void	Channel::assignUser(Client* new_user)
 	std::string host = ":bar.example.com ";
 	// std::string re1 = host + "332 " + new_user->getNickName()+ ' ' + name_ + " :\r\n";
 	// new_user->getSendBuf().append(re1);
-	std::string re2 = host + "353 " + new_user->getNickName()+ " = " + name_ + " :";
+	std::string re2 = host + "353 " + new_user->getNickName()+ " = " + name_ + " :@";
 	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
 	{
 		re2 += (*user_it)->getNickName() + " ";

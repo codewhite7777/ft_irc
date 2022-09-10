@@ -40,4 +40,6 @@ bool	getPortNumber(const char *str, int *o_value);
 bool	isValidPwd(const std::string& pwd);
 bool	isSpecialCharactor(const std::string& str);
 
+
+std::vector<std::string> split(std::string input, char delimiter);
 #endif

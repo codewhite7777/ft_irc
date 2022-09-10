@@ -23,7 +23,8 @@ SRC_FILE	=	main.cpp \
 				channel.cpp \
 				join.cpp \
 				part.cpp \
-				utils.cpp
+				utils.cpp \
+				mode.cpp
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 
