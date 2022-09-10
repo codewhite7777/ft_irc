@@ -89,10 +89,8 @@ void	Server::networkInit(void)
 
 	// socket
 	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (listen_sock_ == -1) {
-		#ifdef DEBUG
-		std::cout << "socket() failed\n";
-		#endif
+	if (listen_sock_ == -1)
+	{
 		status_ = false;
 		return ;
 	}
@@ -105,10 +103,8 @@ void	Server::networkInit(void)
 	int optval = 1;
 	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR,
 		&optval, sizeof(optval));
-	if (retval == -1) {
-		#ifdef DEBUG
-		std::cout << "setsockopt() for SO_REUSADDR failed\n";
-		#endif
+	if (retval == -1)
+	{
 		status_ = false;
 		return ;
 	}
@@ -118,9 +114,6 @@ void	Server::networkInit(void)
 	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 	if (retval == -1)
 	{
-		#ifdef DEBUG
-		std::cout << "setsockopt() for TCP_NODELAY failed\n";
-		#endif
 		status_ = false;
 		return ;
 	}
@@ -131,20 +124,16 @@ void	Server::networkInit(void)
 	s_addr_in_.sin_addr.s_addr = htonl(INADDR_ANY);
 	s_addr_in_.sin_port = htons(s_port_); // SERVERPORT
 	retval = bind(listen_sock_, reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
-	if (retval == -1) {
-		#ifdef DEBUG
-		std::cout << "bind() failed\n";
-		#endif
+	if (retval == -1)
+	{
 		status_ = false;
 		return ;
 	}
 
 	// listen
 	retval = listen(listen_sock_, SOMAXCONN);
-	if (retval == -1) {
-		#ifdef DEBUG
-		std::cout << "listen() failed\n";
-		#endif
+	if (retval == -1)
+	{
 		status_ = false;
 		return ;
 	}
