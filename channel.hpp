@@ -14,7 +14,7 @@
 # define CHANNEL_HPP
 # include <vector>
 # include "client.hpp"
-# include "mode.hpp"
+# include "ModeClass.hpp"
 # include "map"
 
 class Channel
@@ -25,7 +25,7 @@ private:
 
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
-
+	Mode state;
 public:
 	Channel(std::string name); // todo: use reference?
 	Channel(void);

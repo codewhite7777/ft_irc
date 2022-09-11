@@ -180,7 +180,7 @@ void	Client::leaveAllChannels(void)
 	{
 		//std::cout << "chnn_it address: [" << chnn_it << "]\n";
 		// 문제: (*chnn_it)가 NULL임 -> 다시보니 chnn_it가 NULL임.. 근데 iterator인데 어떻게..?
-		if (*chnn_it == NULL)
+		if (*chnn_it == NULL) // chnn_it을 참조하는 순간 zero-page access로 터진다
 			continue ;
 		std::cout << "channel address: [" << (*chnn_it) << "]\n";
 		(*chnn_it)->eraseUser(nick_name_);

@@ -17,12 +17,15 @@ enum  PARAM_TYPE
 class Mode
 {
 // 생성자
-public:	Mode(void);
+public:	Mode(STRING);
 
 // 멤버 함수들
 public: bool IsProperMode(STRING input);
 
-void ChangeChannelMode(std::string mode);
+void ClassifyMode(std::string mode);
+
+void ChangeChannelMode(STRING, STRING);
+void ChangeChannelMode(STRING, STRING, STRING);
 
 std::string getChannelMode(void)
 {
