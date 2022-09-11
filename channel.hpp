@@ -15,12 +15,15 @@
 # include <vector>
 # include "client.hpp"
 # include "mode.hpp"
+# include "map"
+
 class Channel
 {
 private:
 	std::vector<Client*>	users_;
-	std::vector<Client*>	opers_;
+	std::map<std::string, Client*>	opers_;
 
+	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
 	Mode					mode;//add my
 
@@ -32,6 +35,8 @@ public:
 
 	void	assignUser(Client* new_user);
 	void	assignOper(Client* user);
+
+	bool	isUserAlreadyIn(Client* user);
 
 	
 

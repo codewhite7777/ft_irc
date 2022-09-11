@@ -146,6 +146,7 @@ std::vector<std::string>& Client::getChannelList()
 {
 	return channelList;
 }
+
 void	Client::addChannel(Channel* new_chann)
 {
 	chann_list_.push_back(new_chann);

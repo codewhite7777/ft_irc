@@ -22,10 +22,11 @@ SRC_FILE	=	main.cpp \
 				client.cpp \
 				channel.cpp \
 				join.cpp \
-				part.cpp \
 				utils.cpp \
-				mode.cpp	\
-				Message.cpp	\
+				Message.cpp
+				
+#part.cpp
+#mode.cpp
 				
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =

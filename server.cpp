@@ -508,7 +508,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		std::cout << "command : PART " << std::endl;
 		{
-			partTest(iter, command, param);	
+			//partTest(iter, command, param);	
 		}
 	}
 	else if (command == "QUIT")
@@ -524,7 +524,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "MODE")
 	{
 		std::cout << "command : " << command << ", param : " << param << std::endl;
-		requestMode(iter, command, param);
+		//requestMode(iter, command, param);
 	}
 	else if (command == "KICK")
 	{
