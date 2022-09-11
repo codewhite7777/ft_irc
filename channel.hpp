@@ -25,7 +25,7 @@ private:
 
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
-	Mode state;
+	// Mode state;
 public:
 	Channel(std::string name); // todo: use reference?
 	Channel(void);
@@ -49,7 +49,6 @@ public:
 	void eraseUser(int index);
 	void eraseUser(const std::string& nick);	//void	removeUser(Client* user);
 	void eraseOper(const std::string& nick);	//void	removeOper(Client* oper); // todo
-
 };
 
 #endif

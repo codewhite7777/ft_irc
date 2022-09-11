@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "mode.hpp"
 #include "client.hpp"
 #include "irc_protocol.hpp"
 #include "Message.hpp"

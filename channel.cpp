@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "channel.hpp"
-#include "mode.hpp"
 #include <iterator>
 
 Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
