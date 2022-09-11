@@ -142,10 +142,12 @@ bool	Client::getOperatorFlag(void) const
 	return (this->operator_flag_);
 }
 
+/*
 std::vector<std::string>& Client::getChannelList()
 {
 	return channelList;
 }
+*/
 
 void	Client::addChannel(Channel* new_chann)
 {
@@ -160,8 +162,28 @@ void	Client::removeChannel(Channel* chann_to_del)
 	{
 		if ((*chnn_it)->getName() == chann_to_del->getName())
 		{
+			//chann_to_del->eraseUser(nick_name_);
 			chann_list_.erase(chnn_it);
 			break ;
 		}
 	}
+}
+
+void	Client::leaveAllChannels(void)
+{
+	std::cout << "channel size: [" << chann_list_.size() << "]\n";
+	// 왜 채널 1개에만 들어가있는데 사이즈가 2냐...?
+
+	for (std::list<Channel*>::iterator chnn_it
+		; chnn_it != chann_list_.end()
+		; ++chnn_it)
+	{
+		//std::cout << "chnn_it address: [" << chnn_it << "]\n";
+		// 문제: (*chnn_it)가 NULL임 -> 다시보니 chnn_it가 NULL임.. 근데 iterator인데 어떻게..?
+		if (*chnn_it == NULL)
+			continue ;
+		std::cout << "channel address: [" << (*chnn_it) << "]\n";
+		(*chnn_it)->eraseUser(nick_name_);
+	}
+	chann_list_.clear();
 }

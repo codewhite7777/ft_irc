@@ -14,9 +14,9 @@
 #include "mode.hpp"
 #include <iterator>
 
-Channel::Channel(std::string name) : users_(), opers_(), name_(name),mode(CHANNEL_MODE) {}
+Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
 
-Channel::Channel(void) : users_(), opers_(), mode(CHANNEL_MODE) {}
+Channel::Channel(void) : users_(), opers_() {}
 
 Channel::~Channel(void) {}
 
@@ -131,9 +131,26 @@ void Channel::eraseUser(int index)
 {
 	users_.erase(users_.begin() + index);
 }
-void Channel::eraseOper(const std::string nick)
+
+void Channel::eraseUser(const std::string& nick)
+{
+	for (std::vector<Client*>::iterator clnt_it
+		; clnt_it != users_.end()
+		; ++clnt_it)
+	{
+		if ((*clnt_it)->getNickName() == nick)
+		{
+			if (opers_.find(nick) != opers_.end())
+			{
+				eraseOper(nick);
+			}
+			users_.erase(clnt_it);
+		}
+	}
+}
+
+void Channel::eraseOper(const std::string& nick)
 {
 	opers_.erase(nick);
 	// std::map<std::string, Client*>::iterator iter;
-
 }

@@ -25,7 +25,6 @@ private:
 
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
-	Mode					mode;//add my
 
 public:
 	Channel(std::string name); // todo: use reference?
@@ -46,13 +45,11 @@ public:
 
 	std::vector<Client*>& getUsers();
 	std::vector<Client*>& getOpers_();
-	void eraseUser(int index);	//void	removeUser(Client* user);
-	void eraseOper(std::string);		//void	removeOper(Client* oper); // todo
 
-	Mode& getChannelState()
-	{
-		return mode;
-	}
+	void eraseUser(int index);
+	void eraseUser(const std::string& nick);	//void	removeUser(Client* user);
+	void eraseOper(const std::string& nick);	//void	removeOper(Client* oper); // todo
+
 };
 
 #endif

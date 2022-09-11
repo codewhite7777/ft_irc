@@ -514,6 +514,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "QUIT")
 	{
 		std::cout << "command : quit " << std::endl;
+		iter->second->leaveAllChannels();
 		iter->second->setDisconnectFlag(true);
 	}
 	else if (command == "PRIVMSG" || command == "NOTICE")
@@ -601,7 +602,7 @@ void	Server::clientDisconnect(void)
 		{
 			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			close(iter->first);
-			delete iter->second;
+			delete iter->second; // critical point
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
 		}

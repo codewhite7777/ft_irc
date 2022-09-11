@@ -56,6 +56,7 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
         if (partSocket == ClientList[i]->getSocket())
         {
             std::cout << "Fount it\n";
+            //channelIter->second->eraseUser(ClientList[i]->getNickName());   
             channelIter->second->eraseUser(i);   
             break;
         }

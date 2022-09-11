@@ -40,8 +40,6 @@ private:
 	bool					operator_flag_;
 	std::list<Channel*>		chann_list_;
 
-	std::vector<std::string> channelList;
-
 public:
 	Client(SOCKET s, std::string host_name);
 	~Client(void);
@@ -89,10 +87,8 @@ public:
 
 	void			addChannel(Channel* new_chann);
 	void			removeChannel(Channel* chann_to_del);
+	void			leaveAllChannels(void);
 
-
-	// test
-	std::vector<std::string>& getChannelList();
 };
 
 #endif

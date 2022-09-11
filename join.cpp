@@ -18,6 +18,7 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 				chann_iter->second->assignOper(client_iter->second);
 			std::cout << "already channel name\n";
 			chann_iter->second->assignUser(client_iter->second);
+			client_iter->second->addChannel(chann_iter->second);
 			return ;
 		}
 	}
@@ -29,6 +30,6 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 	new_chann->assignOper(client_iter->second);
 	new_chann->assignUser(client_iter->second);
 	
-	client_iter->second->getChannelList().push_back(param);
+	client_iter->second->addChannel(new_chann);
 	(void)command;
 }
