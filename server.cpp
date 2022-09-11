@@ -508,7 +508,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		std::cout << "command : PART " << std::endl;
 		{
-			//partTest(iter, command, param);	
+			partTest(iter, command, param);	
 		}
 	}
 	else if (command == "QUIT")

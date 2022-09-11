@@ -20,7 +20,6 @@ Channel::Channel(void) : users_(), opers_(), mode(CHANNEL_MODE) {}
 
 Channel::~Channel(void) {}
 
-
 bool	Channel::isUserAlreadyIn(Client* user)
 {
 	for (std::vector<Client*>::iterator user_it = users_.begin()
@@ -131,4 +130,10 @@ std::vector<Client*>& Channel::getUsers()
 void Channel::eraseUser(int index)
 {
 	users_.erase(users_.begin() + index);
+}
+void Channel::eraseOper(const std::string nick)
+{
+	opers_.erase(nick);
+	// std::map<std::string, Client*>::iterator iter;
+
 }

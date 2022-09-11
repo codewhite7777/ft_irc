@@ -23,9 +23,8 @@ SRC_FILE	=	main.cpp \
 				channel.cpp \
 				join.cpp \
 				utils.cpp \
-				Message.cpp
-				
-#part.cpp
+				Message.cpp \
+				part.cpp
 #mode.cpp
 				
 OBJ_FILE = $(SRC_FILE:.cpp=.o)

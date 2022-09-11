@@ -14,6 +14,8 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 	{
 		if (chann_iter->first == param)
 		{
+			if (!chann_iter->second->getUsers().size())
+				chann_iter->second->assignOper(client_iter->second);
 			std::cout << "already channel name\n";
 			chann_iter->second->assignUser(client_iter->second);
 			return ;

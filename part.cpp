@@ -3,6 +3,7 @@
 # include <map>
 # include "channel.hpp"
 #include "server.hpp"
+#include "utils.hpp"
 
 void	Server::requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
@@ -28,14 +29,18 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
 {
     // 검색
     std::string channelName = param;
+    std::vector<std::string> splitted_param = split(param, ' ');
+    if (splitted_param.size() > 1)
+    {
+        channelName = splitted_param[0];
+    }
     std::map<std::string, Channel *>::iterator channelIter = chann_map_.find(channelName);
     if (channelIter == chann_map_.end())
     {
-        std::cout << "tq";
+        std::cout << "WTF";
         exit(0);
     }
     int partSocket = iter->second->getSocket();
-
 
     std::cout << "PART TEST START\n";
     std::cout << "param :  [" << channelName << "]\n";
@@ -56,8 +61,9 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
         }
     }
     //oper 삭제
-    channelIter->second->eraseOper(partSocket);
+    channelIter->second->eraseOper(iter->second->getNickName());
     iter->second->removeChannel(channelIter->second);
     // 나가기
     requestPartMsg(iter , command, param);
+    // todo: part leaving message
 }

@@ -47,7 +47,7 @@ public:
 	std::vector<Client*>& getUsers();
 	std::vector<Client*>& getOpers_();
 	void eraseUser(int index);	//void	removeUser(Client* user);
-	void eraseOper(int sd);		//void	removeOper(Client* oper); // todo
+	void eraseOper(std::string);		//void	removeOper(Client* oper); // todo
 
 	Mode& getChannelState()
 	{
