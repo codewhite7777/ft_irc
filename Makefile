@@ -25,6 +25,8 @@ SRC_FILE	=	main.cpp \
 				utils.cpp \
 				Message.cpp \
 				part.cpp	\
+				privmsg.cpp	\
+				quit.cpp
 #mode.cpp
 				
 OBJ_FILE = $(SRC_FILE:.cpp=.o)

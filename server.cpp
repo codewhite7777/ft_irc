@@ -282,6 +282,7 @@ void	Server::packetMarshalling(void)
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			packetAnalysis(iter);
+			return ;
 			//iter->second->getRecvBuf().clear();
 		}
 	}
@@ -515,12 +516,15 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "QUIT")
 	{
 		std::cout << "command : quit " << std::endl;
+
 		iter->second->setDisconnectFlag(true);
+		quitTest(iter, command, param);
+		return ;
 	}
 	else if (command == "PRIVMSG" || command == "NOTICE")
 	{
 		std::cout << "command : privmsg" << std::endl;
-		// requestPrivateMsg(iter, command, param);
+		requestPrivateMsg(iter, command, param);
 	}
 	else if (command == "MODE")
 	{
@@ -539,60 +543,6 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;
 }
-
-// void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
-// 						std::string& command, std::string& param)
-// {
-// 	std::cout << "test\n";
-// 	std::cout << command << ' ' << param << '\n';
-// 	std::cout << "test\n";
-// 	std::string	tar_nick = param.substr(0, param.find(' '));
-// 	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
-
-// 	std::cout << tar_nick << '\n';
-// 	// 채널 메시지
-// 	// 루프 -> 유효한 방 -> 리스트 명단 -> 보내기
-// 	if (tar_nick[0] == '#')
-// 	{
-// 		std::map<std::string, Channel*>::iterator chanIter = chann_map_.find(tar_nick);
-// 		if (chanIter == chann_map_.end())
-// 		{
-// 			std::cout << "not found \n";
-// 		}
-// 		else {
-// 			std::vector<Client*> clientVector = chanIter->second->getUsers();
-// 			std::cout << "now client count: " << clientVector.size() << '\n';
-// 			for (std::vector<Client*>::iterator it = clientVector.begin() ; it != clientVector.end() ; ++it)
-// 			{
-// 				std::cout << (*it)->getNickName() << ' ' << iter->second->getNickName() << '\n';
-// 				if ((*it)->getNickName() != iter->second->getNickName())
-// 				{
-// 					std::string message = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
-// 						+ " PRIVMSG " + tar_nick + " :" + msg;
-// 					message += "\r\n";
-// 					std::cout << message << '\n';
-// 					insertSendBuffer((*it), message);
-// 				}
-// 			}
-// 		}
-		
-// 	}
-// 	else {
-// 		for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
-// 		{
-// 			std::cout << "name Test: " << c_iter->second->getNickName() <<' ' << tar_nick << '\n';
-// 			if (c_iter->second->getNickName() == tar_nick)
-// 			{
-// 				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
-// 					+ " PRIVMSG " + tar_nick + " :" + msg;
-// 				msg += "\r\n";
-// 				std::cout << msg << '\n';
-// 				insertSendBuffer(c_iter->second, msg);
-// 				return ;
-// 			}
-// 		}
-// 	}
-// }
 
 void	Server::clientDisconnect(void)
 {
