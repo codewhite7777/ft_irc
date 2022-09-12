@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 11:50:38 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/12 17:23:08 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ void	Client::leaveAllChannels(void)
 	std::cout << "channel size: [" << chann_list_.size() << "]\n";
 	// 왜 채널 1개에만 들어가있는데 사이즈가 2냐...?
 
-	for (std::list<Channel*>::iterator chnn_it
+	for (std::list<Channel*>::iterator chnn_it = chann_list_.begin()
 		; chnn_it != chann_list_.end()
 		; ++chnn_it)
 	{
@@ -184,6 +184,7 @@ void	Client::leaveAllChannels(void)
 			continue ;
 		std::cout << "channel address: [" << (*chnn_it) << "]\n";
 		(*chnn_it)->eraseUser(nick_name_);
+		// (*chnn_it)->eraseOper(nick_name_);
 	}
 	chann_list_.clear();
 }
