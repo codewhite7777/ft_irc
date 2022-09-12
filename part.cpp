@@ -12,14 +12,10 @@ void	Server::requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
     std::string msg = "";
     for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
     {
-        // if (c_iter != iter)
-        // {
-            msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), "bar.example.com ") \
-                + command + " " + param + " :Bye\r\n"; 
-            std::cout << msg << '\n';
-            insertSendBuffer(c_iter->second, msg);
-
-        // }
+        msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), "bar.example.com ") \
+            + command + " " + param + " :Bye\r\n"; 
+        std::cout << msg << '\n';
+        insertSendBuffer(c_iter->second, msg);
     }
 }
 
@@ -27,44 +23,34 @@ void	Server::requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
 void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-    // 검색
-    std::string channelName = param;
+    // #체널 + 메세지 올 경우    
     std::vector<std::string> splitted_param = split(param, ' ');
-    if (splitted_param.size() > 1)
-    {
-        channelName = splitted_param[0];
-    }
-    std::map<std::string, Channel *>::iterator channelIter = chann_map_.find(channelName);
-    if (channelIter == chann_map_.end())
-    {
-        std::cout << "WTF";
-        exit(0);
-    }
+
+    std::string channelName = splitted_param[0];
+    std::map<std::string, Channel *>::iterator channel_iter = chann_map_.find(channelName);
+
+    // 없다면 part할 필요가 없음
+    if (channel_iter == chann_map_.end())
+        return ;
+    
+    // 나갈 친구의 fd
     int partSocket = iter->second->getSocket();
 
     std::cout << "PART TEST START\n";
     std::cout << "param :  [" << channelName << "]\n";
     std::cout << "partSocket :  [" << partSocket << "]\n";
     
-    std::vector<Client*> ClientList = channelIter->second->getUsers();
-    std::cout << ClientList.size() << '\n';
-    //channel에서 삭제
-    for (unsigned int i = 0 ; i < ClientList.size() ; ++i)
-    {
-        std::cout << i << '\n';
-        // 삭제 로직
-        if (partSocket == ClientList[i]->getSocket())
-        {
-            std::cout << "Fount it\n";
-            //channelIter->second->eraseUser(ClientList[i]->getNickName());   
-            channelIter->second->eraseUser(i);   
-            break;
-        }
-    }
-    //oper 삭제
-    channelIter->second->eraseOper(iter->second->getNickName());
-    iter->second->removeChannel(channelIter->second);
+    MAP<int, Client*> client_map = channel_iter->second->getUsers_();
+    
+    MAP<int, Client*>::iterator client_iter = client_map.find(partSocket);
+    // 내가 찾는 친구가 없네? 그럼 끝
+    if (client_iter == client_map.end())
+        return ;
     // 나가기
+    channel_iter->second->eraseUser(partSocket);
+    channel_iter->second->eraseOper(partSocket);
+    
+    // 명령어 요청
     requestPartMsg(iter , command, param);
     // todo: part leaving message
 }

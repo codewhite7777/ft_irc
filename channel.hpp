@@ -17,11 +17,12 @@
 # include "ModeClass.hpp"
 # include "map"
 
+#define MAP std::map
 class Channel
 {
 private:
-	std::vector<Client*>	users_;
-	std::map<std::string, Client*>	opers_;
+	std::map<int , Client*>	users_;
+	std::map<int , Client*>	opers_;
 
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
@@ -32,23 +33,23 @@ public:
 	~Channel(void);
 	// todo: OCCF
 
-	void	assignUser(Client* new_user);
-	void	assignOper(Client* user);
+	void	assignUser(int fd, Client* new_user);
+	void	assignOper(int fd, Client* user);
 
-	bool	isUserAlreadyIn(Client* user);
+	bool	isUserAlreadyIn(int);
 
 
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
 
+	MAP<int, Client*>&	getUsers_();
+	MAP<int, Client*>&	getOpers_();
 
-	std::vector<Client*>& getUsers();
-	std::vector<Client*>& getOpers_();
-
-	void eraseUser(int index);
-	void eraseUser(std::string& nick);	//void	removeUser(Client* user);
-	void eraseOper(const std::string& nick);	//void	removeOper(Client* oper); // todo
+	void eraseUser(int fd);
+	void eraseOper(int fd);
+	// void eraseUser(std::string& nick);	//void	removeUser(Client* user);
+	
 };
 
 #endif

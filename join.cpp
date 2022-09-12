@@ -3,33 +3,37 @@
 #include <netinet/tcp.h>
 #include <sstream>
 #include <vector>
-
+#define VECTOR std::vector
+#define MAP std::map
 void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 						std::string& command, std::string& param)
 {
-	// find channel name in chann_map
-	for (std::map<std::string, Channel*>::iterator chann_iter = chann_map_.begin()\
-		; chann_iter != chann_map_.end()\
-		; ++chann_iter)
+	VECTOR<STRING> server_split = split(param, ',');
+	
+	// ,으로 구분해주고 일일이 넣어줘야한다.
+	for (unsigned int i = 0 ; i < server_split.size() ; ++i)
 	{
-		if (chann_iter->first == param)
+		std::cout << "TEST tq[" << server_split[i] << "]\n";
+		MAP<STRING, Channel*>::iterator chan_iter = chann_map_.find(server_split[i]);
+		if (chan_iter == chann_map_.end())
 		{
-			if (!chann_iter->second->getUsers().size())
-				chann_iter->second->assignOper(client_iter->second);
-			std::cout << "already channel name\n";
-			chann_iter->second->assignUser(client_iter->second);
-			client_iter->second->addChannel(chann_iter->second);
-			return ;
+			std::cout << "make channel\n";
+			Channel* new_chann = new Channel(server_split[i]);
+			chann_map_.insert(std::make_pair(server_split[i], new_chann));
+			std::cout << "new channel created, chann name: [" << param << "]\n"; // test
+
+			new_chann->assignOper(client_iter->second->getSocket(), client_iter->second);
+			new_chann->assignUser(client_iter->second->getSocket(), client_iter->second);
+		}
+		// 찾았을 경우
+		else
+		{
+			std::cout << "already channel exist\n";
+			Channel* channel_info = chan_iter->second;
+			if (!channel_info->getUsers_().size())
+				channel_info->assignOper(client_iter->second->getSocket(), client_iter->second);
+			channel_info->assignUser(client_iter->second->getSocket(), client_iter->second);
 		}
 	}
-	std::cout << "make channel\n";
-	Channel* new_chann = new Channel(param);
-	chann_map_.insert(std::make_pair(param, new_chann));
-	std::cout << "new channel created, chann name: [" << param << "]\n"; // test
-
-	new_chann->assignOper(client_iter->second);
-	new_chann->assignUser(client_iter->second);
-	
-	client_iter->second->addChannel(new_chann);
 	(void)command;
 }

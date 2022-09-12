@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include "channel.hpp"
+#include "Message.hpp"
+#include "client.hpp"
+#include "server.hpp"
 #include <iterator>
 
 Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
@@ -18,28 +21,25 @@ Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}
 Channel::Channel(void) : users_(), opers_() {}
 
 Channel::~Channel(void) {}
-
-bool	Channel::isUserAlreadyIn(Client* user)
+#define MAP std::map
+bool	Channel::isUserAlreadyIn(int fd)
 {
-	for (std::vector<Client*>::iterator user_it = users_.begin()
-		; user_it != users_.end()
-		; ++user_it)
-	{
-		if ((*user_it)->getNickName() == user->getNickName())
-			return true;
-	}
-	return false;
+	MAP<int, Client*>::iterator client_iter = users_.find(fd);
+	if (client_iter == users_.end())
+		return (false);
+	return (true);
 }
 
-void	Channel::assignUser(Client* new_user)
+#define VECTOR std::vector
+void	Channel::assignUser(int fd, Client* new_user)
 {
-	#ifdef DEBUG
-	std::cout << "assign new client user in channel\n"; // test
-	#endif
-	if (isUserAlreadyIn(new_user))
+	// user 찾기
+	if (isUserAlreadyIn(fd))
 		return ;
-	users_.push_back(new_user);
-	new_user->addChannel(this); // in client session
+	
+	// 유저 정보 삽입
+	users_.insert(std::make_pair(fd, new_user));
+
 	//"":nickName!userName@hostName JOIN #channName\r\n"
 	std::string	user_info = ":" + new_user->getNickName() \
 							+ "!" + new_user->getUserName() \
@@ -47,68 +47,54 @@ void	Channel::assignUser(Client* new_user)
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
 	std::string proto_to_send;
 	proto_to_send = user_info + proto_join;
-	/*
-	std::cout << "send msg [" << proto_to_send << "]\n";
-	std::cout << "memeber size: [" << users_.size() << "]\n";
-	*/
-	for (std::vector<Client*>::iterator user_it = users_.begin()
-		; user_it != users_.end()
-		; ++user_it)
+	
+	
+	STRING name_list = "";
+	// 전체 멤버에게 join 명령어 보내기 + 이름 리스트
+	for (MAP<int, Client*>::iterator user_iter = users_.begin()
+		; user_iter != users_.end()
+		; ++user_iter
+	)
 	{
-		std::cout << "memeber: [" << (*user_it)->getNickName() << "]\n";
-		(*user_it)->getSendBuf().append(proto_to_send);
+		Client * client_ptr = user_iter->second;
+		std::cout << "memeber: [" << client_ptr->getNickName() << "]\n";
+		client_ptr->getSendBuf().append(proto_to_send);
+		
+		int find_fd = client_ptr->getSocket();
+		if (opers_.find(find_fd) != opers_.end())
+			name_list += "@";
+		name_list += client_ptr->getNickName() + " ";
 	}
-	/*
-	new_user->getSendBuf().append(tmp1);
-	new_user->getSendBuf().append(tmp2);
-	#ifdef DEBUG
-	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
-	#endif
-	*/
-
+	
+	// reply찍어보기
 	std::string host = ":bar.example.com ";
-	std::cout << "tq:" << topic_.size() << '\n';
-	if (topic_.size() > 0)
-	{
-		std::string re1 = host + "332 " + new_user->getNickName()+ ' ' + name_ + " :" + topic_ + "\r\n";
-		new_user->getSendBuf().append(re1);
-		std::cout << re1 << '\n'; // todo: remove
-	}
+	//TODO:: host
+	// topic이 있을 시에 전달하기.
+	// if (topic_.size() > 0)
+	// {
+	// 	Message topic(host, "332", new_user->getNickName(), name_, topic_);
+	// 	std::string re1 =  + " " + new_user->getNickName()+ ' ' +  + " :" + topic_ + "\r\n";
+	// 	new_user->getSendBuf().append(re1);
+	// 	std::cout << re1 << '\n'; // todo: remove
+	// }
+
+
 	std::string re2 = host + "353 " + new_user->getNickName()+ " = " + name_ + " :";
-	for (std::vector<Client*>::iterator user_it = users_.begin(); user_it != users_.end(); ++user_it)
-	{
-		if (opers_.find(((*user_it)->getNickName())) != opers_.end())
-			re2 += "@";
-		re2 += (*user_it)->getNickName() + " ";
-	}
+	re2 += name_list;
 	re2 += "\r\n";
 	new_user->getSendBuf().append(re2);
+
 	std::string re3 = host + "366 " + new_user->getNickName()+ " " + name_ + " :End of NAMES list\r\n";
 	new_user->getSendBuf().append(re3);
 	std::cout << re2 << '\n'; // todo: remove
 	std::cout << re3 << '\n'; // todo: remove
-	#ifdef DEBUG
-	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
-	#endif
 }
 
-void	Channel::assignOper(Client* user)
+void	Channel::assignOper(int fd, Client* user)
 {
 	std::string nick = user->getNickName();
-	//std::map<std::string, Client*>::iterator iter = opers_.find(nick);
-	opers_[nick] = user;
-
-	/*
-	if (iter ==  opers_.end())
-	{
-
-	}
-	else {
-		// opers_.insert({nick, user});
-		opers_.insert(make_pair(nick, user));
-	}
-	*/
-
+	
+	opers_[fd] = user;
 }
 
 void	Channel::setName(std::string &name)
@@ -121,39 +107,27 @@ const std::string&	Channel::getName(void) const
 	return name_;
 }
 
-std::vector<Client*>& Channel::getUsers()
+MAP<int, Client*>& Channel::getUsers_()
 {
 	return users_;
 }
 
-void Channel::eraseUser(int index)
+
+MAP<int, Client*>& Channel::getOpers_()
 {
-	users_.erase(users_.begin() + index);
+	return opers_;
 }
 
-void Channel::eraseUser(std::string& nick)
+void Channel::eraseUser(int fd)
 {
-	for (std::vector<Client*>::iterator clnt_it = users_.begin()
-		; clnt_it != users_.end()
-		; ++clnt_it)
-	{
-		//TODO : temp code
-		// std::cout << "iter : [ " << (*clnt_it)->getNickName() << "]" << std::endl;
-		// std::cout << "param : [ " << nick << "]" << std::endl;
-
-		if ((*clnt_it)->getNickName() == nick)
-		{
-			// if (opers_.find(nick) != opers_.end())
-			// {
-			// 	std::cout << "!@#!@#!@#" << std::endl;
-			// 	eraseOper(nick);
-			// }
-			users_.erase(clnt_it);
-		}
-	}
+	MAP<int, Client*>::iterator iter = users_.find(fd);
+	if (iter != users_.end())
+		users_.erase(iter);
 }
 
-void Channel::eraseOper(const std::string& nick)
+void Channel::eraseOper(int fd)
 {
-	opers_.erase(nick);
+	MAP<int, Client*>::iterator iter = opers_.find(fd);
+	if (iter != opers_.end())
+		opers_.erase(iter);
 }
