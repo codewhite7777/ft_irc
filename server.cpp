@@ -494,8 +494,9 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	if (command != "PONG")
-		std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	if (command == "PONG")
+		return ;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
@@ -616,7 +617,7 @@ bool	Server::getStatus(void)
 {
 	return (this->status_);
 }
-extern int g_count;
+//extern int g_count;
 
 void	Server::Run(void)
 {
