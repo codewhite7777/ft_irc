@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/08/29 15:22:51 by alee             ###   ########.fr       */
+/*   Updated: 2022/08/29 17:05:24 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -657,7 +657,7 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 
 	//채널 메시지
 	//루프 -> 유효한 방 -> 리스트 명단 -> 보내기
-
+	302 :hena!hena@hostname
 	//개인 메시지
 	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
 	{
