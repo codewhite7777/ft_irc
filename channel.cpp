@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:38 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 18:32:39 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/12 17:22:21 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	Channel::assignUser(Client* new_user)
 	std::cout << "Channel: send JOIN protocol to users in the channel\n"; // test
 	#endif
 	*/
-	
+
 	std::string host = ":bar.example.com ";
 	std::cout << "tq:" << topic_.size() << '\n';
 	if (topic_.size() > 0)
@@ -131,18 +131,23 @@ void Channel::eraseUser(int index)
 	users_.erase(users_.begin() + index);
 }
 
-void Channel::eraseUser(const std::string& nick)
+void Channel::eraseUser(std::string& nick)
 {
-	for (std::vector<Client*>::iterator clnt_it
+	for (std::vector<Client*>::iterator clnt_it = users_.begin()
 		; clnt_it != users_.end()
 		; ++clnt_it)
 	{
+		//TODO : temp code
+		// std::cout << "iter : [ " << (*clnt_it)->getNickName() << "]" << std::endl;
+		// std::cout << "param : [ " << nick << "]" << std::endl;
+
 		if ((*clnt_it)->getNickName() == nick)
 		{
-			if (opers_.find(nick) != opers_.end())
-			{
-				eraseOper(nick);
-			}
+			// if (opers_.find(nick) != opers_.end())
+			// {
+			// 	std::cout << "!@#!@#!@#" << std::endl;
+			// 	eraseOper(nick);
+			// }
 			users_.erase(clnt_it);
 		}
 	}
@@ -151,5 +156,4 @@ void Channel::eraseUser(const std::string& nick)
 void Channel::eraseOper(const std::string& nick)
 {
 	opers_.erase(nick);
-	// std::map<std::string, Client*>::iterator iter;
 }

@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:23 by alee              #+#    #+#             */
-/*   Updated: 2022/08/28 18:37:58 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/12 16:45:00 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ public:
 
 	bool	isUserAlreadyIn(Client* user);
 
-	
+
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
@@ -47,7 +47,7 @@ public:
 	std::vector<Client*>& getOpers_();
 
 	void eraseUser(int index);
-	void eraseUser(const std::string& nick);	//void	removeUser(Client* user);
+	void eraseUser(std::string& nick);	//void	removeUser(Client* user);
 	void eraseOper(const std::string& nick);	//void	removeOper(Client* oper); // todo
 };
 
