@@ -34,21 +34,21 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
         return ;
     
     // 나갈 친구의 fd
-    int partSocket = iter->second->getSocket();
+    STRING partNick = iter->second->getNickName();
 
     std::cout << "PART TEST START\n";
     std::cout << "param :  [" << channelName << "]\n";
-    std::cout << "partSocket :  [" << partSocket << "]\n";
+    std::cout << "partSocket :  [" << partNick << "]\n";
     
-    MAP<int, Client*> client_map = channel_iter->second->getUsers_();
+    MAP<STRING, Client*> client_map = channel_iter->second->getUsers_();
     
-    MAP<int, Client*>::iterator client_iter = client_map.find(partSocket);
+    MAP<STRING, Client*>::iterator client_iter = client_map.find(partNick);
     // 내가 찾는 친구가 없네? 그럼 끝
     if (client_iter == client_map.end())
         return ;
     // 나가기
-    channel_iter->second->eraseUser(partSocket);
-    channel_iter->second->eraseOper(partSocket);
+    channel_iter->second->eraseUser(partNick);
+    channel_iter->second->eraseOper(partNick);
     
     // 명령어 요청
     requestPartMsg(iter , command, param);

@@ -22,23 +22,23 @@ Channel::Channel(void) : users_(), opers_() {}
 
 Channel::~Channel(void) {}
 #define MAP std::map
-bool	Channel::isUserAlreadyIn(int fd)
+bool	Channel::isUserAlreadyIn(STRING nick)
 {
-	MAP<int, Client*>::iterator client_iter = users_.find(fd);
+	MAP<STRING, Client*>::iterator client_iter = users_.find(nick);
 	if (client_iter == users_.end())
 		return (false);
 	return (true);
 }
 
 #define VECTOR std::vector
-void	Channel::assignUser(int fd, Client* new_user)
+void	Channel::assignUser(STRING nick, Client* new_user)
 {
 	// user 찾기
-	if (isUserAlreadyIn(fd))
+	if (isUserAlreadyIn(nick))
 		return ;
 	
 	// 유저 정보 삽입
-	users_.insert(std::make_pair(fd, new_user));
+	users_.insert(std::make_pair(nick, new_user));
 
 	//"":nickName!userName@hostName JOIN #channName\r\n"
 	std::string	user_info = ":" + new_user->getNickName() \
@@ -51,7 +51,7 @@ void	Channel::assignUser(int fd, Client* new_user)
 	
 	STRING name_list = "";
 	// 전체 멤버에게 join 명령어 보내기 + 이름 리스트
-	for (MAP<int, Client*>::iterator user_iter = users_.begin()
+	for (MAP<STRING, Client*>::iterator user_iter = users_.begin()
 		; user_iter != users_.end()
 		; ++user_iter
 	)
@@ -60,8 +60,8 @@ void	Channel::assignUser(int fd, Client* new_user)
 		std::cout << "memeber: [" << client_ptr->getNickName() << "]\n";
 		client_ptr->getSendBuf().append(proto_to_send);
 		
-		int find_fd = client_ptr->getSocket();
-		if (opers_.find(find_fd) != opers_.end())
+		STRING find_nick = client_ptr->getNickName();
+		if (opers_.find(find_nick) != opers_.end())
 			name_list += "@";
 		name_list += client_ptr->getNickName() + " ";
 	}
@@ -90,11 +90,11 @@ void	Channel::assignUser(int fd, Client* new_user)
 	std::cout << re3 << '\n'; // todo: remove
 }
 
-void	Channel::assignOper(int fd, Client* user)
+void	Channel::assignOper(STRING nick, Client* user)
 {
-	std::string nick = user->getNickName();
+	// std::string nick = user->getNickName();
 	
-	opers_[fd] = user;
+	opers_[nick] = user;
 }
 
 void	Channel::setName(std::string &name)
@@ -107,27 +107,27 @@ const std::string&	Channel::getName(void) const
 	return name_;
 }
 
-MAP<int, Client*>& Channel::getUsers_()
+MAP<STRING, Client*>& Channel::getUsers_()
 {
 	return users_;
 }
 
 
-MAP<int, Client*>& Channel::getOpers_()
+MAP<STRING, Client*>& Channel::getOpers_()
 {
 	return opers_;
 }
 
-void Channel::eraseUser(int fd)
+void Channel::eraseUser(STRING nick)
 {
-	MAP<int, Client*>::iterator iter = users_.find(fd);
+	MAP<STRING, Client*>::iterator iter = users_.find(nick);
 	if (iter != users_.end())
 		users_.erase(iter);
 }
 
-void Channel::eraseOper(int fd)
+void Channel::eraseOper(STRING nick)
 {
-	MAP<int, Client*>::iterator iter = opers_.find(fd);
+	MAP<STRING, Client*>::iterator iter = opers_.find(nick);
 	if (iter != opers_.end())
 		opers_.erase(iter);
 }

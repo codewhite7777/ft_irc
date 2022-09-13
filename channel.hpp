@@ -21,8 +21,8 @@
 class Channel
 {
 private:
-	std::map<int , Client*>	users_;
-	std::map<int , Client*>	opers_;
+	std::map<STRING , Client*>	users_;
+	std::map<STRING , Client*>	opers_;
 
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
@@ -33,21 +33,21 @@ public:
 	~Channel(void);
 	// todo: OCCF
 
-	void	assignUser(int fd, Client* new_user);
-	void	assignOper(int fd, Client* user);
+	void	assignUser(STRING , Client* new_user);
+	void	assignOper(STRING , Client* user);
 
-	bool	isUserAlreadyIn(int);
+	bool	isUserAlreadyIn(STRING);
 
 
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
 
-	MAP<int, Client*>&	getUsers_();
-	MAP<int, Client*>&	getOpers_();
+	MAP<STRING, Client*>&	getUsers_();
+	MAP<STRING, Client*>&	getOpers_();
 
-	void eraseUser(int fd);
-	void eraseOper(int fd);
+	void eraseUser(STRING);
+	void eraseOper(STRING);
 	// void eraseUser(std::string& nick);	//void	removeUser(Client* user);
 	
 };

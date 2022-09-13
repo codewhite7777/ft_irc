@@ -534,6 +534,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "KICK")
 	{
 		std::cout << "command : KICK " << std::endl;
+		requestKickMsg(iter, command, param);
 	}
 	else if (command == "INVITE")
 	{

@@ -22,8 +22,8 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 			chann_map_.insert(std::make_pair(server_split[i], new_chann));
 			std::cout << "new channel created, chann name: [" << param << "]\n"; // test
 
-			new_chann->assignOper(client_iter->second->getSocket(), client_iter->second);
-			new_chann->assignUser(client_iter->second->getSocket(), client_iter->second);
+			new_chann->assignOper(client_iter->second->getNickName(), client_iter->second);
+			new_chann->assignUser(client_iter->second->getNickName(), client_iter->second);
 		}
 		// 찾았을 경우
 		else
@@ -31,8 +31,8 @@ void	Server::requestJoin(std::map<SOCKET, Client*>::iterator &client_iter, \
 			std::cout << "already channel exist\n";
 			Channel* channel_info = chan_iter->second;
 			if (!channel_info->getUsers_().size())
-				channel_info->assignOper(client_iter->second->getSocket(), client_iter->second);
-			channel_info->assignUser(client_iter->second->getSocket(), client_iter->second);
+				channel_info->assignOper(client_iter->second->getNickName(), client_iter->second);
+			channel_info->assignUser(client_iter->second->getNickName(), client_iter->second);
 		}
 	}
 	(void)command;

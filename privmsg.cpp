@@ -21,10 +21,10 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 			std::cout << "not found \n";
 		}
 		else {
-            MAP<int, Client*> client_map = chanIter->second->getUsers_();
+            MAP<STRING, Client*> client_map = chanIter->second->getUsers_();
 			
 			
-			for (MAP<int, Client*>::iterator client_iter = client_map.begin()
+			for (MAP<STRING, Client*>::iterator client_iter = client_map.begin()
                 ; client_iter != client_map.end() 
                 ; ++client_iter)
 			{
