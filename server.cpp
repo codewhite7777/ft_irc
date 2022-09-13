@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/09/12 21:19:11 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/13 15:55:05 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,7 +358,6 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	return ;
 }
 
-
 void	Server::packetMarshalling(void)
 {
 	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
@@ -380,22 +379,24 @@ std::string	Server::buildErrPacket(std::string err_code, std::string user_name, 
 	std::string	packet;
 	if (err_code == ERR_PASSWDMISMATCH || err_code == ERR_NEEDMOREPARAMS || err_code == ERR_NONICKNAMEGIVEN)
 		packet = err_code + " " + user_name + " " + err_msg;
+	else if (err_code == ERR_NICKNAMEINUSE)
+		packet = ":" + this->s_host_name_ + " " + err_code + " * " + user_name + " :" + err_msg;
 	return (packet);
 }
 
-std::string	Server::buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg)
+std::string	Server::buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg, std::string optional_msg)
 {
 	std::string	packet;
 	if (reply_code == RPL_NONE)
 		packet = reply_code + " " + user_name + " " + reply_msg;
 	else if (reply_code == RPL_WELCOME)
-		packet = ":" + this->s_host_name_ + " " + reply_code + " " 
+		packet = ":" + this->s_host_name_ + " " + reply_code + " " + user_name + " :" + reply_msg + " " + optional_msg;
 	return (packet);
 }
 
 std::string	Server::getUserInfo(std::string nickname, std::string username, std::string hostname)
 {
-	std::string	msg = ":" + nickname + "!" + username + "@" + hostname;
+	std::string	msg = nickname + "!" + username + "@" + hostname;
 	return (msg);
 }
 
@@ -448,13 +449,14 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
-	else if (iter->second->getNickFlag() == false)
-		requestSetNickName(iter, command, param);
-	else if (iter->second->getUserNameFlag() == false)
-		requestSetUserName(iter, command, param);
-	// else
-	// 	requestCommand(iter, command, param);
-	// return ;
+	else if (iter->second->getNickFlag() == false || iter->second->getUserNameFlag() == false)
+		requestSetClientInfo(iter, command, param);
+	else
+	{
+		requestCommand(iter, command, param);
+		std::cout << "로그인 성공 이후 로직 " << std::endl;
+	}
+	return ;
 }
 
 void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
@@ -482,34 +484,74 @@ void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 	return ;
 }
 
-void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
+std::vector<std::string> split(std::string str, char delimiter)
+{
+	std::vector<std::string>	internal;
+	std::stringstream			ss(str);
+	std::string					temp;
+
+	while (getline(ss, temp, delimiter))
+		internal.push_back(temp);
+	return (internal);
+}
+
+void	Server::requestSetClientInfo(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	//커맨드 확인
-	if (command != "NICK")
+	std::cout << "command : [" << command << "]" << std::endl;
+	std::cout << "param : [" << param << "]" << std::endl;
+	if (command == "NICK")
+	{
+		//닉네임 중복 확인
+		if (isOverlapNickName(param) == true)
+		{
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
+			return ;
+		}
+		//유효하지 않은 닉네임
+		if (param == "\"\"")
+		{
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
+			return ;
+		}
+
+		iter->second->setNickName(true, param);
+		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
+		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
+		// std::cout << "-----------------------------------" << std::endl;
+		// std::cout << iter->first << " Client Successful Set NickName" << std::endl;
+		// std::cout << "-----------------------------------" << std::endl;
+	}
+	else if (command == "USER")
+	{
+		std::vector<std::string> splitVector = split(param, ' ');
+		std::cout << "vector : " << splitVector.size() << std::endl;
+		if (splitVector.size() < 4)
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
+		else
+		{
+			Client	*newClient = iter->second;
+			// std::cout << "0 : " << splitVector[0] << std::endl;
+			// std::cout << "1 : " << splitVector[1] << std::endl;
+			// std::cout << "2 : " << splitVector[2] << std::endl;
+			// std::cout << "3 : " << splitVector[3] << std::endl;
+			// std::cout << "4 : " << splitVector[4] << std::endl;
+
+			iter->second->setUserName(true, splitVector[0]);
+			iter->second->setMode(splitVector[1]);
+			iter->second->setUnused(splitVector[2]);
+			iter->second->setUserRealName(true, splitVector[3]);//TODO: modify realname
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n", \
+				getUserInfo(newClient->getNickName(), newClient->getUserName(), newClient->getHostName())));
+		}
+	}
+	else
 	{
 		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
-		return ;
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
 	}
-	//닉네임 중복 확인
-	if (isOverlapNickName(param) == true)
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
-		return ;
-	}
-	//유효하지 않은 닉네임
-	if (param == "\"\"")
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
-		return ;
-	}
-
-	iter->second->setNickName(true, param);
-	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
-	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
-	std::cout << "-----------------------------------" << std::endl;
-	std::cout << iter->first << " Client Successful Set NickName" << std::endl;
-	std::cout << "-----------------------------------" << std::endl;
 	return ;
 }
 
@@ -523,17 +565,6 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-std::vector<std::string> split(std::string str, char delimiter)
-{
-	std::vector<std::string>	internal;
-	std::stringstream			ss(str);
-	std::string					temp;
-
-	while (getline(ss, temp, delimiter))
-		internal.push_back(temp);
-	return (internal);
-}
-
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
@@ -545,20 +576,29 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 	else
 	{
 		std::vector<std::string> splitVector = split(param, ' ');
-		if (splitVector.size() != 4)
+		std::cout << "vector : " << splitVector.size() << std::endl;
+		if (splitVector.size() < 4)
 		{
 			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
 			return ;
 		}
 		else
 		{
+			Client	*newClient = iter->second;
+			std::cout << "0 : " << splitVector[0] << std::endl;
+			std::cout << "1 : " << splitVector[1] << std::endl;
+			std::cout << "2 : " << splitVector[2] << std::endl;
+			std::cout << "3 : " << splitVector[3] << std::endl;
+			std::cout << "4 : " << splitVector[4] << std::endl;
+
 			iter->second->setUserName(true, splitVector[0]);
 			iter->second->setMode(splitVector[1]);
 			iter->second->setUnused(splitVector[2]);
-			iter->second->setUserRealName(true, splitVector[3]);
+			iter->second->setUserRealName(true, splitVector[3]);//TODO: modify realname
 			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
 			insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
-			insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
+			insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n", \
+				getUserInfo(newClient->getNickName(), newClient->getUserName(), newClient->getHostName())));
 		}
 	}
 	return ;
@@ -567,7 +607,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	// std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
