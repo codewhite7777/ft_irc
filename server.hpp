@@ -106,6 +106,9 @@ public:
 	void		quitTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
+	void		inviteTest(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+
 	//disconnect client
 	void		clientDisconnect(void);
 

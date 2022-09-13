@@ -282,7 +282,6 @@ void	Server::packetMarshalling(void)
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			packetAnalysis(iter);
-			return ;
 			//iter->second->getRecvBuf().clear();
 		}
 	}
@@ -495,9 +494,9 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PONG")
 		return ;
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
@@ -539,6 +538,7 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "INVITE")
 	{
 		std::cout << "command : INVITE " << std::endl;
+		inviteTest(iter, command, param);
 	}
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
