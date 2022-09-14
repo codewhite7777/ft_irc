@@ -358,6 +358,8 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		param = packet_buf;
 	}
 
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+
 	// executing
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
@@ -480,7 +482,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
-			std::string tmp = ":bar.example.com 001 " + iter->second->getUserName() + " :Welcome to the ft_irc Network ";
+			std::string tmp = ":bar.example.com 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
 
 			std::string	user_info = iter->second->getNickName() \
 							+ "!" + iter->second->getUserName() \
@@ -502,7 +504,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	//std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PONG")
 		return ;
 	if (command == "PASS" || command == "USER")
