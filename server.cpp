@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/09/13 15:55:05 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/15 07:55:38 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,10 @@
 #include "irc_protocol.hpp"
 #include <sstream>
 #include <vector>
+#include <fstream>
 
 Server::Server(int argc, char *argv[])
-	: status_(true), sock_count_(0)
+	: status_(true), sock_count_(0), src_pos("./src_dir"),dst_pos("/Users/alee/Downloads")
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -377,7 +378,7 @@ void Server::insertSendBuffer(Client* target_client, const std::string& msg)
 std::string	Server::buildErrPacket(std::string err_code, std::string user_name, std::string err_msg)
 {
 	std::string	packet;
-	if (err_code == ERR_PASSWDMISMATCH || err_code == ERR_NEEDMOREPARAMS || err_code == ERR_NONICKNAMEGIVEN)
+	if (err_code == ERR_PASSWDMISMATCH || err_code == ERR_NEEDMOREPARAMS || err_code == ERR_NONICKNAMEGIVEN || err_code == ERR_UNKNOWNCOMMAND)
 		packet = err_code + " " + user_name + " " + err_msg;
 	else if (err_code == ERR_NICKNAMEINUSE)
 		packet = ":" + this->s_host_name_ + " " + err_code + " * " + user_name + " :" + err_msg;
@@ -405,11 +406,11 @@ std::string	Server::ExtractPacket(std::string& origin_packet)
 	std::string	packet_buf("");
 	size_t		pos(0);
 
-	pos = origin_packet.find("\r\n");
+	pos = origin_packet.find("\n");
 	if (pos != std::string::npos)
 	{
 		packet_buf = origin_packet.substr(0, pos);
-		origin_packet.erase(0, pos + strlen("\r\n"));
+		origin_packet.erase(0, pos + strlen("\n"));
 	}
 	return (packet_buf);
 }
@@ -417,6 +418,7 @@ std::string	Server::ExtractPacket(std::string& origin_packet)
 void	Server::TokenizePacket(std::string& packet_buf, std::string& o_command, std::string& o_param)
 {
 	size_t	pos(0);
+	size_t	carr_pos(0);
 
 	pos = packet_buf.find(' ');
 	if (pos != std::string::npos)
@@ -429,6 +431,9 @@ void	Server::TokenizePacket(std::string& packet_buf, std::string& o_command, std
 		o_command = "";
 		o_param = packet_buf;
 	}
+	carr_pos = o_param.find("\r");
+	if (carr_pos != std::string::npos)
+		o_param.erase(carr_pos);
 	return ;
 }
 
@@ -442,20 +447,17 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 	TokenizePacket(packet_buf, command, param);
 
 	//TODO : Del - for debug
-	std::cout << "packet_buf : " << '[' << packet_buf << ']' << std::endl;
-	std::cout << "command : " << '[' << command << ']' << std::endl;
-	std::cout << "param : " << '[' << param << ']' << std::endl;
-	std::cout << "--------" << std::endl;
+	// std::cout << "packet_buf : " << '[' << packet_buf << ']' << std::endl;
+	// std::cout << "command : " << '[' << command << ']' << std::endl;
+	// std::cout << "param : " << '[' << param << ']' << std::endl;
+	// std::cout << "--------" << std::endl;
 
 	if (iter->second->getPassFlag() == false)
 		requestAuth(iter, command, param);
 	else if (iter->second->getNickFlag() == false || iter->second->getUserNameFlag() == false)
 		requestSetClientInfo(iter, command, param);
 	else
-	{
 		requestCommand(iter, command, param);
-		std::cout << "로그인 성공 이후 로직 " << std::endl;
-	}
 	return ;
 }
 
@@ -518,24 +520,19 @@ void	Server::requestSetClientInfo(std::map<SOCKET, Client*>::iterator &iter, \
 		iter->second->setNickName(true, param);
 		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
 		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
-		// std::cout << "-----------------------------------" << std::endl;
-		// std::cout << iter->first << " Client Successful Set NickName" << std::endl;
-		// std::cout << "-----------------------------------" << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
+		std::cout << iter->first << " Client Successful Set NickName" << std::endl;
+		std::cout << "-----------------------------------" << std::endl;
 	}
 	else if (command == "USER")
 	{
 		std::vector<std::string> splitVector = split(param, ' ');
 		std::cout << "vector : " << splitVector.size() << std::endl;
 		if (splitVector.size() < 4)
-			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", "info) Not enough parameter\r\n"));
 		else
 		{
 			Client	*newClient = iter->second;
-			// std::cout << "0 : " << splitVector[0] << std::endl;
-			// std::cout << "1 : " << splitVector[1] << std::endl;
-			// std::cout << "2 : " << splitVector[2] << std::endl;
-			// std::cout << "3 : " << splitVector[3] << std::endl;
-			// std::cout << "4 : " << splitVector[4] << std::endl;
 
 			iter->second->setUserName(true, splitVector[0]);
 			iter->second->setMode(splitVector[1]);
@@ -549,8 +546,8 @@ void	Server::requestSetClientInfo(std::map<SOCKET, Client*>::iterator &iter, \
 	}
 	else
 	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", "ex) <NICK> <nickname>\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", "ex) <USER> <user> <mode> <unused> <realname>\r\n"));
 	}
 	return ;
 }
@@ -570,7 +567,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 {
 	if (command != "USER")
 	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", "ex) <USER> <user> <mode> <unused> <realname>\r\n"));
 		return ;
 	}
 	else
@@ -579,17 +576,12 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 		std::cout << "vector : " << splitVector.size() << std::endl;
 		if (splitVector.size() < 4)
 		{
-			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
+			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", "info) Not enough parameter\r\n"));
 			return ;
 		}
 		else
 		{
 			Client	*newClient = iter->second;
-			std::cout << "0 : " << splitVector[0] << std::endl;
-			std::cout << "1 : " << splitVector[1] << std::endl;
-			std::cout << "2 : " << splitVector[2] << std::endl;
-			std::cout << "3 : " << splitVector[3] << std::endl;
-			std::cout << "4 : " << splitVector[4] << std::endl;
 
 			iter->second->setUserName(true, splitVector[0]);
 			iter->second->setMode(splitVector[1]);
@@ -607,7 +599,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	// std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
 	else if (command == "JOIN")
@@ -642,6 +634,10 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	{
 		std::cout << "command : INVITE " << std::endl;
 	}
+	else if (command == "FILE")
+	{
+		requestFileSend(iter, command, param);
+	}
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;
@@ -650,66 +646,103 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::string	tar_nick = param.substr(0, param.find(' '));
-	std::string	msg = param.substr(param.find(' ') + 1) + "\r\n";
-
-	//채널 메시지
-	//루프 -> 유효한 방 -> 리스트 명단 -> 보내기
-	//개인 메시지
-	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
-	{
-		if (c_iter->second->getNickName() == tar_nick)
-		{
-			msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
-				+ " PRIVMSG " + iter->second->getNickName() + " :" + msg;
-			insertSendBuffer(c_iter->second, msg);
-			return ;
-		}
-	}
-	//존재하지 않는 닉네임 메시지 처리
-	//TODO : notice의 경우 에러 메시지를 처리하지 않는다.
-	insertSendBuffer(iter->second, buildErrPacket(ERR_NOSUCHNICK, iter->second->getUserName(), tar_nick + ": No such nick \r\n"));
 	(void)command;
+	(void)iter;
+	(void)param;
 	return ;
 }
 
 void		Server::requestMode(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	std::string	cp_param;
-	std::string	tar_nick;
-	std::string	option;
-	size_t		pos;
-
-	cp_param = param;
-	pos = cp_param.find(' ');
-	if (pos == std::string::npos)
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, iter->second->getUserName(), ":info) Not enough parameter\r\n"));
-		return ;
-	}
-	tar_nick = param.substr(0, pos);
-	option = cp_param.erase(0, pos + 1);
-
-	std::cout << "target : " << tar_nick << std::endl;
-	std::cout << "option : " << option << std::endl;
-
-	//채널에서 해당 타겟 클라이언트가 존재하는지 확인 -> 없다? -> Error(401): +o No such nick
-
-
-	if (option == "-o")
-	{
-
-	}
-	else
-	{
-
-	}
-
-	//OPER <Name> <Pass>
 	(void)command;
 	(void)iter;
 	(void)param;
+	return ;
+}
+
+//FILE nickname filename
+void	Server::requestFileSend(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param)
+{
+	std::vector<std::string>	splitVector = split(param, ' ');
+	//param count confirm
+	if (splitVector.size() != 2)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, iter->second->getUserName(), ":info) Not enough parameter\r\n"));
+		insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, iter->second->getUserName(), ":ex) FILE Nickname Filename\r\n"));
+		return ;
+	}
+
+	//connect client confirm
+	if (isOverlapNickName(splitVector[0]) == false)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), ":info) Not Connected Client\r\n"));
+		return ;
+	}
+
+	//self file sending confirm
+	if (iter->second->getUserName() == splitVector[0])
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), ":info) Not Allowed Self Transfer\r\n"));
+		return ;
+	}
+
+	//file open
+	std::string	file_pos = src_pos + "/" + splitVector[1];
+	std::ifstream	is;
+	is.open(file_pos.c_str(), std::ios::binary);
+	if (is.is_open() == false)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), ":info) Not exist File\r\n"));
+		return ;
+	}
+	is.seekg(0, std::ios::end);
+	int file_size = is.tellg();
+	is.seekg(0, std::ios::beg);
+	if (file_size >= FILE_MAX)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), ":info) File is too big\r\n"));
+		return ;
+	}
+	// std::cout << "file size : " << file_size << "Byte " << std::endl;
+	unsigned char *ptr = new unsigned char[file_size];
+	if (ptr == nullptr)
+	{
+		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), ":info) Memory allocation failed\r\n"));
+		is.close();
+		return ;
+	}
+	is.read (reinterpret_cast<char *>(ptr), file_size);
+
+	//상대방 클라이언트 플래그 변경
+	Client*	dstClient = NULL;
+	for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
+	{
+		if (c_iter->second->getNickName() == splitVector[0])
+		{
+			std::cout << c_iter->second->getNickName() << ", " << splitVector[1] << std::endl;
+			dstClient = c_iter->second;
+			c_iter->second->setUserFileTransFlag(true);
+			break ;
+		}
+	}
+
+	if (dstClient == NULL)
+	{
+		return ;
+	}
+
+
+	//파일 이름 전송
+	insertSendBuffer(dstClient, splitVector[1]);
+
+	//루프를 돌면서 파일 데이터 전송
+
+	// std::cout.write(reinterpret_cast<const char *>(ptr), file_size);
+	is.close();
+	(void)command;
+	delete[] ptr;
 	return ;
 }
 

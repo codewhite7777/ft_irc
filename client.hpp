@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/08/29 14:27:00 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/15 02:11:17 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ private:
 	bool		user_flag_;
 	bool		user_real_name_flag_;
 	bool		operator_flag_;
+	bool		file_trans_flag;
 public:
 	Client(SOCKET s, std::string host_name);
 	~Client(void);
@@ -76,6 +77,10 @@ public:
 
 	//client user host getter
 	std::string&	getHostName(void);
+
+	//client file setter/getter
+	void			setUserFileTransFlag(bool flag);
+	bool			getUserFileTransFlag(void) const;
 
 	bool			getOperatorFlag(void) const;
 };

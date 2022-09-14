@@ -6,7 +6,7 @@
 /*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/09/13 05:18:07 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/15 01:55:29 by alee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef enum e_port
 typedef enum e_buf
 {
 	BUFFER_MAX = 1024 << 4,
-	// BUFFER_MAX = 100,
+	FILE_MAX = 1024 << 8,
 }			t_buf;
 
 class Server
@@ -61,6 +61,9 @@ private:
 	//channel
 	std::map<std::string, Channel *>	channel_map_;
 
+	//file trasnfer position
+	std::string					src_pos;
+	std::string					dst_pos;
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
@@ -117,6 +120,10 @@ public:
 
 	//packet request :: OPER
 	void		requestMode(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+
+	//packet request :: FILE SEND
+	void		requestFileSend(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
 	//disconnect client
