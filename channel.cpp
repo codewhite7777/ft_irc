@@ -49,7 +49,7 @@ void	Channel::assignUser(STRING nick, Client* new_user)
 							+ "@" + new_user->getHostName();
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
 	std::string proto_to_send;
-	proto_to_send = ":" + user_info + proto_join;
+	proto_to_send = user_info + proto_join;
 	
 	// 전체 멤버에게 join 명령어 보내기 + 이름 리스트
 	STRING name_list = "";
@@ -66,8 +66,8 @@ void	Channel::assignUser(STRING nick, Client* new_user)
 		STRING find_nick = client_ptr->getNickName();
 		if (opers_.find(find_nick) != opers_.end())
 			name_list += "@";
-		//name_list += client_ptr->getNickName() + " ";
-		name_list += client_ptr->getNickName() + "!" + client_ptr->getUserName() + "@" + client_ptr->getHostName() + " ";
+		name_list += client_ptr->getNickName() + " ";
+		//name_list += client_ptr->getNickName() + "!" + client_ptr->getUserName() + "@" + client_ptr->getHostName() + " ";
 	}
 	
 	// reply찍어보기
@@ -82,14 +82,14 @@ void	Channel::assignUser(STRING nick, Client* new_user)
 		std::cout << re1 << '\n'; // todo: remove
 	}
 
-	//std::string re2 = host + "353 " + new_user->getNickName() + " = " + name_ + " :";
-	std::string re2 = host + "353 " + user_info + " = " + name_ + " :";
+	std::string re2 = host + "353 " + new_user->getNickName() + " = " + name_ + " :";
+	//std::string re2 = host + "353 " + user_info + " = " + name_ + " :";
 	re2 += name_list;
 	re2 += "\r\n";
 	new_user->getSendBuf().append(re2);
 
-	//std::string re3 = host + "366 " + new_user->getNickName() + " " + name_ + " :End of /NAMES list.\r\n";
-	std::string re3 = host + "366 " + user_info + " " + name_ + " :End of /NAMES list.\r\n";
+	std::string re3 = host + "366 " + new_user->getNickName() + " " + name_ + " :End of /NAMES list.\r\n";
+	//std::string re3 = host + "366 " + user_info + " " + name_ + " :End of /NAMES list.\r\n";
 	new_user->getSendBuf().append(re3);
 	std::cout << re2 << '\n'; // todo: remove
 	std::cout << re3 << '\n'; // todo: remove
