@@ -282,6 +282,7 @@ void	Server::packetMarshalling(void)
 		if (iter->second->getRecvBuf().length() != 0)
 		{
 			packetAnalysis(iter);
+			// return ;
 			//iter->second->getRecvBuf().clear();
 		}
 	}
@@ -356,6 +357,8 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		command = "";
 		param = packet_buf;
 	}
+
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 
 	// executing
 	if (iter->second->getPassFlag() == false)
@@ -479,7 +482,14 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
-			std::string tmp = ":bar.example.com 001 " + iter->second->getUserName() + " :welcome to the Internet Relay Network \r\n";
+			std::string tmp = ":bar.example.com 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
+
+			std::string	user_info = iter->second->getNickName() \
+							+ "!" + iter->second->getUserName() \
+							+ "@" + iter->second->getHostName();
+						
+			tmp += user_info + "\r\n";
+
 			insertSendBuffer(iter->second, tmp);
 			#ifdef DEBUG
 				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
@@ -494,6 +504,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
+	//std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
 	if (command == "PONG")
 		return ;
 	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
