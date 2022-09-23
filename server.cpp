@@ -56,13 +56,11 @@ Server::Server(int argc, char *argv[])
 
 	//network init
 	networkInit();
-	return ;
 }
 
 Server::~Server(void)
 {
 	networkClose();
-	return ;
 }
 
 bool	Server::configPort(std::string port)
@@ -143,13 +141,11 @@ void	Server::networkInit(void)
 	sock_count_ += 1;
 
 	std::cout << "IRC Server started" << std::endl;
-	return ;
 }
 
 void	Server::networkClose(void)
 {
 	close(listen_sock_);
-	return ;
 }
 
 int	Server::getMaxFD(SOCKET sock)
@@ -206,7 +202,6 @@ void	Server::networkProcess(void)
 				sendPacket(iter);
 		}
 	}
-	return ;
 }
 
 void	Server::acceptClient(SOCKET listen_sock)
@@ -240,43 +235,49 @@ void	Server::acceptClient(SOCKET listen_sock)
 	//client count
 	sock_count_ += 1;
 
-	//display client network info
+	// test: display client network info
 	std::cout << "-------------------" << std::endl;
 	std::cout << "client connected" << std::endl;
 	std::cout << "client socket : " << client_sock << std::endl;
 	std::cout << "client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
 	std::cout << "client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
 	std::cout << "-------------------" << std::endl;
-	return ;
 }
 
 void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
-	int	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
+	int				recv_ret(0);
+	
+	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
 	if (recv_ret == 0)
 		iter->second->setDisconnectFlag(true);
 	else if (recv_ret > 0)
 	{
 		buf[recv_ret] = '\0';
-		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
+		iter->second->appendToRecvBuf(buf); //iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
+
+		// test: print RecvBuf
 		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
 			 << " recvPacket: " << "[" << buf << "]\n";
 	}
-	return ;
 }
 
 void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
+	int				send_ret(0);
+
 	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
-	int	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
+	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 		iter->second->setDisconnectFlag(true);
 	else if (send_ret > 0)
 	{
+		// test: print SendBuf
 		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
 			 << " sendPacket: " << "[" << buf << "]\n";
+
 		iter->second->getSendBuf().erase(0, send_ret);
 	}
 	return ;
@@ -284,16 +285,7 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 
 void	Server::packetMarshalling(void)
 {
-	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
-	{
-		if (iter->second->getRecvBuf().length() != 0)
-		{
-			packetAnalysis(iter);
-			// return ;
-			//iter->second->getRecvBuf().clear();
-		}
-	}
-	return ;
+	
 }
 
 void Server::insertSendBuffer(Client* target_client, const std::string& msg)
@@ -440,17 +432,6 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	}
 	return (false);
 }
-
-// std::vector<std::string> split(std::string str, char delimiter)
-// {
-// 	std::vector<std::string>	internal;
-// 	std::stringstream			ss(str);
-// 	std::string					temp;
-
-// 	while (getline(ss, temp, delimiter))
-// 		internal.push_back(temp);
-// 	return (internal);
-// }
 
 void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
@@ -617,6 +598,20 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	return ;
 }
 
+
+void	Server::processClientMessages()
+{
+	//packetMarshalling();
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	{
+		if (iter->second->getRecvBuf().length() > 0)
+		{
+			packetAnalysis(iter);
+		}
+	}
+}
+
+
 void	Server::clientDisconnect(void)
 {
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
@@ -635,15 +630,15 @@ void	Server::clientDisconnect(void)
 	return ;
 }
 
-bool	Server::getStatus(void)
+bool	Server::getStatus(void) const
 {
-	return (this->status_);
+	return (status_);
 }
-//extern int g_count;
 
 void	Server::Run(void)
 {
 	networkProcess();
+	processClientMessages();
 	packetMarshalling();
 	clientDisconnect();
 	return ;

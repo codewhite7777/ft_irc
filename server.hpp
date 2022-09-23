@@ -22,35 +22,14 @@
 
 class Server
 {
-private:
-	//config value
-	std::string					raw_port_;
-	std::string					raw_pwd_;
-
-	//server info
-	bool						status_;
-	std::string					s_operator_pwd_;
-	std::string					host_name_;
-
-	//network
-	SOCKET						listen_sock_;
-	struct sockaddr_in			s_addr_in_;
-	unsigned short				s_port_;
-	std::string					s_ip_;
-
-	//client
-	unsigned int				sock_count_;
-	std::map<SOCKET, Client *>	client_map_;
-	fd_set						read_set_;
-	fd_set						write_set_;
-
-	//channel
-	std::map<std::string, Channel *>	chann_map_;
-
 public:
+	bool		getStatus(void) const;
+	void		Run(void);
+
 	Server(int argc, char *argv[]);
 	~Server(void);
 
+private:
 	//configure port
 	bool		configPort(std::string port);
 
@@ -71,6 +50,7 @@ public:
 	void		sendPacket(std::map<SOCKET, Client *>::iterator &iter);
 
 	//network packet marshalling
+	void		processClientMessages(void);
 	void		packetMarshalling(void);
 	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
 	std::string	takeFirstProtocol(std::string& packet);
@@ -113,26 +93,43 @@ public:
 	//disconnect client
 	void		clientDisconnect(void);
 
-	//status
-	bool		getStatus(void);
-
-	//run
-	void		Run(void);
-
-private:
 	void		insertSendBuffer(Client* target_client, const std::string& msg);
 	std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
 	std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
 	std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
 
+	void requestPart(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	void kickTest(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
+	void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
+						std::string& command, std::string& param);
 
-public:	void requestPart(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-public: void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-public:	void kickTest(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-public: void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
+	//config value
+	std::string					raw_port_;
+	std::string					raw_pwd_;
+
+	//server info
+	bool						status_;
+	std::string					s_operator_pwd_;
+	std::string					host_name_;
+
+	//network
+	SOCKET						listen_sock_;
+	struct sockaddr_in			s_addr_in_;
+	unsigned short				s_port_;
+	std::string					s_ip_;
+
+	//client
+	unsigned int				sock_count_;
+	std::map<SOCKET, Client *>	client_map_;
+	fd_set						read_set_;
+	fd_set						write_set_;
+
+	//channel
+	std::map<std::string, Channel *>	chann_map_;
+
 };
 #endif

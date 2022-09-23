@@ -15,30 +15,14 @@
 
 # include <iostream>
 # include <list>
+#include <vector>
+
+typedef int	SOCKET;
 
 class Channel;
-#include <vector>
-typedef int	SOCKET;
 
 class Client
 {
-private:
-	std::string				s_buf_;	//network send_buf
-	std::string				r_buf_;	//network recv_buf
-	SOCKET					client_sock_;	//network socket
-	std::string				nick_name_;
-	std::string				user_name_;
-	std::string				mode_;
-	std::string				unused_;
-	std::string				user_real_name_;
-	std::string				host_name_;
-	bool					disconnect_flag_;
-	bool					pass_flag_;
-	bool					nick_flag_;
-	bool					user_flag_;
-	bool					user_real_name_flag_;
-	bool					operator_flag_;
-
 public:
 	Client(SOCKET s, std::string host_name);
 	~Client(void);
@@ -47,8 +31,16 @@ public:
 	SOCKET&			getSocket(void);
 
 	//client network buf
-	std::string&	getSendBuf(void);
-	std::string&	getRecvBuf(void);
+	
+	// recvBuf
+	void	appendToRecvBuf(unsigned char* buf);
+	std::string&	getRecvBuf(void);	// todo: remove
+
+	// sendBuf
+	//bool	appendToSendBuf(unsigned char buf);
+
+	std::string&	getSendBuf(void);	// todo: remove
+	
 
 	//client disconnect getter/setter
 	bool			getDisconnectFlag(void) const;
@@ -81,6 +73,24 @@ public:
 
 	//client user host getter
 	std::string&	getHostName(void);
+
+private:
+	std::string				s_buf_;	//network send_buf
+	std::string				r_buf_;	//network recv_buf
+	SOCKET					client_sock_;	//network socket
+	std::string				nick_name_;
+	std::string				user_name_;
+	std::string				mode_;
+	std::string				unused_;
+	std::string				user_real_name_;
+	std::string				host_name_;
+	bool					disconnect_flag_;
+	bool					pass_flag_;
+	bool					nick_flag_;
+	bool					user_flag_;
+	bool					user_real_name_flag_;
+	bool					operator_flag_;
+
 };
 
 #endif

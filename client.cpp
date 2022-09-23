@@ -31,6 +31,14 @@ Client::~Client(void)
 	return ;
 }
 
+
+void	Client::appendToRecvBuf(unsigned char* buf)
+{
+	getRecvBuf().append(reinterpret_cast<char *>(buf));
+}
+
+
+
 SOCKET&	Client::getSocket(void)
 {
 	return (this->client_sock_);
