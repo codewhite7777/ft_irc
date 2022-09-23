@@ -1,5 +1,5 @@
-#include "client.hpp"
-#include "server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 void		Server::quitTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {

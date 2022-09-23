@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "Server.hpp"
 #include "utils.hpp"
 #define VECTOR std::vector
 void Server::inviteTest(std::map<SOCKET, Client*>::iterator &iter, \

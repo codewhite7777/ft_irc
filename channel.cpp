@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "channel.hpp"
+#include "Channel.hpp"
 #include "Message.hpp"
-#include "client.hpp"
-#include "server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 #include <iterator>
 
 Channel::Channel(std::string name) : users_(), opers_(), name_(name) {}

@@ -1,5 +1,5 @@
-#include "client.hpp"
-#include "server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 #include "utils.hpp"
 
 void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \

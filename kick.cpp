@@ -1,8 +1,8 @@
 # include <iostream>
-# include "client.hpp"
+# include "Client.hpp"
 # include <map>
-# include "channel.hpp"
-#include "server.hpp"
+# include "Channel.hpp"
+#include "Server.hpp"
 #include <sstream>
 #include "utils.hpp"
 #define VECTOR std::vector

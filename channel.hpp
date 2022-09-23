@@ -13,7 +13,7 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 # include <vector>
-# include "client.hpp"
+# include "Client.hpp"
 # include "ModeClass.hpp"
 # include "map"
 

@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "client.hpp"
-#include "channel.hpp" // consider to remove
+#include "Client.hpp"
+#include "Channel.hpp" // consider to remove
 
 #include "Command.hpp"
 
@@ -23,7 +23,7 @@ Client::Client(SOCKET s, std::string host_name, Server* sv)
 	, nick_flag_(false)
 	, user_flag_(false)
 	, user_real_name_flag_(false)
-	, operator_flag_(false)
+	//, operator_flag_(false)
 	, welcomed_(false)
 	, sv_(sv) {}
 
@@ -196,11 +196,9 @@ std::string	extractFirstMsg(std::string& recv_buf)
 
 void	Client::processMessageInBuf()
 {
-	std::string	command;
-	std::string	param;
-
-	marshalMessage(command, param);
-	processProtocol(command, param);
+	marshalMessage(command_, param_);
+	processProtocol();
+	//clearCommandAndParam();
 }
 
 void	Client::marshalMessage(std::string& command, std::string& param)
@@ -227,15 +225,13 @@ void	Client::marshalMessage(std::string& command, std::string& param)
 	}
 }
 
-void	Client::processProtocol(std::string& command, std::string& param)
+void	Client::processProtocol(void)
 {
-	//isWelcomed
 	if (isWelcomed() == false)
-		processToWelcome(command, param);
+		processToWelcome(command_, param_);
 	else
-		processCommand(command, param);
+		processCommand(command_, param_);
 }
-
 
 bool	Client::isWelcomed() const
 {
@@ -244,7 +240,7 @@ bool	Client::isWelcomed() const
 
 void	Client::processToWelcome(std::string& command, std::string& param)
 {
-	Command	cmd(sv_);
+	Command	cmd(sv_, this);
 
 	if (getPassFlag() == false)
 	{
@@ -259,6 +255,8 @@ void	Client::processToWelcome(std::string& command, std::string& param)
 	{
 		// send: welcomeProtocol
 	}
+	(void)command;
+	(void)param;
 }
 
 void	Client::processCommand(std::string& command, std::string& param)
@@ -266,4 +264,14 @@ void	Client::processCommand(std::string& command, std::string& param)
 	std::cout << "in processCommand() ^o^\n";
 	(void)command;
 	(void)param;
+}
+
+std::string&	Client::getCommand(void)
+{
+	return command_;
+}
+
+std::string&	Client::getParam(void)
+{
+	return param_;
 }

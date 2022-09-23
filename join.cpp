@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "Server.hpp"
 #include <fcntl.h>
 #include <netinet/tcp.h>
 #include <sstream>

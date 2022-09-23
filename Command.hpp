@@ -1,8 +1,9 @@
 #ifndef COMMAND_HPP
 # define COMMAND_HPP
 
-#include "client.hpp"
 #include "Protocol.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 //Command
 
@@ -10,12 +11,11 @@ class Command
 {
 public:
     // todo: OCCF
-    Command(Server* sv);
+    Command(Server* sv, Client* cl);
     ~Command(void);
 
     // PASS
     void    pass(Client* clnt);
-    void    passwdMismatch(Client* clnt);
 
     // NICK
     bool    nick();
@@ -40,6 +40,7 @@ public:
 
 private:
     Server* sv_;
+    Client* cl_;
 };
 
 #endif

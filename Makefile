@@ -18,9 +18,9 @@ RM = rm -f
 NAME = ircserv
 
 SRC_FILE	=	main.cpp \
-				server.cpp \
-				client.cpp \
-				channel.cpp \
+				Server.cpp \
+				Client.cpp \
+				Channel.cpp \
 				join.cpp \
 				utils.cpp \
 				Message.cpp \
@@ -28,7 +28,9 @@ SRC_FILE	=	main.cpp \
 				privmsg.cpp	\
 				quit.cpp	\
 				kick.cpp	\
-				invite.cpp
+				invite.cpp \
+				Command.cpp \
+				Protocol.cpp
 #mode.cpp
 				
 OBJ_FILE = $(SRC_FILE:.cpp=.o)

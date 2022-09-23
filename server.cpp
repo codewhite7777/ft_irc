@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
-#include "client.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 #include "irc_protocol.hpp"
 #include <arpa/inet.h>
 #include <cctype>
@@ -52,7 +52,7 @@ Server::Server(int argc, char *argv[])
 
 	//set operator pwd
 	s_operator_pwd_ = "admin";
-	host_name_ = "irc.hena";
+	host_name_ = "irc.server";
 
 	//network init
 	networkInit();
@@ -629,14 +629,19 @@ bool	Server::getStatus(void) const
 	return (status_);
 }
 
-std::string	Server::getHostName(void) const
-{
-	return host_name_;
-}
-
 void	Server::Run(void)
 {
 	networkProcess();
 	processClientMessages(); //packetMarshalling();
 	clientDisconnect();
+}
+
+std::string	Server::getHostName(void) const
+{
+	return host_name_;
+}
+
+std::string	Server::getPwd(void)
+{
+	return raw_pwd_;
 }

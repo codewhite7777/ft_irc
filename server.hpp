@@ -13,8 +13,8 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "client.hpp"
-# include "channel.hpp"
+# include "Client.hpp"
+# include "Channel.hpp"
 # include "utils.hpp"
 # include <iostream>
 # include <map>
@@ -27,6 +27,7 @@ public:
 	void		Run(void);
 
 	std::string	getHostName(void) const;
+	std::string	getPwd(void);
 
 	Server(int argc, char *argv[]);
 	~Server(void);
