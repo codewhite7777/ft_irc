@@ -31,12 +31,25 @@ Client::~Client(void)
 	return ;
 }
 
-
 void	Client::appendToRecvBuf(unsigned char* buf)
 {
 	getRecvBuf().append(reinterpret_cast<char *>(buf));
 }
 
+const char*	Client::getSendBufCharStr()
+{
+	return (getSendBuf().c_str());
+}
+
+size_t		Client::getSendBufLength()
+{
+	return (getSendBuf().length());
+}
+
+void		Client::eraseSendBufSize(int size)
+{
+	getSendBuf().erase(0, size);
+}
 
 
 SOCKET&	Client::getSocket(void)
@@ -46,12 +59,12 @@ SOCKET&	Client::getSocket(void)
 
 std::string&	Client::getSendBuf(void)
 {
-	return (this->s_buf_);
+	return (s_buf_);
 }
 
 std::string&	Client::getRecvBuf(void)
 {
-	return (this->r_buf_);
+	return (r_buf_);
 }
 
 bool	Client::getDisconnectFlag(void) const

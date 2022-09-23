@@ -268,7 +268,7 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	unsigned char	buf[BUFFER_MAX];
 	int				send_ret(0);
 
-	memcpy(buf, iter->second->getSendBuf().c_str(), iter->second->getSendBuf().length() + 1);
+	memcpy(buf, iter->second->getSendBufCharStr(), iter->second->getSendBufLength() + 1);
 	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 		iter->second->setDisconnectFlag(true);
@@ -278,7 +278,7 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
 			 << " sendPacket: " << "[" << buf << "]\n";
 
-		iter->second->getSendBuf().erase(0, send_ret);
+		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
 	}
 	return ;
 }

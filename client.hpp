@@ -34,12 +34,16 @@ public:
 	
 	// recvBuf
 	void	appendToRecvBuf(unsigned char* buf);
-	std::string&	getRecvBuf(void);	// todo: remove
+
+	std::string&	getRecvBuf(void);	// todo: private
 
 	// sendBuf
+	const char*	getSendBufCharStr();
+	size_t		getSendBufLength();
+	void		eraseSendBufSize(int size);
 	//bool	appendToSendBuf(unsigned char buf);
 
-	std::string&	getSendBuf(void);	// todo: remove
+	std::string&	getSendBuf(void);	// todo: private
 	
 
 	//client disconnect getter/setter
