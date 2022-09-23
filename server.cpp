@@ -227,7 +227,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 	fcntl(client_sock, F_SETFL, O_NONBLOCK);
 
 	//create client session
-	Client*	new_client = new Client(client_sock, inet_ntoa(c_addr_in.sin_addr));
+	Client*	new_client = new Client(client_sock, inet_ntoa(c_addr_in.sin_addr), this);
 
 	//push client socket
 	client_map_.insert(std::make_pair(client_sock, new_client));
@@ -281,11 +281,6 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
 	}
 	return ;
-}
-
-void	Server::packetMarshalling(void)
-{
-	
 }
 
 void Server::insertSendBuffer(Client* target_client, const std::string& msg)
@@ -598,19 +593,19 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	return ;
 }
 
-
 void	Server::processClientMessages()
 {
-	//packetMarshalling();
-	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()\
+		; iter != client_map_.end()\
+		; iter++)
 	{
-		if (iter->second->getRecvBuf().length() > 0)
+		if (iter->second->getRecvBufLength() > 0)
 		{
-			packetAnalysis(iter);
+			//packetAnalysis(iter);
+			iter->second->processMessageInBuf();
 		}
 	}
 }
-
 
 void	Server::clientDisconnect(void)
 {
@@ -627,7 +622,6 @@ void	Server::clientDisconnect(void)
 		else
 			iter++;
 	}
-	return ;
 }
 
 bool	Server::getStatus(void) const
@@ -635,11 +629,14 @@ bool	Server::getStatus(void) const
 	return (status_);
 }
 
+std::string	Server::getHostName(void) const
+{
+	return host_name_;
+}
+
 void	Server::Run(void)
 {
 	networkProcess();
-	processClientMessages();
-	packetMarshalling();
+	processClientMessages(); //packetMarshalling();
 	clientDisconnect();
-	return ;
 }

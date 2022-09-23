@@ -26,6 +26,8 @@ public:
 	bool		getStatus(void) const;
 	void		Run(void);
 
+	std::string	getHostName(void) const;
+
 	Server(int argc, char *argv[]);
 	~Server(void);
 

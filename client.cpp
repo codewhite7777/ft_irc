@@ -13,27 +13,40 @@
 #include "client.hpp"
 #include "channel.hpp" // consider to remove
 
-Client::Client(SOCKET s, std::string host_name)
-{
-	client_sock_ = s;
-	disconnect_flag_ = 0;
-	pass_flag_ = 0;
-	nick_flag_ = 0;
-	user_flag_ = 0;
-	operator_flag_ = 0;
-	user_real_name_flag_ = 0;
-	host_name_ = host_name;
-	return ;
-}
+#include "Command.hpp"
 
-Client::~Client(void)
-{
-	return ;
-}
+Client::Client(SOCKET s, std::string host_name, Server* sv)
+	: client_sock_(s)
+	, host_name_(host_name)
+	, disconnect_flag_(false)
+	, pass_flag_(false)
+	, nick_flag_(false)
+	, user_flag_(false)
+	, user_real_name_flag_(false)
+	, operator_flag_(false)
+	, welcomed_(false)
+	, sv_(sv) {}
+
+Client::~Client(void) {}
 
 void	Client::appendToRecvBuf(unsigned char* buf)
 {
 	getRecvBuf().append(reinterpret_cast<char *>(buf));
+}
+
+size_t		Client::getRecvBufLength()
+{
+	return (getRecvBuf().length());
+}
+
+void		Client::appendToSendBuf(const std::string& str)
+{
+	getSendBuf().append(str);
+}
+
+void		Client::appendToSendBuf(unsigned char* buf)
+{
+	getSendBuf().append(reinterpret_cast<char *>(buf));
 }
 
 const char*	Client::getSendBufCharStr()
@@ -156,4 +169,101 @@ std::string&	Client::getUserRealName(void)
 std::string&	Client::getHostName(void)
 {
 	return (this->host_name_);
+}
+
+
+/*
+	take first protocol from packet
+
+	1) [one protocol] If no more behind \r\n, just return pure packet.
+	2) [more than one protocol] If something behind \r\n, split packet by first \r\n and return only first protocol.
+	3) [no protocol] If no \r\n, return empty.
+*/
+std::string	extractFirstMsg(std::string& recv_buf)
+{
+	std::string	first_msg("");
+	size_t		found(0);
+
+	found = recv_buf.find("\r\n");
+	if (found != std::string::npos)
+	{
+		first_msg = recv_buf.substr(0, found);
+		recv_buf.erase(0, found + 2);
+	}
+	return (first_msg);
+}
+
+
+void	Client::processMessageInBuf()
+{
+	std::string	command;
+	std::string	param;
+
+	marshalMessage(command, param);
+	processProtocol(command, param);
+}
+
+void	Client::marshalMessage(std::string& command, std::string& param)
+{
+	std::string	tmp;
+
+	tmp = extractFirstMsg(getRecvBuf());
+	if (tmp.find(' ') != std::string::npos)
+	{
+		command = tmp.substr(0, tmp.find(' '));
+		param = tmp.substr(tmp.find(' ') + 1);
+	}
+	else
+	{
+		command = "";
+		param = tmp;
+	}
+
+	// test: print command and param
+	{
+		std::cout << "command: [" << command << "], ";
+		std::cout << "param: [" << param << "] ";
+		std::cout << "in marshalMessage()\n";
+	}
+}
+
+void	Client::processProtocol(std::string& command, std::string& param)
+{
+	//isWelcomed
+	if (isWelcomed() == false)
+		processToWelcome(command, param);
+	else
+		processCommand(command, param);
+}
+
+
+bool	Client::isWelcomed() const
+{
+	return (welcomed_);
+}
+
+void	Client::processToWelcome(std::string& command, std::string& param)
+{
+	Command	cmd(sv_);
+
+	if (getPassFlag() == false)
+	{
+		cmd.pass(this);
+	}
+	else if (getNickFlag() == false || getUserNameFlag() == false)
+	{
+		// nick
+		// user
+	}
+	if (getPassFlag() && getNickFlag() && getUserNameFlag())
+	{
+		// send: welcomeProtocol
+	}
+}
+
+void	Client::processCommand(std::string& command, std::string& param)
+{
+	std::cout << "in processCommand() ^o^\n";
+	(void)command;
+	(void)param;
 }

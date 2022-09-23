@@ -13,6 +13,7 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
+//#include "server.hpp"
 # include <iostream>
 # include <list>
 #include <vector>
@@ -20,11 +21,12 @@
 typedef int	SOCKET;
 
 class Channel;
+class Server;
 
 class Client
 {
 public:
-	Client(SOCKET s, std::string host_name);
+	Client(SOCKET s, std::string host_name, Server* sv);
 	~Client(void);
 
 	//client socket
@@ -33,17 +35,23 @@ public:
 	//client network buf
 	
 	// recvBuf
-	void	appendToRecvBuf(unsigned char* buf);
+	void		appendToRecvBuf(unsigned char* buf);
+	size_t		getRecvBufLength();
 
 	std::string&	getRecvBuf(void);	// todo: private
 
 	// sendBuf
+	void		appendToSendBuf(const std::string& str);
+	void		appendToSendBuf(unsigned char* buf); // todo: remove
 	const char*	getSendBufCharStr();
 	size_t		getSendBufLength();
 	void		eraseSendBufSize(int size);
-	//bool	appendToSendBuf(unsigned char buf);
+	
 
 	std::string&	getSendBuf(void);	// todo: private
+	
+	// processMessage
+	void	processMessageInBuf();
 	
 
 	//client disconnect getter/setter
@@ -79,6 +87,14 @@ public:
 	std::string&	getHostName(void);
 
 private:
+	void	marshalMessage(std::string& command, std::string& param); // private
+	void	processProtocol(std::string& command, std::string& param); // private
+
+	bool	isWelcomed() const;
+
+	void	processToWelcome(std::string& command, std::string& param);
+	void	processCommand(std::string& command, std::string& param);
+
 	std::string				s_buf_;	//network send_buf
 	std::string				r_buf_;	//network recv_buf
 	SOCKET					client_sock_;	//network socket
@@ -94,6 +110,9 @@ private:
 	bool					user_flag_;
 	bool					user_real_name_flag_;
 	bool					operator_flag_;
+
+	bool					welcomed_;
+	Server*					sv_;
 
 };
 
