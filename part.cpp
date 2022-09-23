@@ -12,15 +12,15 @@ void	Server::requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
     std::string msg = "";
     for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
     {
-        msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), "bar.example.com ") \
-            + command + " " + param + " :Bye\r\n"; 
+            msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+            + " " + command + " :" + param + "\r\n";
         std::cout << msg << '\n';
         insertSendBuffer(c_iter->second, msg);
     }
 }
 
 
-void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
+void Server::requestPart(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
     // #체널 + 메세지 올 경우    
@@ -35,10 +35,6 @@ void Server::partTest(std::map<SOCKET, Client*>::iterator &iter, \
     
     // 나갈 친구의 fd
     STRING partNick = iter->second->getNickName();
-
-    std::cout << "PART TEST START\n";
-    std::cout << "param :  [" << channelName << "]\n";
-    std::cout << "partSocket :  [" << partNick << "]\n";
     
     MAP<STRING, Client*> client_map = channel_iter->second->getUsers_();
     

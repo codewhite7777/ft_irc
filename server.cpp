@@ -52,6 +52,7 @@ Server::Server(int argc, char *argv[])
 
 	//set operator pwd
 	s_operator_pwd_ = "admin";
+	host_name_ = "irc.hena";
 
 	//network init
 	networkInit();
@@ -69,7 +70,7 @@ bool	Server::configPort(std::string port)
 	int	retPort;
 	if (isValidPort(port) == false)
 		return (false);
-	if (getPortNumber(port.c_str(), &retPort) == false)
+	if (setPortNumber(port.c_str(), &retPort) == false)
 		return (false);
 	s_port_ = static_cast<unsigned short>(retPort);
 	return (true);
@@ -259,6 +260,8 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 	{
 		buf[recv_ret] = '\0';
 		iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
+		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
+			 << " recvPacket: " << "[" << buf << "]\n";
 	}
 	return ;
 }
@@ -271,7 +274,11 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	if (send_ret == -1)
 		iter->second->setDisconnectFlag(true);
 	else if (send_ret > 0)
+	{
+		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
+			 << " sendPacket: " << "[" << buf << "]\n";
 		iter->second->getSendBuf().erase(0, send_ret);
+	}
 	return ;
 }
 
@@ -344,7 +351,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 
 	// parsing
 	packet_buf = takeFirstProtocol(iter->second->getRecvBuf());
-	std::cout << "recvBuf(after): [" <<	iter->second->getRecvBuf() << "]\n";
+	//std::cout << "recvBuf(after): [" <<	iter->second->getRecvBuf() << "]\n";
 
 
 	if (packet_buf.find(' ') != std::string::npos)
@@ -358,7 +365,7 @@ void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
 		param = packet_buf;
 	}
 
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << "\n\n";
 
 	// executing
 	if (iter->second->getPassFlag() == false)
@@ -482,15 +489,65 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
-			std::string tmp = ":bar.example.com 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
 
+			//001
+			std::string tmp = ":" + host_name_ + " 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
 			std::string	user_info = iter->second->getNickName() \
 							+ "!" + iter->second->getUserName() \
 							+ "@" + iter->second->getHostName();
-						
 			tmp += user_info + "\r\n";
-
 			insertSendBuffer(iter->second, tmp);
+			
+			//002
+			std::string RPL_YOURHOST("");
+			RPL_YOURHOST += ":" + host_name_ + " 002 " + iter->second->getNickName() + \
+				" :Your host is " + host_name_ + ", running version " + "ft_irc-1" + "\r\n";
+			insertSendBuffer(iter->second, RPL_YOURHOST);
+
+			//003
+			std::string RPL_CREATED("");
+			RPL_CREATED += ":" + host_name_ + " 003 " + iter->second->getNickName() + \
+				" :This server was created ";
+			std::string tmp_curr_time;
+			tmp_curr_time = "07:08:31 Sep 23 2022";
+			RPL_CREATED += tmp_curr_time + "\r\n";
+			insertSendBuffer(iter->second, RPL_CREATED);
+			
+			//004
+			std::string RPL_MYINFO = ":";
+			RPL_MYINFO += host_name_ + 
+			" 004 " + 
+			iter->second->getNickName() + " " + 
+			host_name_ + " "
+			"v1.0" + " " + "io " + "snio :\r\n";
+			insertSendBuffer(iter->second, RPL_MYINFO);
+
+			// irc.local 004 henalove2 irc.local InspIRCd-3 iosw biklmnopstv :bklov
+
+			/*
+				001    RPL_WELCOME
+						"Welcome to the Internet Relay Network
+						<nick>!<user>@<host>"
+				002    RPL_YOURHOST
+						"Your host is <servername>, running version <ver>"
+				003    RPL_CREATED
+						"This server was created <date>"
+				004    RPL_MYINFO
+						"<servername> <version> <available user modes>
+						<available channel modes>"
+
+				- The server sends Replies 001 to 004 to a user upon
+				successful registration.
+
+				005    RPL_BOUNCE
+						"Try server <server name>, port <port number>"
+
+				- Sent by the server to a user to suggest an alternative
+				server.  This is often used when the connection is
+				refused because the server is already full.
+			*/
+			
+
 			#ifdef DEBUG
 				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
 			#endif
@@ -504,12 +561,18 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
-	//std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
-	if (command == "PONG")
-		return ;
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << std::endl;
+	// if (command == "PONG")
+	// 	return ;
 	if (command == "PASS" || command == "USER")
 		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
+	else if (command == "PING")
+	{
+		STRING msg = ":" + host_name_ + " PONG "+ host_name_ +  " :\r\n";
+		insertSendBuffer(iter->second, msg);
+		// PONG csd.bu.edu tolsun.oulu.fi
+	}
+	else if (command == "PONG")
+		return ;
 	else if (command == "JOIN")
 	{
 		//TODO : 채널 구조 구상 및 구현
@@ -519,38 +582,36 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 	else if (command == "PART")
 	{
 		std::cout << "command : PART " << std::endl;
-		{
-			partTest(iter, command, param);	
-		}
+		requestPart(iter, command, param);
 	}
-	else if (command == "QUIT")
-	{
-		std::cout << "command : quit " << std::endl;
+	// else if (command == "QUIT")
+	// {
+	// 	std::cout << "command : quit " << std::endl;
 
-		iter->second->setDisconnectFlag(true);
-		quitTest(iter, command, param);
-		return ;
-	}
-	else if (command == "PRIVMSG" || command == "NOTICE")
-	{
-		std::cout << "command : privmsg" << std::endl;
-		requestPrivateMsg(iter, command, param);
-	}
-	else if (command == "MODE")
-	{
-		std::cout << "command : " << command << ", param : " << param << std::endl;
-		//requestMode(iter, command, param);
-	}
-	else if (command == "KICK")
-	{
-		std::cout << "command : KICK " << std::endl;
-		requestKickMsg(iter, command, param);
-	}
-	else if (command == "INVITE")
-	{
-		std::cout << "command : INVITE " << std::endl;
-		inviteTest(iter, command, param);
-	}
+	// 	iter->second->setDisconnectFlag(true);
+	// 	quitTest(iter, command, param);
+	// 	return ;
+	// }
+	// else if (command == "PRIVMSG" || command == "NOTICE")
+	// {
+	// 	std::cout << "command : privmsg" << std::endl;
+	// 	requestPrivateMsg(iter, command, param);
+	// }
+	// else if (command == "MODE")
+	// {
+	// 	std::cout << "command : " << command << ", param : " << param << std::endl;
+	// 	//requestMode(iter, command, param);
+	// }
+	// else if (command == "KICK")
+	// {
+	// 	std::cout << "command : KICK " << std::endl;
+	// 	requestKickMsg(iter, command, param);
+	// }
+	// else if (command == "INVITE")
+	// {
+	// 	std::cout << "command : INVITE " << std::endl;
+	// 	inviteTest(iter, command, param);
+	// }
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;

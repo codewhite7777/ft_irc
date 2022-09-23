@@ -29,7 +29,7 @@ t_port	getPortType(int value)
 	return (INVALID_PORT);
 }
 
-bool	getPortNumber(const char *str, int *o_value)
+bool	setPortNumber(const char *str, int *o_value)
 {
 	long long total = 0;
 

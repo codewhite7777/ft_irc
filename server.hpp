@@ -30,6 +30,7 @@ private:
 	//server info
 	bool						status_;
 	std::string					s_operator_pwd_;
+	std::string					host_name_;
 
 	//network
 	SOCKET						listen_sock_;
@@ -102,7 +103,7 @@ public:
 	//packet request :: OPER
 	void		requestMode(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
-
+						
 	void		quitTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 
@@ -125,7 +126,7 @@ private:
 	std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
 
 
-public:	void partTest(std::map<SOCKET, Client*>::iterator &iter, \
+public:	void requestPart(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 public: void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);

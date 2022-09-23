@@ -34,7 +34,7 @@ typedef enum e_buf
 // configure port
 bool	isValidPort(const std::string& port);
 t_port	getPortType(int value);
-bool	getPortNumber(const char *str, int *o_value);
+bool	setPortNumber(const char *str, int *o_value);
 
 // configure pwd
 bool	isValidPwd(const std::string& pwd);
