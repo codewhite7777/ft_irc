@@ -49,36 +49,45 @@ void    Command::nick(Client* clnt)
 void    Command::user(Client* clnt)
 {
     Protocol        proto(sv_);
-    std::string args(clnt->getParam());
-    std::vector<std::string> spltd_args(split(args, ' ')); // todo: refactor using :
+    std::string     args(clnt->getParam());
+    std::size_t     colon_pos;
 
-    if (spltd_args.size() < 4)
+    colon_pos = args.find_first_of(':');
+    if (colon_pos != std::string::npos)
     {
-        clnt->appendToSendBuf(proto.errNeedMoreParams());
+        std::size_t cnt_arg(0);
+        std::size_t space_pos(args.rfind(' ', colon_pos));
+        while (space_pos != std::string::npos)
+        {
+            ++cnt_arg;
+            space_pos = args.rfind(' ', --space_pos);
+        }
+        if (cnt_arg == 3)
+        {
+            clnt->setRealname(args.substr(colon_pos + 1));
+            args.erase(colon_pos, std::string::npos);
+
+            std::vector<std::string>    spltd_args(split(args, ' '));
+            clnt->setUsername(spltd_args[0]);
+            clnt->setHostname(spltd_args[2]);
+
+            // test: print
+            {
+            std::cout << "\n\t-----------------------------------" << std::endl;
+            std::cout << "\tSuccessfully processed USER command\n";
+            std::cout << "\tClient Username: [" << clnt->getUsername() << "]\n";
+            std::cout << "\tClient Hostname: [" << clnt->getHostname() << "]\n";
+            std::cout << "\tClient Realname: [" << clnt->getRealname() << "]\n";
+            std::cout << "\t-----------------------------------\n" << std::endl;
+            }
+        }
+        else
+        {
+            clnt->appendToSendBuf(proto.errNeedMoreParams());
+        }
     }
     else
     {
-        clnt->setUsername(spltd_args[0]);
-        clnt->setHostname(spltd_args[2]);
-        // setRealname
-        std::string tmp_username("");
-        for (std::size_t i = 3; i < spltd_args.size(); ++i)
-        {
-            tmp_username += spltd_args[i];
-        }
-        std::size_t	found = tmp_username.find_first_of(':');
-        if (found != std::string::npos)
-        {
-            tmp_username.erase(0, found);
-        }
-        clnt->setRealname(tmp_username);
-
-        // test: print
-        std::cout << "\n\t-----------------------------------" << std::endl;
-        std::cout << "\tSuccessfully processed USER command\n";
-        std::cout << "\tClient Username: [" << clnt->getUsername() << "]\n";
-        std::cout << "\tClient Hostname: [" << clnt->getHostname() << "]\n";
-        std::cout << "\tClient Realname: [" << clnt->getRealname() << "]\n";
-        std::cout << "\t-----------------------------------\n" << std::endl;
+        clnt->appendToSendBuf(proto.errNeedMoreParams());
     }
 }
