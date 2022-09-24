@@ -18,7 +18,7 @@ public:
     void    pass(Client* clnt);
 
     // NICK
-    bool    nick();
+    void    nick(Client* clnt);
 
     // USER
     bool    user();

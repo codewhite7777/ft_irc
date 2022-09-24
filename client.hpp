@@ -66,6 +66,9 @@ public:
 	bool			getNickFlag(void) const;
 	void			setNickName(bool flag, std::string& nickname);
 	std::string&	getNickName(void);
+	
+	void			setNickname(std::string& nickname);
+	void			setNickFlagOn(void);
 
 	//client user getter/setter
 	bool			getUserNameFlag(void) const;
@@ -97,7 +100,7 @@ private:
 	bool	isWelcomed() const;
 
 	void	processToWelcome();
-	void	processCommand(std::string& command, std::string& param);
+	void	processCommand();
 
 	std::string				s_buf_;	//network send_buf
 	std::string				r_buf_;	//network recv_buf

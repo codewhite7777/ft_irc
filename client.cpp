@@ -229,9 +229,9 @@ void	Client::marshalMessage(std::string& command, std::string& param)
 void	Client::processProtocol(void)
 {
 	if (isWelcomed() == false)
-		processToWelcome(command_, param_);
+		processToWelcome();
 	else
-		processCommand(command_, param_);
+		processCommand();
 }
 
 bool	Client::isPassed() const
@@ -260,21 +260,30 @@ void	Client::processToWelcome()
 	}
 	else if (getNickFlag() == false || getUserNameFlag() == false)
 	{
-		// nick
+		if (command_ == "NICK")// nick
+		{
+			cmd.nick(this);
+		}
 		// user
+		if (command_ == "USER")
+		{
+			
+		}
 	}
 	else if (getPassFlag() && getNickFlag() && getUserNameFlag())
 	{
 		// send: welcomeProtocold
 		welcomed_ = true;
 	}
+	else
+	{
+		//cmd.unknown
+	}
 }
 
-void	Client::processCommand(std::string& command, std::string& param)
+void	Client::processCommand()
 {
 	std::cout << "in processCommand() ^o^\n";
-	(void)command;
-	(void)param;
 }
 
 std::string&	Client::getCommand(void)
@@ -285,4 +294,14 @@ std::string&	Client::getCommand(void)
 std::string&	Client::getParam(void)
 {
 	return param_;
+}
+
+void			Client::setNickname(std::string& nickname)
+{
+	nick_name_ = nickname;
+}
+
+void			Client::setNickFlagOn(void)
+{
+	nick_flag_ = true;
 }

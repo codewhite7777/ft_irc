@@ -641,6 +641,11 @@ std::string	Server::getHostName(void) const
 	return host_name_;
 }
 
+std::string	Server::getHostNamePrefix() const
+{
+	return (":" + host_name_ + " ");
+}
+
 std::string	Server::getPwd(void)
 {
 	return raw_pwd_;

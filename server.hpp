@@ -23,14 +23,19 @@
 class Server
 {
 public:
+	Server(int argc, char *argv[]);
+	~Server(void);
+
 	bool		getStatus(void) const;
 	void		Run(void);
 
 	std::string	getHostName(void) const;
+
+	std::string	getHostNamePrefix() const;
+
 	std::string	getPwd(void);
 
-	Server(int argc, char *argv[]);
-	~Server(void);
+	bool		isOverlapNickName(std::string& search_nick);
 
 private:
 	//configure port
@@ -65,7 +70,7 @@ private:
 	//packet request :: NICK
 	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
-	bool		isOverlapNickName(std::string& search_nick);
+	
 
 	//packet request :: USER
 	void		requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \

@@ -15,6 +15,9 @@ public:
     std::string     errWrongPasswd();
     std::string     errNotPassCmd();
 
+    std::string     errNicknameInUse(const std::string& nick);
+    std::string     errNoNicknameGiven();
+
 private:
     Server* getServer_();
 

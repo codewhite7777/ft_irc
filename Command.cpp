@@ -26,3 +26,23 @@ void    Command::pass(Client* clnt)
         clnt->appendToSendBuf(proto.errNotPassCmd());
     }
 }
+
+void    Command::nick(Client* clnt)
+{
+    std::string     tmp_nick = clnt->getParam();
+    Protocol        proto(sv_);
+
+    if (sv_->isOverlapNickName(tmp_nick))
+    {
+        clnt->appendToSendBuf(proto.errNicknameInUse(tmp_nick));
+    }
+    else if (tmp_nick == "")
+    {
+        clnt->appendToSendBuf(proto.errNoNicknameGiven());
+    }
+    else
+    {
+        clnt->setNickname(tmp_nick);
+        clnt->setNickFlagOn();
+    }
+}
