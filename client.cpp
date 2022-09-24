@@ -24,6 +24,7 @@ Client::Client(SOCKET s, std::string host_name, Server* sv)
 	, user_flag_(false)
 	, user_real_name_flag_(false)
 	//, operator_flag_(false)
+	, passed_(false)
 	, welcomed_(false)
 	, sv_(sv) {}
 
@@ -233,30 +234,40 @@ void	Client::processProtocol(void)
 		processCommand(command_, param_);
 }
 
-bool	Client::isWelcomed() const
+bool	Client::isPassed() const
 {
-	return (welcomed_);
+	return passed_;
 }
 
-void	Client::processToWelcome(std::string& command, std::string& param)
+bool	Client::isWelcomed() const
 {
-	Command	cmd(sv_, this);
+	return welcomed_;
+}
+
+void	Client::processToWelcome()
+{
+	Command		cmd(sv_);
+	Protocol	proto(sv_);
 
 	if (getPassFlag() == false)
 	{
-		cmd.pass(this);
+		if (command_ == "CAP")
+			return ;
+		else if (command_ == "PASS")
+			cmd.pass(this);
+		else
+			appendToSendBuf(proto.errNotPassCmd());
 	}
 	else if (getNickFlag() == false || getUserNameFlag() == false)
 	{
 		// nick
 		// user
 	}
-	if (getPassFlag() && getNickFlag() && getUserNameFlag())
+	else if (getPassFlag() && getNickFlag() && getUserNameFlag())
 	{
-		// send: welcomeProtocol
+		// send: welcomeProtocold
+		welcomed_ = true;
 	}
-	(void)command;
-	(void)param;
 }
 
 void	Client::processCommand(std::string& command, std::string& param)

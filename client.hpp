@@ -93,9 +93,10 @@ private:
 	void	marshalMessage(std::string& command, std::string& param);
 	void	processProtocol();
 
+	bool	isPassed() const;
 	bool	isWelcomed() const;
 
-	void	processToWelcome(std::string& command, std::string& param);
+	void	processToWelcome();
 	void	processCommand(std::string& command, std::string& param);
 
 	std::string				s_buf_;	//network send_buf
@@ -116,6 +117,7 @@ private:
 	bool					user_real_name_flag_;
 	//bool					operator_flag_;
 
+	bool					passed_;
 	bool					welcomed_;
 	Server*					sv_;
 

@@ -1,7 +1,7 @@
 #include "Command.hpp"
 
-Command::Command(Server* sv, Client* cl)
-    : sv_(sv), cl_(cl) {}
+Command::Command(Server* sv)
+    : sv_(sv) {}
 
 Command::~Command(void) {}
 
@@ -9,8 +9,6 @@ void    Command::pass(Client* clnt)
 {
     Protocol    proto(sv_);
 
-    if (clnt->getCommand() == "CAP")
-        return ;
     if (clnt->getCommand() == "PASS")
     {
         if (clnt->getParam() == sv_->getPwd())

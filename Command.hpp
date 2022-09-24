@@ -11,7 +11,7 @@ class Command
 {
 public:
     // todo: OCCF
-    Command(Server* sv, Client* cl);
+    Command(Server* sv);
     ~Command(void);
 
     // PASS
