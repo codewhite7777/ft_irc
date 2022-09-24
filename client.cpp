@@ -260,14 +260,13 @@ void	Client::processToWelcome()
 	}
 	else if (getNickFlag() == false || getUserNameFlag() == false)
 	{
-		if (command_ == "NICK")// nick
+		if (command_ == "NICK")
 		{
 			cmd.nick(this);
 		}
-		// user
-		if (command_ == "USER")
+		else if (command_ == "USER")
 		{
-			
+			cmd.user(this);
 		}
 	}
 	else if (getPassFlag() && getNickFlag() && getUserNameFlag())
@@ -296,12 +295,47 @@ std::string&	Client::getParam(void)
 	return param_;
 }
 
-void			Client::setNickname(std::string& nickname)
+void			Client::setNickname(std::string nickname)
 {
-	nick_name_ = nickname;
+	nickname_ = nickname;
+}
+
+const std::string&	Client::getNickname() const
+{
+	return nickname_;
 }
 
 void			Client::setNickFlagOn(void)
 {
 	nick_flag_ = true;
+}
+
+void			Client::setUsername(std::string username)
+{
+	username_ = username;
+}
+
+const std::string&	Client::getUsername() const
+{
+	return username_;
+}
+
+void			Client::setHostname(std::string hostname)
+{
+	hostname_ = hostname;
+}
+
+const std::string&	Client::getHostname() const
+{
+	return hostname_;
+}
+
+void			Client::setRealname(std::string realname)
+{
+	realname_ = realname;
+}
+
+const std::string&	Client::getRealname() const
+{
+	return realname_;
 }

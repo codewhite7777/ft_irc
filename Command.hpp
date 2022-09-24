@@ -21,26 +21,25 @@ public:
     void    nick(Client* clnt);
 
     // USER
-    bool    user();
+    void    user(Client* clnt);
 
     // JOIN
-    bool    join();
+    void    join();
 
     // PART
-    bool    part();
+    void    part();
 
     // PRIVMSG
-    bool    privmsg();
+    void    privmsg();
 
     // QUIT
-    bool    quit();
+    void    quit();
 
     // INVITE
-    bool    invite();
+    void    invite();
 
 private:
     Server* sv_;
-    Client* cl_;
 };
 
 #endif

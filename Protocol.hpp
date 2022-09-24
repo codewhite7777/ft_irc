@@ -18,6 +18,8 @@ public:
     std::string     errNicknameInUse(const std::string& nick);
     std::string     errNoNicknameGiven();
 
+    std::string     errNeedMoreParams();
+
 private:
     Server* getServer_();
 

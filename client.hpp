@@ -67,13 +67,19 @@ public:
 	void			setNickName(bool flag, std::string& nickname);
 	std::string&	getNickName(void);
 	
-	void			setNickname(std::string& nickname);
-	void			setNickFlagOn(void);
+	//mgo nickname
+	void				setNickname(std::string nickname);
+	const std::string&	getNickname() const;
+	void				setNickFlagOn(void);
 
 	//client user getter/setter
 	bool			getUserNameFlag(void) const;
 	void			setUserName(bool flag, std::string &username);
 	std::string&	getUserName(void);
+
+	//mgo username
+	void				setUsername(std::string username);
+	const std::string&	getUsername() const;
 
 	//client user mode setter
 	void			setMode(std::string &mode);
@@ -89,6 +95,14 @@ public:
 	//client user host getter
 	std::string&	getHostName(void);
 
+	//mgo hostname, realname
+	void				setHostname(std::string hostname);
+	const std::string&	getHostname() const;
+
+	void				setRealname(std::string username);
+	const std::string&	getRealname() const;
+
+	//mgo command, param
 	std::string&	getCommand(void);
 	std::string&	getParam(void);
 
@@ -108,10 +122,17 @@ private:
 
 	std::string				nick_name_;
 	std::string				user_name_;
+	std::string				host_name_;
+
+	//mgo names
+	std::string				nickname_;
+	std::string				username_;
+	std::string				hostname_;
+	std::string				realname_;
+
 	std::string				mode_;
 	std::string				unused_;
 	std::string				user_real_name_;
-	std::string				host_name_;
 
 	bool					disconnect_flag_;
 	bool					pass_flag_;

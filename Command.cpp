@@ -9,28 +9,21 @@ void    Command::pass(Client* clnt)
 {
     Protocol    proto(sv_);
 
-    if (clnt->getCommand() == "PASS")
+    if (clnt->getParam() == sv_->getPwd())
     {
-        if (clnt->getParam() == sv_->getPwd())
-        {
-            clnt->setPassFlag(true);
-            clnt->appendToSendBuf(proto.rplPass());
-        }
-        else
-        {
-            clnt->appendToSendBuf(proto.errWrongPasswd());
-        }
+        clnt->setPassFlag(true);
+        clnt->appendToSendBuf(proto.rplPass());
     }
     else
     {
-        clnt->appendToSendBuf(proto.errNotPassCmd());
+        clnt->appendToSendBuf(proto.errWrongPasswd());
     }
 }
 
 void    Command::nick(Client* clnt)
 {
-    std::string     tmp_nick = clnt->getParam();
     Protocol        proto(sv_);
+    std::string     tmp_nick(clnt->getParam());
 
     if (sv_->isOverlapNickName(tmp_nick))
     {
@@ -44,5 +37,48 @@ void    Command::nick(Client* clnt)
     {
         clnt->setNickname(tmp_nick);
         clnt->setNickFlagOn();
+
+        // test: print
+        std::cout << "\n\t-----------------------------------" << std::endl;
+        std::cout << "\tSuccessfully set Client Nickname!\n";
+        std::cout << "\tClient Nickname: [" << clnt->getNickname() << "]\n";
+        std::cout << "\t-----------------------------------\n" << std::endl;
+    }
+}
+
+void    Command::user(Client* clnt)
+{
+    Protocol        proto(sv_);
+    std::string args(clnt->getParam());
+    std::vector<std::string> spltd_args(split(args, ' ')); // todo: refactor using :
+
+    if (spltd_args.size() < 4)
+    {
+        clnt->appendToSendBuf(proto.errNeedMoreParams());
+    }
+    else
+    {
+        clnt->setUsername(spltd_args[0]);
+        clnt->setHostname(spltd_args[2]);
+        // setRealname
+        std::string tmp_username("");
+        for (std::size_t i = 3; i < spltd_args.size(); ++i)
+        {
+            tmp_username += spltd_args[i];
+        }
+        std::size_t	found = tmp_username.find_first_of(':');
+        if (found != std::string::npos)
+        {
+            tmp_username.erase(0, found);
+        }
+        clnt->setRealname(tmp_username);
+
+        // test: print
+        std::cout << "\n\t-----------------------------------" << std::endl;
+        std::cout << "\tSuccessfully processed USER command\n";
+        std::cout << "\tClient Username: [" << clnt->getUsername() << "]\n";
+        std::cout << "\tClient Hostname: [" << clnt->getHostname() << "]\n";
+        std::cout << "\tClient Realname: [" << clnt->getRealname() << "]\n";
+        std::cout << "\t-----------------------------------\n" << std::endl;
     }
 }

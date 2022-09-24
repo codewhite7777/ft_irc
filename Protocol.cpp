@@ -54,6 +54,16 @@ std::string     Protocol::errNoNicknameGiven()
     return ret;
 }
 
+std::string     Protocol::errNeedMoreParams()
+{
+    std::string ret;
+
+    ret = sv_->getHostNamePrefix();
+    ret = ERR_NEEDMOREPARAMS;
+    ret += " :Not enough parameters.\r\n";
+    return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
     return sv_;
