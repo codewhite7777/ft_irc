@@ -77,12 +77,6 @@ public:
 	void			setUserName(bool flag, std::string &username);
 	std::string&	getUserName(void);
 
-	//mgo username
-	void				setUsername(std::string username);
-	const std::string&	getUsername() const;
-
-	void				setUserFlagOn();
-	bool				getUserFlag() const;
 
 	//client user mode setter
 	void			setMode(std::string &mode);
@@ -98,18 +92,24 @@ public:
 	//client user host getter
 	std::string&	getHostName(void);
 
-	//mgo hostname, realname
-	void				setHostname(std::string hostname);
-	const std::string&	getHostname() const;
 
+
+	//mgo username, hostname, realname
+	void				setUsername(std::string username);
+	void				setHostname(std::string hostname);
 	void				setRealname(std::string username);
+
+	const std::string&	getUsername() const;
+	const std::string&	getHostname() const;
 	const std::string&	getRealname() const;
+	const std::string	getUserRealHostNamesInfo() const;
+
+	void				setUserFlagOn();
+	bool				getUserFlag() const;
 
 	//mgo command, param
 	std::string&	getCommand();
 	std::string&	getParam();
-
-	const std::string	getUserRealHostNamesInfo() const;
 
 private:
 	void	marshalMessage(std::string& command, std::string& param);

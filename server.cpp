@@ -466,6 +466,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
 			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
 
+			/*
 			//001
 			std::string tmp = ":" + host_name_ + " 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
 			std::string	user_info = iter->second->getNickName() \
@@ -497,6 +498,7 @@ void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
 			host_name_ + " "
 			"v1.0" + " " + "io " + "snio :\r\n";
 			insertSendBuffer(iter->second, RPL_MYINFO);
+			*/
 
 			// irc.local 004 henalove2 irc.local InspIRCd-3 iosw biklmnopstv :bklov
 

@@ -23,11 +23,11 @@ public:
     // 001
     std::string     rplWelcome(Client* clnt);
     // 002
-    std::string     rplYourHost();
+    std::string     rplYourHost(Client* clnt);
     // 003
-    std::string     rplCreated();
+    std::string     rplCreated(Client* clnt);
     // 004
-    std::string     rplMyInfo();
+    std::string     rplMyInfo(Client* clnt);
 
 private:
     Server* getServer_();
