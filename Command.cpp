@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/25 17:35:06 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 18:18:15 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <vector>
 
 Command::Command(Server* sv)
-    : sv_(sv) {}
+    : sv_(sv), proto_(sv_->getProtocol()) {}
 
 Command::~Command(void) {}
 

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:38 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/25 17:35:39 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 17:57:56 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ public:
     void    invite();
 
 private:
-    Server* sv_;
+    Server*     sv_;
+    Protocol*   proto_;
 };
 
 #endif
