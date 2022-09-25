@@ -280,7 +280,7 @@ void	Client::processToWelcome()
 		// 002
 		appendToSendBuf(proto.rplYourHost(this));
 		// 003
-		//appendToSendBuf(proto.rplCreated(this));
+		appendToSendBuf(proto.rplCreated(this));
 		// 004
 		//appendToSendBuf(proto.rplMyInfo(this));
 	}

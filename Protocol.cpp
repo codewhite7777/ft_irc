@@ -96,8 +96,15 @@ std::string     Protocol::rplYourHost(Client* clnt)
 // 003
 std::string     Protocol::rplCreated(Client* clnt)
 {
-    (void)clnt;
-    return NULL;
+    std::string ret;
+
+    ret = sv_->getHostNamePrefix();
+    ret += RPL_CREATED;
+    ret += " " + clnt->getNickname();
+    ret += " :This server was created ";
+    ret += "05:22:40 Sep 25 2022"; // todo: sv_->getCreatedDate()
+    ret += "\r\n";
+    return ret;
 }
 
 // 004
