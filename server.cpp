@@ -6,11 +6,13 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:36:03 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 17:51:23 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Command.hpp"
+#include "Protocol.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "irc_protocol.hpp"
@@ -28,6 +30,8 @@
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
+	, cmd_(new Command(this))
+	, proto_(new Protocol(this))
 	, name_("irc.server")
 	, version_("ft_irc-mandatory")
 	, sock_count_(0)
@@ -56,7 +60,7 @@ Server::Server(int argc, char *argv[])
 	}
 
 	//set operator pwd
-	s_operator_pwd_ = "admin";
+	//s_operator_pwd_ = "admin";
 
 	//network init
 	networkInit();
@@ -65,6 +69,8 @@ Server::Server(int argc, char *argv[])
 Server::~Server(void)
 {
 	networkClose();
+	delete cmd_;
+	delete proto_;
 }
 
 bool	Server::getStatus(void) const
@@ -77,6 +83,16 @@ void	Server::Run(void)
 	networkProcess();
 	processClientMessages(); //packetMarshalling();
 	clientDisconnect();
+}
+
+Command*	Server::getCommand() const
+{
+	return cmd_;
+}
+
+Protocol*	Server::getProtocol() const
+{
+	return proto_;
 }
 
 const std::string&	Server::getName(void) const

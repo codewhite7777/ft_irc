@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:36:06 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 17:50:27 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <netinet/in.h>
 # include <map>
 
+class Command;
+class Protocol;
 class Client;
 class Channel;
 
@@ -28,6 +30,9 @@ public:
 
 	bool					getStatus(void) const;
 	void					Run(void);
+
+	Command*				getCommand() const;
+	Protocol*				getProtocol() const;
 
 	const std::string&		getName(void) const;
 	std::string				getNamePrefix() const;
@@ -62,16 +67,20 @@ private:
 	//mgo.refactor
 	void		processClientMessages(void);
 
+
+	bool						status_;
+
 	//config value
 	std::string					raw_port_;
 	std::string					raw_pwd_;
 
+	Command*					cmd_;
+	Protocol*					proto_;
+
 	//server info
-	bool						status_;
-	std::string					s_operator_pwd_;
-		//mgo.refactor
-	std::string							name_;
-	const std::string					version_;
+	//std::string					s_operator_pwd_;
+	std::string					name_;
+	const std::string			version_;
 
 	//network
 	SOCKET						listen_sock_;

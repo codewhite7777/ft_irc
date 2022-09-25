@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:35:34 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 17:53:05 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@
 
 typedef int	SOCKET; // todo: set typedefs
 
-class Channel;
 class Server;
+class Command;
+class Protocol;
+class Channel;
 
 class Client
 {
@@ -105,7 +107,10 @@ private:
 
 	bool					passed_;
 	bool					welcomed_; // refistered
+	
 	Server*					sv_;
+	Command*				cmd_;
+	Protocol*				proto_;
 };
 
 #endif

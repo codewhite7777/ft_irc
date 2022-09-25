@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:34:53 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 17:55:54 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ Client::Client(SOCKET sdes, std::string hostname, Server* sv)
 	, disconnect_flag_(false)
 	, passed_(false)
 	, welcomed_(false)
-	, sv_(sv) {}
+	, sv_(sv)
+	, cmd_(sv_->getCommand())
+	, proto_(sv_->getProtocol()) {}
 
 Client::~Client(void) {}
 
@@ -161,7 +163,6 @@ bool				Client::getUserFlag() const
 	return user_flag_;
 }
 
-
 void	Client::marshalMessage(std::string& command__, std::string& param__)
 {
 	std::string	tmp_msg;
@@ -217,44 +218,29 @@ void	Client::processProtocol(void)
 
 void	Client::processToWelcome()
 {
-	Command		cmd(sv_);
-	Protocol	proto(sv_);
-	// 얘들을 main에서 만들고 주소를 Client의 상태로 설정하면 더 효율적일 것 같다.
-
 	if (getPassFlag() == false)
 	{
 		if (command_ == "CAP")
 			return ;
 		else if (command_ == "PASS")
-			cmd.pass(this);
+			cmd_->pass(this);
 		else
-			appendToSendBuf(proto.errNotPassCmd());
+			appendToSendBuf(proto_->errNotPassCmd());
 	}
 	else if (getNickFlag() == false || getUserFlag() == false)
 	{
 		if (command_ == "NICK")
-		{
-			cmd.nick(this);
-		}
+			cmd_->nick(this);
 		else if (command_ == "USER")
-		{
-			cmd.user(this);
-		}
+			cmd_->user(this);
 	}
 	if (getPassFlag() && getNickFlag() && getUserFlag())
 	{
 		welcomed_ = true;
-
-		// send: Protocols when Welcome
-		// The server sends Replies 001 to 004 to a user upon successful registration.
-		// 001
-		appendToSendBuf(proto.rplWelcome(this));
-		// 002
-		appendToSendBuf(proto.rplYourHost(this));
-		// 003
-		appendToSendBuf(proto.rplCreated(this));
-		// 004
-		appendToSendBuf(proto.rplMyInfo(this));
+		appendToSendBuf(proto_->rplWelcome(this));
+		appendToSendBuf(proto_->rplYourHost(this));
+		appendToSendBuf(proto_->rplCreated(this));
+		appendToSendBuf(proto_->rplMyInfo(this));
 	}
 }
 
