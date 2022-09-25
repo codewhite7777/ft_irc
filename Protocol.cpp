@@ -64,6 +64,37 @@ std::string     Protocol::errNeedMoreParams()
     return ret;
 }
 
+// 001
+std::string     Protocol::rplWelcome(Client* clnt)
+{
+    std::string ret;
+
+    ret = sv_->getHostNamePrefix();
+    ret += RPL_WELCOME;
+    ret += " " + clnt->getNickname();
+    ret += " :Welcome to the ft_irc server(mgo, hena) ";
+    ret += clnt->getUserRealHostNamesInfo();
+    ret += "\r\n";
+    return ret;
+}
+
+// 002
+std::string     Protocol::rplYourHost()
+{
+    return NULL;
+}
+// 003
+std::string     Protocol::rplCreated()
+{
+    return NULL;
+}
+
+// 004
+std::string     Protocol::rplMyInfo()
+{
+    return NULL;
+}
+
 Server* Protocol::getServer_(void)
 {
     return sv_;

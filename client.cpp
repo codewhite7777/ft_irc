@@ -248,6 +248,7 @@ void	Client::processToWelcome()
 {
 	Command		cmd(sv_);
 	Protocol	proto(sv_);
+	// 얘들을 main에서 만들고 주소를 Client의 상태로 설정하면 더 효율적일 것 같다.
 
 	if (getPassFlag() == false)
 	{
@@ -258,7 +259,7 @@ void	Client::processToWelcome()
 		else
 			appendToSendBuf(proto.errNotPassCmd());
 	}
-	else if (getNickFlag() == false || getUserNameFlag() == false)
+	else if (getNickFlag() == false || getUserFlag() == false)
 	{
 		if (command_ == "NICK")
 		{
@@ -269,14 +270,19 @@ void	Client::processToWelcome()
 			cmd.user(this);
 		}
 	}
-	else if (getPassFlag() && getNickFlag() && getUserNameFlag())
+	if (getPassFlag() && getNickFlag() && getUserFlag())
 	{
-		// send: welcomeProtocold
 		welcomed_ = true;
-	}
-	else
-	{
-		//cmd.unknown
+
+		// send: Protocols when Welcome
+		// 001
+		appendToSendBuf(proto.rplWelcome(this));
+		// 002
+		//appendToSendBuf(proto.rplYourHost());
+		// 003
+		//appendToSendBuf(proto.rplCreated());
+		// 004
+		//appendToSendBuf(proto.rplMyInfo());
 	}
 }
 
@@ -338,4 +344,19 @@ void			Client::setRealname(std::string realname)
 const std::string&	Client::getRealname() const
 {
 	return realname_;
+}
+
+const std::string	Client::getUserRealHostNamesInfo() const
+{
+	return (nickname_ + "!" + username_ + "@" + hostname_);
+}
+
+void				Client::setUserFlagOn()
+{
+	user_flag_ = true;
+}
+
+bool				Client::getUserFlag() const
+{
+	return user_flag_;
 }

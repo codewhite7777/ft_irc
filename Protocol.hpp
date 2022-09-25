@@ -20,6 +20,15 @@ public:
 
     std::string     errNeedMoreParams();
 
+    // 001
+    std::string     rplWelcome(Client* clnt);
+    // 002
+    std::string     rplYourHost();
+    // 003
+    std::string     rplCreated();
+    // 004
+    std::string     rplMyInfo();
+
 private:
     Server* getServer_();
 

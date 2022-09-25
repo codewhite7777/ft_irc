@@ -70,7 +70,7 @@ public:
 	//mgo nickname
 	void				setNickname(std::string nickname);
 	const std::string&	getNickname() const;
-	void				setNickFlagOn(void);
+	void				setNickFlagOn();
 
 	//client user getter/setter
 	bool			getUserNameFlag(void) const;
@@ -80,6 +80,9 @@ public:
 	//mgo username
 	void				setUsername(std::string username);
 	const std::string&	getUsername() const;
+
+	void				setUserFlagOn();
+	bool				getUserFlag() const;
 
 	//client user mode setter
 	void			setMode(std::string &mode);
@@ -103,8 +106,10 @@ public:
 	const std::string&	getRealname() const;
 
 	//mgo command, param
-	std::string&	getCommand(void);
-	std::string&	getParam(void);
+	std::string&	getCommand();
+	std::string&	getParam();
+
+	const std::string	getUserRealHostNamesInfo() const;
 
 private:
 	void	marshalMessage(std::string& command, std::string& param);

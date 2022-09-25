@@ -70,6 +70,7 @@ void    Command::user(Client* clnt)
             std::vector<std::string>    spltd_args(split(args, ' '));
             clnt->setUsername(spltd_args[0]);
             clnt->setHostname(spltd_args[2]);
+            clnt->setUserFlagOn();
 
             // test: print
             {
