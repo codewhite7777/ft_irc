@@ -26,16 +26,13 @@ public:
 	Server(int argc, char *argv[]);
 	~Server(void);
 
-	bool		getStatus(void) const;
-	void		Run(void);
-
-	std::string	getHostName(void) const;
-
-	std::string	getHostNamePrefix() const;
-
-	std::string	getPwd(void);
-
-	bool		isOverlapNickName(std::string& search_nick);
+	bool			getStatus(void) const;
+	void			Run(void);
+	std::string		getHostName(void) const;
+	std::string		getHostNamePrefix() const;
+	std::string		getPwd(void);
+	bool			isOverlapNickName(std::string& search_nick);
+	const std::string&	getVersion() const;
 
 private:
 	//configure port
@@ -122,7 +119,6 @@ private:
 	//server info
 	bool						status_;
 	std::string					s_operator_pwd_;
-	std::string					host_name_;
 
 	//network
 	SOCKET						listen_sock_;
@@ -139,5 +135,8 @@ private:
 	//channel
 	std::map<std::string, Channel *>	chann_map_;
 
+	//mgo
+	std::string							host_name_;
+	const std::string					version_;
 };
 #endif

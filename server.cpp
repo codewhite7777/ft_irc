@@ -25,7 +25,10 @@
 #include <vector>
 
 Server::Server(int argc, char *argv[])
-	: status_(true), sock_count_(0)
+	: status_(true)
+	, sock_count_(0)
+	, host_name_("irc.server")
+	, version_("ft_irc-mandatory")
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -52,7 +55,6 @@ Server::Server(int argc, char *argv[])
 
 	//set operator pwd
 	s_operator_pwd_ = "admin";
-	host_name_ = "irc.server";
 
 	//network init
 	networkInit();
@@ -651,4 +653,9 @@ std::string	Server::getHostNamePrefix() const
 std::string	Server::getPwd(void)
 {
 	return raw_pwd_;
+}
+
+const std::string&	Server::getVersion() const
+{
+	return version_;
 }

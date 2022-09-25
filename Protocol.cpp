@@ -89,7 +89,7 @@ std::string     Protocol::rplYourHost(Client* clnt)
     ret += " :Your host is ";
     ret += sv_->getHostName();
     ret += ", running version ";
-    ret += "ft_irc-mandatory"; // todo: sv_->getVersion()
+    ret += sv_->getVersion();
     ret += "\r\n";
     return ret;
 }
@@ -110,8 +110,18 @@ std::string     Protocol::rplCreated(Client* clnt)
 // 004
 std::string     Protocol::rplMyInfo(Client* clnt)
 {
-    (void)clnt;
-    return NULL;
+    std::string ret;
+
+    ret = sv_->getHostNamePrefix();
+    ret += RPL_MYINFO;
+    ret += " " + clnt->getNickname();
+    ret += " " + sv_->getHostName();
+    ret += " " + sv_->getVersion();
+    ret += " iosw"; // available user modes
+    ret += " biklmnopstv"; // available channel modes
+    ret += " :bklov";
+    ret += "\r\n";
+    return ret;
 }
 
 Server* Protocol::getServer_(void)

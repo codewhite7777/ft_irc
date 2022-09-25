@@ -275,6 +275,7 @@ void	Client::processToWelcome()
 		welcomed_ = true;
 
 		// send: Protocols when Welcome
+		// The server sends Replies 001 to 004 to a user upon successful registration.
 		// 001
 		appendToSendBuf(proto.rplWelcome(this));
 		// 002
@@ -282,7 +283,7 @@ void	Client::processToWelcome()
 		// 003
 		appendToSendBuf(proto.rplCreated(this));
 		// 004
-		//appendToSendBuf(proto.rplMyInfo(this));
+		appendToSendBuf(proto.rplMyInfo(this));
 	}
 }
 
