@@ -12,7 +12,7 @@ void	Server::requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
     std::string msg = "";
     for (std::map<SOCKET, Client*>::iterator c_iter = client_map_.begin(); c_iter != client_map_.end(); c_iter++)
     {
-            msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+            msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getName()) \
             + " " + command + " :" + param + "\r\n";
         std::cout << msg << '\n';
         insertSendBuffer(c_iter->second, msg);

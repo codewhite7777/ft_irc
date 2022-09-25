@@ -34,7 +34,7 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
                 // 나 자신을 뺀 나머지에게 보내야 한다.
 				if (client_info->getNickName() != iter->second->getNickName())
 				{
-					std::string message = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+					std::string message = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getName()) \
 						+ " PRIVMSG " + tar_nick + " :" + msg;
 					message += "\r\n";
 					std::cout << message << '\n';
@@ -50,7 +50,7 @@ void	Server::requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
 			std::cout << "name Test: " << c_iter->second->getNickName() <<' ' << tar_nick << '\n';
 			if (c_iter->second->getNickName() == tar_nick)
 			{
-				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+				msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getName()) \
 					+ " PRIVMSG " + tar_nick + " :" + msg;
 				msg += "\r\n";
 				std::cout << msg << '\n';

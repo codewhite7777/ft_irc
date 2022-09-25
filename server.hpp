@@ -26,13 +26,15 @@ public:
 	Server(int argc, char *argv[]);
 	~Server(void);
 
-	bool			getStatus(void) const;
-	void			Run(void);
-	std::string		getHostName(void) const;
-	std::string		getHostNamePrefix() const;
-	std::string		getPwd(void);
-	bool			isOverlapNickName(std::string& search_nick);
-	const std::string&	getVersion() const;
+	bool					getStatus(void) const;
+	void					Run(void);
+
+	const std::string&		getName(void) const;
+	std::string				getNamePrefix() const;
+	const std::string&		getVersion() const;
+	const std::string&		getPwd(void) const;
+
+	bool					isOverlapNickName(std::string& search_nick);
 
 private:
 	//configure port
@@ -54,12 +56,47 @@ private:
 	void		recvPacket(std::map<SOCKET, Client *>::iterator &iter);
 	void		sendPacket(std::map<SOCKET, Client *>::iterator &iter);
 
-	//network packet marshalling
-	void		processClientMessages(void);
-	void		packetMarshalling(void);
-	void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
-	std::string	takeFirstProtocol(std::string& packet);
+	//disconnect client
+	void		clientDisconnect(void);
 
+	//mgo.refactor
+	void		processClientMessages(void);
+
+	//config value
+	std::string					raw_port_;
+	std::string					raw_pwd_;
+
+	//server info
+	bool						status_;
+	std::string					s_operator_pwd_;
+		//mgo.refactor
+	std::string							name_;
+	const std::string					version_;
+
+	//network
+	SOCKET						listen_sock_;
+	struct sockaddr_in			s_addr_in_;
+	unsigned short				s_port_;
+	std::string					s_ip_;
+
+	//client
+	unsigned int				sock_count_;
+	std::map<SOCKET, Client *>	client_map_;
+	fd_set						read_set_;
+	fd_set						write_set_;
+
+	//channel
+	std::map<std::string, Channel *>	chann_map_;
+};
+
+
+	// ---------------------------------------------------------------------
+	// to remove
+	//network packet marshalling
+	// void		packetMarshalling(void);
+	// void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
+	// std::string	takeFirstProtocol(std::string& packet);
+	/*
 	//packet request :: PASS
 	void		requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
@@ -94,15 +131,12 @@ private:
 
 	void		inviteTest(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
-
-	//disconnect client
-	void		clientDisconnect(void);
-
-	void		insertSendBuffer(Client* target_client, const std::string& msg);
-	std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
-	std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
-	std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
-
+	*/
+	//void		insertSendBuffer(Client* target_client, const std::string& msg);
+	//std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
+	//std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
+	//std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
+	/*
 	void requestPart(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
 	void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
@@ -111,32 +145,8 @@ private:
 						std::string& command, std::string& param);
 	void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param);
+	*/
+	// ---------------------------------------------------------------------
 
-	//config value
-	std::string					raw_port_;
-	std::string					raw_pwd_;
 
-	//server info
-	bool						status_;
-	std::string					s_operator_pwd_;
-
-	//network
-	SOCKET						listen_sock_;
-	struct sockaddr_in			s_addr_in_;
-	unsigned short				s_port_;
-	std::string					s_ip_;
-
-	//client
-	unsigned int				sock_count_;
-	std::map<SOCKET, Client *>	client_map_;
-	fd_set						read_set_;
-	fd_set						write_set_;
-
-	//channel
-	std::map<std::string, Channel *>	chann_map_;
-
-	//mgo
-	std::string							host_name_;
-	const std::string					version_;
-};
 #endif

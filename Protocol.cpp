@@ -10,7 +10,7 @@ std::string    Protocol::rplPass()
     std::string ret;
 
     ret = RPL_NONE;
-    ret += " " +  sv_->getHostName() + " :info) Successful Authentication.\r\n";
+    ret += " " +  sv_->getName() + " :info) Successful Authentication.\r\n";
     return ret;
 }
 
@@ -19,7 +19,7 @@ std::string     Protocol::errWrongPasswd()
     std::string ret;
 
     ret = ERR_PASSWDMISMATCH;
-    ret += " " + sv_->getHostName() + " :info) Wrong password\r\n";
+    ret += " " + sv_->getName() + " :info) Wrong password\r\n";
     return ret;
 }
 
@@ -28,7 +28,7 @@ std::string     Protocol::errNotPassCmd()
     std::string ret;
 
     ret = ERR_PASSWDMISMATCH;
-    ret += " " + sv_->getHostName() + " :ex) <PASS> <password>\r\n";
+    ret += " " + sv_->getName() + " :ex) <PASS> <password>\r\n";
     return ret;
 }
 
@@ -36,7 +36,7 @@ std::string     Protocol::errNicknameInUse(const std::string& nick)
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret += ERR_NICKNAMEINUSE;
     ret += " *";
     ret += " " + nick;
@@ -48,7 +48,7 @@ std::string     Protocol::errNoNicknameGiven()
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret = ERR_NONICKNAMEGIVEN;
     ret += " :No nickname is given.\r\n";
     return ret;
@@ -58,7 +58,7 @@ std::string     Protocol::errNeedMoreParams()
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret = ERR_NEEDMOREPARAMS;
     ret += " :Not enough parameters.\r\n";
     return ret;
@@ -69,7 +69,7 @@ std::string     Protocol::rplWelcome(Client* clnt)
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret += RPL_WELCOME;
     ret += " " + clnt->getNickname();
     ret += " :Welcome to the IRC Network ";
@@ -83,11 +83,11 @@ std::string     Protocol::rplYourHost(Client* clnt)
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret += RPL_YOURHOST;
     ret += " " + clnt->getNickname();
     ret += " :Your host is ";
-    ret += sv_->getHostName();
+    ret += sv_->getName();
     ret += ", running version ";
     ret += sv_->getVersion();
     ret += "\r\n";
@@ -98,7 +98,7 @@ std::string     Protocol::rplCreated(Client* clnt)
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret += RPL_CREATED;
     ret += " " + clnt->getNickname();
     ret += " :This server was created ";
@@ -112,10 +112,10 @@ std::string     Protocol::rplMyInfo(Client* clnt)
 {
     std::string ret;
 
-    ret = sv_->getHostNamePrefix();
+    ret = sv_->getNamePrefix();
     ret += RPL_MYINFO;
     ret += " " + clnt->getNickname();
-    ret += " " + sv_->getHostName();
+    ret += " " + sv_->getName();
     ret += " " + sv_->getVersion();
     ret += " iosw"; // available user modes
     ret += " biklmnopstv"; // available channel modes

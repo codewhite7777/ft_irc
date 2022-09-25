@@ -46,7 +46,7 @@ void	Channel::assignUser(STRING nick, Client* new_user)
 	//"":nickName!userName@hostName JOIN #channName\r\n"
 	std::string	user_info = new_user->getNickName() \
 							+ "!" + new_user->getUserName() \
-							+ "@" + new_user->getHostName();
+							+ "@" + new_user->getName();
 	std::string	proto_join = " JOIN " + name_ + "\r\n";
 	std::string proto_to_send;
 	proto_to_send = user_info + proto_join;
@@ -67,7 +67,7 @@ void	Channel::assignUser(STRING nick, Client* new_user)
 		if (opers_.find(find_nick) != opers_.end())
 			name_list += "@";
 		name_list += client_ptr->getNickName() + " ";
-		//name_list += client_ptr->getNickName() + "!" + client_ptr->getUserName() + "@" + client_ptr->getHostName() + " ";
+		//name_list += client_ptr->getNickName() + "!" + client_ptr->getUserName() + "@" + client_ptr->getName() + " ";
 	}
 	
 	// reply찍어보기

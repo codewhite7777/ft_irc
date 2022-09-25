@@ -46,7 +46,7 @@ void	Server::requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
                     std::cout << "cnt" << cnt << '\n';
                     // if (user_iter->second->getNickName() != iter->second->getNickName())
                     // {
-                    msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getHostName()) \
+                    msg = getUserInfo(iter->second->getNickName(), iter->second->getUserName(), iter->second->getName()) \
                         +" " + command + " " + param + "\r\n";
                     std::cout << "msg:" << msg << "\n";
                     std::cout << user_iter->second->getNickName() << "\n";

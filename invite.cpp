@@ -18,7 +18,7 @@ void Server::inviteTest(std::map<SOCKET, Client*>::iterator &iter, \
     }
     STRING msg = ":" + iter->second->getNickName() + "!" +
                 iter->second->getUserName() + "@" +
-                iter->second->getHostName() + " ";
+                iter->second->getName() + " ";
     msg += command + " " + param + "\r\n";
     for (std::map<SOCKET, Client*>::iterator client_iter = client_map_.begin()
         ; client_iter != client_map_.end() 

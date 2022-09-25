@@ -167,14 +167,14 @@ std::string&	Client::getUserRealName(void)
 	return (this->user_real_name_);
 }
 
-std::string&	Client::getHostName(void)
+std::string&	Client::getName(void)
 {
 	return (this->host_name_);
 }
 
 
 /*
-	take first protocol from packet
+	extract first protocol message from packet
 
 	1) [one protocol] If no more behind \r\n, just return pure packet.
 	2) [more than one protocol] If something behind \r\n, split packet by first \r\n and return only first protocol.
@@ -332,7 +332,7 @@ void			Client::setHostname(std::string hostname)
 	hostname_ = hostname;
 }
 
-const std::string&	Client::getHostname() const
+const std::string&	Client::getName() const
 {
 	return hostname_;
 }

@@ -90,7 +90,7 @@ public:
 	std::string&	getUserRealName(void);
 
 	//client user host getter
-	std::string&	getHostName(void);
+	std::string&	getName(void);
 
 
 
@@ -100,7 +100,7 @@ public:
 	void				setRealname(std::string username);
 
 	const std::string&	getUsername() const;
-	const std::string&	getHostname() const;
+	const std::string&	getName() const;
 	const std::string&	getRealname() const;
 	const std::string	getUserRealHostNamesInfo() const;
 

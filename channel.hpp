@@ -27,6 +27,7 @@ private:
 	std::string				topic_;
 	std::string				name_; // tmp... considering to remove
 	// Mode state;
+
 public:
 	Channel(std::string name); // todo: use reference?
 	Channel(void);
@@ -38,8 +39,6 @@ public:
 
 	bool	isUserAlreadyIn(STRING);
 
-
-
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
 
@@ -49,7 +48,7 @@ public:
 	void eraseUser(STRING);
 	void eraseOper(STRING);
 	// void eraseUser(std::string& nick);	//void	removeUser(Client* user);
-	
+
 };
 
 #endif

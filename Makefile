@@ -19,20 +19,21 @@ NAME = ircserv
 
 SRC_FILE	=	main.cpp \
 				Server.cpp \
-				Client.cpp \
-				Channel.cpp \
-				join.cpp \
-				utils.cpp \
-				Message.cpp \
-				part.cpp	\
-				privmsg.cpp	\
-				quit.cpp	\
-				kick.cpp	\
-				invite.cpp \
 				Command.cpp \
-				Protocol.cpp
+				Protocol.cpp \
+				Client.cpp \
+				utils.cpp
+#Channel.cpp
+
+#privmsg.cpp
+#quit.cpp
+#kick.cpp
+#invite.cpp
+#join.cpp
+#part.cpp
+#Message.cpp
 #mode.cpp
-				
+
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 

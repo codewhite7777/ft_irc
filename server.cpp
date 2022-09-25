@@ -26,9 +26,9 @@
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
-	, sock_count_(0)
-	, host_name_("irc.server")
+	, name_("irc.server")
 	, version_("ft_irc-mandatory")
+	, sock_count_(0)
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -63,6 +63,38 @@ Server::Server(int argc, char *argv[])
 Server::~Server(void)
 {
 	networkClose();
+}
+
+bool	Server::getStatus(void) const
+{
+	return (status_);
+}
+
+void	Server::Run(void)
+{
+	networkProcess();
+	processClientMessages(); //packetMarshalling();
+	clientDisconnect();
+}
+
+const std::string&	Server::getName(void) const
+{
+	return name_;
+}
+
+std::string	Server::getNamePrefix() const
+{
+	return (":" + name_ + " ");
+}
+
+const std::string&	Server::getVersion() const
+{
+	return version_;
+}
+
+const std::string&	Server::getPwd(void) const
+{
+	return raw_pwd_;
 }
 
 bool	Server::configPort(std::string port)
@@ -285,141 +317,6 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	return ;
 }
 
-void Server::insertSendBuffer(Client* target_client, const std::string& msg)
-{
-	target_client->getSendBuf().append(msg);
-	return ;
-}
-
-std::string	Server::buildErrPacket(std::string err_code, std::string user_name, std::string err_msg)
-{
-	std::string	packet;
-	packet = err_code + " " + user_name + " " + err_msg;
-	return (packet);
-}
-
-std::string	Server::buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg)
-{
-	std::string	packet;
-	packet = reply_code + " " + user_name + " " + reply_msg;
-	return (packet);
-}
-
-std::string	Server::getUserInfo(std::string nickname, std::string username, std::string hostname)
-{
-	std::string	msg = ":" + nickname + "!" + username + "@" + hostname;
-	return (msg);
-}
-
-/*
-	take first protocol from packet
-
-	1) [one protocol] If no more behind \r\n, just return pure packet.
-	2) [more than one protocol] If something behind \r\n, split packet by first \r\n and return only first protocol.
-	3) [no protocol] If no \r\n, return empty.
-*/
-std::string	Server::takeFirstProtocol(std::string& packet)
-{
-	std::string	first_proto("");
-	size_t		found(0);
-
-	found = packet.find("\r\n");
-	if (found != std::string::npos)
-	{
-		first_proto = packet.substr(0, found);
-		packet.erase(0, found + 2);
-	}
-	return (first_proto);
-}
-
-void	Server::packetAnalysis(std::map<SOCKET, Client *>::iterator& iter)
-{
-	std::string	packet_buf;
-	std::string	command;
-	std::string	param;
-
-	// parsing
-	packet_buf = takeFirstProtocol(iter->second->getRecvBuf());
-	//std::cout << "recvBuf(after): [" <<	iter->second->getRecvBuf() << "]\n";
-
-
-	if (packet_buf.find(' ') != std::string::npos)
-	{
-		command = packet_buf.substr(0, packet_buf.find(' '));
-		param = packet_buf.substr(packet_buf.find(' ') + 1);
-	}
-	else
-	{
-		command = "";
-		param = packet_buf;
-	}
-
-	std::cout << "--requestCommand-- [command : " << command << ']' << ", " << "[param : " << param << ']' << "\n\n";
-
-	// executing
-	if (iter->second->getPassFlag() == false)
-		requestAuth(iter, command, param);
-	else if (iter->second->getNickFlag() == false)
-		requestSetNickName(iter, command, param);
-	else if (iter->second->getUserNameFlag() == false)
-		requestSetUserName(iter, command, param);
-	else
-		requestCommand(iter, command, param);
-	return ;
-}
-
-void	Server::requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
-							std::string& command, std::string& param)
-{
-	if (command != "PASS")
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <PASS> <password>\r\n"));
-		return ;
-	}
-	if (this->raw_pwd_ == param)
-	{
-		iter->second->setPassFlag(true);
-		insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", ":info) Successful Authentication.\r\n"));
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << iter->first << " Client Successful Authentication." << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-	}
-	else
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":info> Wrong password\r\n"));
-	return ;
-}
-
-void	Server::requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	//커맨드 확인
-	if (command != "NICK")
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <NICK> <nickname>\r\n"));
-		return ;
-	}
-	//닉네임 중복 확인
-	if (isOverlapNickName(param) == true)
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NICKNAMEINUSE, "UNKNOWN", "info) This nickname is already taken.\r\n"));
-		return ;
-	}
-	//유효하지 않은 닉네임
-	if (param == "\"\"")
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_NONICKNAMEGIVEN, "UNKNOWN", ":info) No nickname given\r\n"));
-		return ;
-	}
-
-	iter->second->setNickName(true, param);
-	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful nickname.\r\n"));
-	insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Nick Name : " + iter->second->getNickName() + "\r\n"));
-	std::cout << "-----------------------------------" << std::endl;
-	std::cout << iter->first << " Client Successful Set NickName" << std::endl;
-	std::cout << "-----------------------------------" << std::endl;
-	return ;
-}
-
 bool	Server::isOverlapNickName(std::string& search_nick)
 {
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
@@ -430,114 +327,7 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-void	Server::requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	if (command != "USER")
-	{
-		insertSendBuffer(iter->second, buildErrPacket(ERR_PASSWDMISMATCH, "UNKNOWN", ":ex) <USER> <user> <mode> <unused> <realname>\r\n"));
-		return ;
-	}
-	else
-	{
-		std::vector<std::string> splitVector = split(param, ' ');
-		if (splitVector.size() < 4)
-		{
-			insertSendBuffer(iter->second, buildErrPacket(ERR_NEEDMOREPARAMS, "UNKNOWN", ":info) Not enough parameter\r\n"));
-			return ;
-		}
-		else
-		{
-			iter->second->setUserName(true, splitVector[0]);
-			iter->second->setMode(splitVector[1]);
-			iter->second->setUnused(splitVector[2]);
-
-			std::string	tmp_user_name;
-			for (std::size_t i = 3; i < splitVector.size(); ++i)
-			{
-				tmp_user_name += splitVector[i];
-			}
-			std::size_t	found = tmp_user_name.find_first_of(':');
-			if (found != std::string::npos)
-			{
-				tmp_user_name.erase(found);
-			}
-			iter->second->setUserRealName(true, tmp_user_name);
-			// 내 맘임!
-			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) Successful username.\r\n"));
-			// insertSendBuffer(iter->second, buildReplyPacket(RPL_NONE, "UNKNOWN", "info) User Name : " + iter->second->getUserName() + "\r\n"));
-			// insertSendBuffer(iter->second, buildReplyPacket(RPL_WELCOME, iter->second->getUserName(), "Welcome irc Server \r\n"));
-
-			/*
-			//001
-			std::string tmp = ":" + host_name_ + " 001 " + iter->second->getNickName() + " :Welcome to the ft_irc Network ";
-			std::string	user_info = iter->second->getNickName() \
-							+ "!" + iter->second->getUserName() \
-							+ "@" + iter->second->getHostName();
-			tmp += user_info + "\r\n";
-			insertSendBuffer(iter->second, tmp);
-			
-			//002
-			std::string RPL_YOURHOST("");
-			RPL_YOURHOST += ":" + host_name_ + " 002 " + iter->second->getNickName() + \
-				" :Your host is " + host_name_ + ", running version " + "ft_irc-1" + "\r\n";
-			insertSendBuffer(iter->second, RPL_YOURHOST);
-
-			//003
-			std::string RPL_CREATED("");
-			RPL_CREATED += ":" + host_name_ + " 003 " + iter->second->getNickName() + \
-				" :This server was created ";
-			std::string tmp_curr_time;
-			tmp_curr_time = "07:08:31 Sep 23 2022";
-			RPL_CREATED += tmp_curr_time + "\r\n";
-			insertSendBuffer(iter->second, RPL_CREATED);
-			
-			//004
-			std::string RPL_MYINFO = ":";
-			RPL_MYINFO += host_name_ + 
-			" 004 " + 
-			iter->second->getNickName() + " " + 
-			host_name_ + " "
-			"v1.0" + " " + "io " + "snio :\r\n";
-			insertSendBuffer(iter->second, RPL_MYINFO);
-			*/
-
-			// irc.local 004 henalove2 irc.local InspIRCd-3 iosw biklmnopstv :bklov
-
-			/*
-				001    RPL_WELCOME
-						"Welcome to the Internet Relay Network
-						<nick>!<user>@<host>"
-				002    RPL_YOURHOST
-						"Your host is <servername>, running version <ver>"
-				003    RPL_CREATED
-						"This server was created <date>"
-				004    RPL_MYINFO
-						"<servername> <version> <available user modes>
-						<available channel modes>"
-
-				- The server sends Replies 001 to 004 to a user upon
-				successful registration.
-
-				005    RPL_BOUNCE
-						"Try server <server name>, port <port number>"
-
-				- Sent by the server to a user to suggest an alternative
-				server.  This is often used when the connection is
-				refused because the server is already full.
-			*/
-			
-
-			#ifdef DEBUG
-				std::cout << user << ' ' << mode << ' ' << unused << ' ' << realname << '\n';
-			#endif
-		}
-	}
-	return ;
-}
-
-
-
+/*
 void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 						std::string& command, std::string& param)
 {
@@ -564,38 +354,39 @@ void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
 		std::cout << "command : PART " << std::endl;
 		requestPart(iter, command, param);
 	}
-	// else if (command == "QUIT")
-	// {
-	// 	std::cout << "command : quit " << std::endl;
+	else if (command == "QUIT")
+	{
+		std::cout << "command : quit " << std::endl;
 
-	// 	iter->second->setDisconnectFlag(true);
-	// 	quitTest(iter, command, param);
-	// 	return ;
-	// }
-	// else if (command == "PRIVMSG" || command == "NOTICE")
-	// {
-	// 	std::cout << "command : privmsg" << std::endl;
-	// 	requestPrivateMsg(iter, command, param);
-	// }
-	// else if (command == "MODE")
-	// {
-	// 	std::cout << "command : " << command << ", param : " << param << std::endl;
-	// 	//requestMode(iter, command, param);
-	// }
-	// else if (command == "KICK")
-	// {
-	// 	std::cout << "command : KICK " << std::endl;
-	// 	requestKickMsg(iter, command, param);
-	// }
-	// else if (command == "INVITE")
-	// {
-	// 	std::cout << "command : INVITE " << std::endl;
-	// 	inviteTest(iter, command, param);
-	// }
+		iter->second->setDisconnectFlag(true);
+		quitTest(iter, command, param);
+		return ;
+	}
+	else if (command == "PRIVMSG" || command == "NOTICE")
+	{
+		std::cout << "command : privmsg" << std::endl;
+		requestPrivateMsg(iter, command, param);
+	}
+	else if (command == "MODE")
+	{
+		std::cout << "command : " << command << ", param : " << param << std::endl;
+		//requestMode(iter, command, param);
+	}
+	else if (command == "KICK")
+	{
+		std::cout << "command : KICK " << std::endl;
+		requestKickMsg(iter, command, param);
+	}
+	else if (command == "INVITE")
+	{
+		std::cout << "command : INVITE " << std::endl;
+		inviteTest(iter, command, param);
+	}
 	else
 		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
 	return ;
 }
+*/
 
 void	Server::processClientMessages()
 {
@@ -626,36 +417,4 @@ void	Server::clientDisconnect(void)
 		else
 			iter++;
 	}
-}
-
-bool	Server::getStatus(void) const
-{
-	return (status_);
-}
-
-void	Server::Run(void)
-{
-	networkProcess();
-	processClientMessages(); //packetMarshalling();
-	clientDisconnect();
-}
-
-std::string	Server::getHostName(void) const
-{
-	return host_name_;
-}
-
-std::string	Server::getHostNamePrefix() const
-{
-	return (":" + host_name_ + " ");
-}
-
-std::string	Server::getPwd(void)
-{
-	return raw_pwd_;
-}
-
-const std::string&	Server::getVersion() const
-{
-	return version_;
 }
