@@ -3,6 +3,7 @@
 
 #include "irc_protocol.hpp"
 #include "Server.hpp"
+#include "Client.hpp"
 #include <string>
 
 class Protocol

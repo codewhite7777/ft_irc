@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include <string>
 
 Command::Command(Server* sv)
     : sv_(sv) {}

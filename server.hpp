@@ -13,12 +13,12 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "Client.hpp"
-# include "Channel.hpp"
 # include "utils.hpp"
-# include <iostream>
-# include <map>
 # include <netinet/in.h>
+# include <map>
+
+class Client;
+class Channel;
 
 class Server
 {

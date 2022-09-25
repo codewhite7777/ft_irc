@@ -12,17 +12,19 @@
 
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 #include "irc_protocol.hpp"
 #include <arpa/inet.h>
-#include <cctype>
 #include <fcntl.h>
+#include <iostream>
 #include <netinet/tcp.h>
 #include <unistd.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <cstring>
-#include <sstream>
-#include <vector>
+
+//#include <cctype>
+//#include <cstring>
+//#include <sys/select.h>
+//#include <sys/time.h>
+//#include <sstream>
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
