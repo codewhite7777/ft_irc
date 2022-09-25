@@ -1,5 +1,7 @@
 #include "Command.hpp"
+#include <iostream>
 #include <string>
+#include <vector>
 
 Command::Command(Server* sv)
     : sv_(sv) {}
@@ -78,7 +80,7 @@ void    Command::user(Client* clnt)
             std::cout << "\n\t-----------------------------------" << std::endl;
             std::cout << "\tSuccessfully processed USER command\n";
             std::cout << "\tClient Username: [" << clnt->getUsername() << "]\n";
-            std::cout << "\tClient Hostname: [" << clnt->getName() << "]\n";
+            std::cout << "\tClient Hostname: [" << clnt->getHostname() << "]\n";
             std::cout << "\tClient Realname: [" << clnt->getRealname() << "]\n";
             std::cout << "\t-----------------------------------\n" << std::endl;
             }

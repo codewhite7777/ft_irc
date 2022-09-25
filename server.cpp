@@ -234,7 +234,7 @@ void	Server::networkProcess(void)
 				recvPacket(iter);
 			if ((iter->second->getDisconnectFlag() == false) \
 			&& FD_ISSET(iter->first, &write_set_) \
-			&& iter->second->getSendBuf().length() > 0)
+			&& iter->second->getSendBufLength() > 0)
 				sendPacket(iter);
 		}
 	}
@@ -294,7 +294,7 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 		iter->second->appendToRecvBuf(buf); //iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
 
 		// test: print RecvBuf
-		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
+		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
 			 << " recvPacket: " << "[" << buf << "]\n";
 	}
 }
@@ -304,14 +304,14 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	unsigned char	buf[BUFFER_MAX];
 	int				send_ret(0);
 
-	memcpy(buf, iter->second->getSendBufCharStr(), iter->second->getSendBufLength() + 1);
+	memcpy(buf, iter->second->getSendBufCStr(), iter->second->getSendBufLength() + 1);
 	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 		iter->second->setDisconnectFlag(true);
 	else if (send_ret > 0)
 	{
 		// test: print SendBuf
-		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickName() << ">"\
+		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
 			 << " sendPacket: " << "[" << buf << "]\n";
 
 		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
@@ -323,7 +323,7 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 {
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
 	{
-		if (iter->second->getNickName() == search_nick)
+		if (iter->second->getNickname() == search_nick)
 			return (true);
 	}
 	return (false);
@@ -399,7 +399,7 @@ void	Server::processClientMessages()
 		if (iter->second->getRecvBufLength() > 0)
 		{
 			//packetAnalysis(iter);
-			iter->second->processMessageInBuf();
+			iter->second->processMessageInRecvBuf();
 		}
 	}
 }
