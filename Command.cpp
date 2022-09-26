@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 14:52:35 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 17:59:23 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,30 +111,37 @@ void    Command::user(Client* clnt)
 
 void    Command::join(Client* clnt)
 {
+	Protocol        			proto(sv_);
 	std::vector<std::string>	chann_names(split(clnt->getParam(), ','));
 	Channel*					chann_ptr(NULL);
-	Channel*					new_chann(NULL);
-	
-	// ,으로 구분해주고 일일이 넣어줘야한다.
+
 	for (std::size_t i = 0 ; i < chann_names.size() ; ++i)
 	{
 		chann_ptr = sv_->findChannel(chann_names[i]);
 		if (chann_ptr != NULL)
 		{
-			//chann_ptr->getCurrUserCount()
-			//chann_ptr->assignOperator()
-			//chann_ptr->assignUser()
-
-			//send Protocols
+			if (chann_ptr->isAlreadyIn(clnt)) // pending...: client에서 막는다.
+			{
+				// send protocol(already existed)
+				return ;
+			}
+			else
+			{
+				if (chann_ptr->getCurrUserCount() == 0)
+					chann_ptr->assignAsOperator(clnt);
+				chann_ptr->assignAsUser(clnt);
+			}
 		}
 		else
 		{
-			new_chann = new Channel(chann_names[i]);
-			sv_->assignNewChannel(new_chann);
-			//chann_ptr->assignOperator();
-			//chann_ptr->assignUser();
-
-			//send Protocols
+			chann_ptr = new Channel(chann_names[i]);
+			sv_->assignNewChannel(chann_ptr);
+			chann_ptr->assignAsOperator(clnt);
+			chann_ptr->assignAsUser(clnt);
 		}
+		//send Protocols
+		chann_ptr->sendToAll(proto.clntJoinChann(clnt, chann_ptr));
+		clnt->appendToSendBuf(proto.rplNamReply(clnt, chann_ptr));
+		clnt->appendToSendBuf(proto.rplEndOfNames(clnt, chann_ptr));
 	}
 }

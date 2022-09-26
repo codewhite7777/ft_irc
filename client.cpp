@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 18:29:58 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 16:54:43 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,11 @@ bool				Client::getUserFlag() const
 	return user_flag_;
 }
 
+std::string			Client::getNamesPrefix() const
+{
+	return (":" + nickname_ + "!" + username_ + "@" + hostname_ + " ");
+}
+
 void	Client::marshalMessage(std::string& command__, std::string& param__)
 {
 	std::string	tmp_msg;
@@ -259,7 +264,7 @@ void	Client::processCommand()
 	std::cout << "in processCommand() ^o^\n";
 	if (command_ == "JOIN")
 	{
-		cmd_->join();
+		cmd_->join(this);
 	}
 	else if (command_ == "PART")
 	{

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:56 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/25 17:35:56 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 16:50:36 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,31 +21,31 @@
 class Protocol
 {
 public:
-    Protocol(Server* sv);
-    ~Protocol(void);
+	Protocol(Server* sv);
+	~Protocol(void);
 
-    std::string     rplPass();
-    std::string     errWrongPasswd();
-    std::string     errNotPassCmd();
+	std::string		rplPass();
+	std::string		errWrongPasswd();
+	std::string		errNotPassCmd();
 
-    std::string     errNicknameInUse(const std::string& nick);
-    std::string     errNoNicknameGiven();
+	std::string		errNicknameInUse(const std::string& nick);
+	std::string		errNoNicknameGiven();
 
-    std::string     errNeedMoreParams();
+	std::string		errNeedMoreParams();
 
-    // 001
-    std::string     rplWelcome(Client* clnt);
-    // 002
-    std::string     rplYourHost(Client* clnt);
-    // 003
-    std::string     rplCreated(Client* clnt);
-    // 004
-    std::string     rplMyInfo(Client* clnt);
+	std::string		rplWelcome(Client* clnt);
+	std::string		rplYourHost(Client* clnt);
+	std::string		rplCreated(Client* clnt);
+	std::string		rplMyInfo(Client* clnt);
+
+	std::string		clntJoinChann(Client* clnt, Channel* chann);
+	std::string		rplNamReply(Client* clnt, Channel* chann);
+	std::string		rplEndOfNames(Client* clnt, Channel* chann);
 
 private:
-    Server* getServer_();
+	Server* getServer_();
 
-    Server* sv_;
+	Server* sv_;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:35:43 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 16:58:15 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # define RPL_AWAY		"301"
 # define RPL_TOPIC		"332"
 # define RPL_INVITING	"341"
+# define RPL_NAMREPLY   "353"
+# define RPL_ENDOFNAMES "366"
 # define RPL_YOUREOPER	"381"
 
 // ERR

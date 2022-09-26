@@ -6,7 +6,7 @@
 #    By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/17 07:01:17 by alee              #+#    #+#              #
-#    Updated: 2022/09/25 17:35:49 by mgo              ###   ########.fr        #
+#    Updated: 2022/09/26 15:44:20 by mgo              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,8 @@ SRC_FILE	=	main.cpp \
 				Command.cpp \
 				Protocol.cpp \
 				Client.cpp \
+				Channel.cpp \
 				utils.cpp
-#Channel.cpp
 
 #privmsg.cpp
 #quit.cpp

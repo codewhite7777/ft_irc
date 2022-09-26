@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:02:07 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:53:05 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 16:54:49 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ public:
 	const std::string		getUserRealHostNamesInfo() const;
 	void					setUserFlagOn();
 	bool					getUserFlag() const;
+
+	std::string				getNamesPrefix() const;
 
 private:
 	void					marshalMessage(std::string& command, std::string& param);
