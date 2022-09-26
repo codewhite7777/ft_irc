@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:38 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 14:42:48 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:16:57 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ public:
     void    join(Client* clnt);
 
     // PART
-    void    part();
+    void    part(Client* clnt);
 
     // PRIVMSG
     void    privmsg();

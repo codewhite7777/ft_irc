@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 17:59:23 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:20:00 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,6 @@ void    Command::user(Client* clnt)
 	}
 }
 
-
 void    Command::join(Client* clnt)
 {
 	Protocol        			proto(sv_);
@@ -120,17 +119,9 @@ void    Command::join(Client* clnt)
 		chann_ptr = sv_->findChannel(chann_names[i]);
 		if (chann_ptr != NULL)
 		{
-			if (chann_ptr->isAlreadyIn(clnt)) // pending...: client에서 막는다.
-			{
-				// send protocol(already existed)
-				return ;
-			}
-			else
-			{
-				if (chann_ptr->getCurrUserCount() == 0)
-					chann_ptr->assignAsOperator(clnt);
-				chann_ptr->assignAsUser(clnt);
-			}
+			if (chann_ptr->getCurrUserCount() == 0)
+				chann_ptr->assignAsOperator(clnt);
+			chann_ptr->assignAsUser(clnt);
 		}
 		else
 		{
@@ -144,4 +135,9 @@ void    Command::join(Client* clnt)
 		clnt->appendToSendBuf(proto.rplNamReply(clnt, chann_ptr));
 		clnt->appendToSendBuf(proto.rplEndOfNames(clnt, chann_ptr));
 	}
+}
+
+void	Command::part(Client* clnt)
+{
+	(void)clnt;
 }

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:23 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:01:09 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:18:55 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ public:
 	~Channel(void);
 	// todo: OCCF
 
-	bool				isAlreadyIn(Client* clnt);
+	
 	std::size_t			getCurrUserCount(void) const;
 	void				assignAsUser(Client* clnt);
 	void				assignAsOperator(Client* clnt);
@@ -38,13 +38,10 @@ public:
 	void				sendToAll(std::string msg);
 
 private:
-	// tmp
-	void	assignUser(std::string, Client* new_user);
-	void	assignOper(std::string, Client* user);
-	std::map<std::string, Client*>&	getUsers_();
-	std::map<std::string, Client*>&	getOpers_();
-	void eraseUser(std::string);
-	void eraseOper(std::string);
+	void				eraseUser(std::string);
+	void				eraseOper(std::string);
+
+	bool				isAlreadyIn(Client* clnt); // todo: remove
 
 	Channel(void);
 
