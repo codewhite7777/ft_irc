@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:28 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:51:23 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 14:52:00 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -422,7 +422,9 @@ void	Server::processClientMessages()
 
 void	Server::clientDisconnect(void)
 {
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end();)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		; iter != client_map_.end()
+		;)
 	{
 		if (iter->second->getDisconnectFlag() == true)
 		{
@@ -435,4 +437,22 @@ void	Server::clientDisconnect(void)
 		else
 			iter++;
 	}
+}
+
+// join
+Channel*	Server::findChannel(std::string chann_name)
+{
+	std::map<std::string, Channel*>::iterator	chann_it;
+
+	chann_it = chann_map_.find(chann_name);
+	if (chann_it != chann_map_.end())
+		return (chann_it->second);
+	else
+		return NULL;
+}
+
+void		Server::assignNewChannel(Channel* new_chann)
+{
+	chann_map_.insert(std::make_pair(new_chann->getName(), new_chann));
+	// Channel.name is reference... is ok?
 }

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 12:50:44 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:50:27 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 14:52:12 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,10 @@ public:
 	const std::string&		getPwd(void) const;
 
 	bool					isOverlapNickName(std::string& search_nick);
+
+	// mgo/refactor.join
+	Channel*	findChannel(std::string chann_name);
+	void		assignNewChannel(Channel* new_chann);
 
 private:
 	//configure port

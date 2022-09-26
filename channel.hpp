@@ -1,53 +1,55 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   channel.hpp                                        :+:      :+:    :+:   */
+/*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alee <alee@student.42seoul.kr>             +#+  +:+       +#+        */
+/*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:23 by alee              #+#    #+#             */
-/*   Updated: 2022/09/12 16:45:00 by alee             ###   ########.fr       */
+/*   Updated: 2022/09/26 15:27:09 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
-# include <vector>
-# include "Client.hpp"
-# include "ModeClass.hpp"
-# include "map"
 
-#define MAP std::map
+# include "Client.hpp"
+# include <map>
+
 class Channel
 {
-private:
-	std::map<STRING , Client*>	users_;
-	std::map<STRING , Client*>	opers_;
-
-	std::string				topic_;
-	std::string				name_; // tmp... considering to remove
-	// Mode state;
-
 public:
 	Channel(std::string name); // todo: use reference?
 	Channel(void);
 	~Channel(void);
 	// todo: OCCF
 
-	void	assignUser(STRING , Client* new_user);
-	void	assignOper(STRING , Client* user);
+	//chann_ptr->getCurrUserCount()
+	//chann_ptr->assignOperator()
+	//chann_ptr->assignUser()
 
-	bool	isUserAlreadyIn(STRING);
+	void	assignAsUser(Client* clnt);
+	void	assignAsOperator(Client* clnt);
+
+	void	assignUser(std::string, Client* new_user);
+	void	assignOper(std::string, Client* user);
+
+	bool	isUserAlreadyIn(std::string);
 
 	void				setName(std::string &name);
 	const std::string&	getName(void) const;
 
-	MAP<STRING, Client*>&	getUsers_();
-	MAP<STRING, Client*>&	getOpers_();
+	std::map<std::string, Client*>&	getUsers_();
+	std::map<std::string, Client*>&	getOpers_();
 
-	void eraseUser(STRING);
-	void eraseOper(STRING);
+	void eraseUser(std::string);
+	void eraseOper(std::string);
 	// void eraseUser(std::string& nick);	//void	removeUser(Client* user);
+
+private:
+	std::map<std::string, Client*>	users_;
+	std::map<std::string, Client*>	opers_;
+	std::string						name_;
 
 };
 

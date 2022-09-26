@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:38 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/25 17:57:56 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 14:42:48 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,9 @@
 # define COMMAND_HPP
 
 #include "Protocol.hpp"
-#include "Client.hpp"
 #include "Server.hpp"
-
-//Command
+#include "Client.hpp"
+#include "Channel.hpp"
 
 class Command
 {
@@ -36,7 +35,7 @@ public:
     void    user(Client* clnt);
 
     // JOIN
-    void    join();
+    void    join(Client* clnt);
 
     // PART
     void    part();

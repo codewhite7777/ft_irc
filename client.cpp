@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/09/25 17:55:54 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/25 18:29:58 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,6 +257,14 @@ bool	Client::isWelcomed() const
 void	Client::processCommand()
 {
 	std::cout << "in processCommand() ^o^\n";
+	if (command_ == "JOIN")
+	{
+		cmd_->join();
+	}
+	else if (command_ == "PART")
+	{
+		
+	}
 }
 
 std::string&	Client::getSendBuf(void)
