@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:38 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:16:02 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:30:50 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,24 @@ void	Channel::assignAsUser(Client* clnt)
 void	Channel::assignAsOperator(Client* clnt)
 {
 	opers_.insert(std::make_pair(clnt->getNickname(), clnt));
+}
+
+void	Channel::eraseUser(Client* clnt)
+{
+	std::map<std::string, Client*>::iterator	user_it;
+
+	user_it = users_.find(clnt->getNickname());
+	if (user_it != users_.end())
+		users_.erase(user_it);
+}
+
+void	Channel::eraseOperator(Client* clnt)
+{
+	std::map<std::string, Client*>::iterator	oper_it;
+
+	oper_it = opers_.find(clnt->getNickname());
+	if (oper_it != opers_.end())
+		opers_.erase(oper_it);
 }
 
 const std::string&	Channel::getName(void) const

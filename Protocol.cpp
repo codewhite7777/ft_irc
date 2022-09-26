@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:59 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 17:54:47 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:33:30 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,17 @@ std::string		Protocol::rplEndOfNames(Client* clnt, Channel* chann)
 	ret += " " + clnt->getNickname();
 	ret += " " + chann->getName();
 	ret += " :End of /NAMES list.";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntPartChann(Client* clnt, Channel* chann)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "PART :";
+	ret += chann->getName();
 	ret += "\r\n";
 	return ret;
 }

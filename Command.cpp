@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 18:20:00 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:35:57 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,5 +139,18 @@ void    Command::join(Client* clnt)
 
 void	Command::part(Client* clnt)
 {
-	(void)clnt;
+	Protocol		proto(sv_);
+	Channel*		chann_ptr(sv_->findChannel(clnt->getParam()));
+	std::string		msg_part;
+
+	if (chann_ptr)
+	{
+		chann_ptr->eraseOperator(clnt);
+		chann_ptr->eraseUser(clnt);
+		
+		//send Protocols
+		msg_part = proto.clntPartChann(clnt, chann_ptr);
+		clnt->appendToSendBuf(msg_part);
+		chann_ptr->sendToAll(msg_part);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:56 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 16:50:36 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:32:38 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ public:
 	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		rplNamReply(Client* clnt, Channel* chann);
 	std::string		rplEndOfNames(Client* clnt, Channel* chann);
+
+	std::string		clntPartChann(Client* clnt, Channel* chann);
 
 private:
 	Server* getServer_();

@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/28 18:32:23 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:18:55 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/26 18:31:13 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ public:
 	void				assignAsUser(Client* clnt);
 	void				assignAsOperator(Client* clnt);
 
+	void				eraseUser(Client* clnt);
+	void				eraseOperator(Client* clnt);
+
 	const std::string&	getName(void) const;
 
 	std::string			getUserListStr(void);
@@ -38,9 +41,6 @@ public:
 	void				sendToAll(std::string msg);
 
 private:
-	void				eraseUser(std::string);
-	void				eraseOper(std::string);
-
 	bool				isAlreadyIn(Client* clnt); // todo: remove
 
 	Channel(void);
