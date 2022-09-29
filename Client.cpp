@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:23:30 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/29 19:26:54 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,13 +263,11 @@ void	Client::processCommand()
 {
 	std::cout << "in processCommand() ^o^\n";
 	if (command_ == "JOIN")
-	{
 		cmd_->join(this);
-	}
 	else if (command_ == "PART")
-	{
 		cmd_->part(this);
-	}
+	else if (command_ == "QUIT")
+		cmd_->quit(this);
 }
 
 std::string&	Client::getSendBuf(void)

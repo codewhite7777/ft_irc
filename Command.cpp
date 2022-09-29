@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/26 18:35:57 by mgo              ###   ########.fr       */
+/*   Updated: 2022/09/29 20:39:19 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,4 +153,9 @@ void	Command::part(Client* clnt)
 		clnt->appendToSendBuf(msg_part);
 		chann_ptr->sendToAll(msg_part);
 	}
+}
+
+void	Command::quit(Client* clnt)
+{
+	(void)clnt;
 }
