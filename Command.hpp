@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:38 by mgo               #+#    #+#             */
-/*   Updated: 2022/09/29 19:22:01 by mgo              ###   ########.fr       */
+/*   Updated: 2022/10/01 16:45:21 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ public:
 	// INVITE
 	void    invite();
 
-	void	pong();
+	void	ping(Client* clnt);
+	void	pong(Client* clnt);
 
 private:
 	Server*     sv_;
