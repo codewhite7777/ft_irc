@@ -439,7 +439,6 @@ void	Server::clientDisconnect(void)
 	}
 }
 
-// join
 Channel*	Server::findChannel(std::string chann_name)
 {
 	std::map<std::string, Channel*>::iterator	chann_it;
@@ -454,5 +453,17 @@ Channel*	Server::findChannel(std::string chann_name)
 void		Server::assignNewChannel(Channel* new_chann)
 {
 	chann_map_.insert(std::make_pair(new_chann->getName(), new_chann));
-	// Channel.name is reference... is ok?
+	// Channel.name is reference... is ok? Watching continuely...
+}
+
+Client*		Server::findClient(std::string clnt_nickname)
+{
+	for (std::map<SOCKET, Client*>::iterator	clnt_it(client_map_.begin())
+		; clnt_it != client_map_.end()
+		; ++clnt_it)
+	{
+		if (clnt_nickname == clnt_it->second->getNickname())
+			return (clnt_it->second);
+	}
+	return NULL;
 }

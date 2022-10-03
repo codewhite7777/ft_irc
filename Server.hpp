@@ -41,9 +41,10 @@ public:
 
 	bool					isOverlapNickName(std::string& search_nick);
 
-	// mgo/refactor.join
-	Channel*	findChannel(std::string chann_name);
-	void		assignNewChannel(Channel* new_chann);
+	Channel*				findChannel(std::string chann_name);
+	void					assignNewChannel(Channel* new_chann);
+
+	Client*					findClient(std::string clnt_nickname);
 
 private:
 	//configure port
