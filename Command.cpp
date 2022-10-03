@@ -171,21 +171,38 @@ void	Command::ping(Client* clnt)
 void    Command::privmsg(Client* clnt)
 {
 	Protocol					proto(sv_);
-	std::vector<std::string>	args(split(clnt->getParam(), ' '));
-	std::vector<std::string>	names(split(args[0], ','));
-	std::string&				msg(args[1]);
+	std::string					arg(clnt->getParam());
+	std::size_t					found_space(0);
+	std::vector<std::string>	names;
+	std::string					msg;
 	Channel*					chann_ptr(NULL);
+	Client*						clnt_recv_ptr(NULL);
 
+	found_space = arg.find(' ');
+	if (found_space == std::string::npos)
+	{
+		clnt->appendToSendBuf(proto.errNeedMoreParams());
+	}
+	names = split(arg.substr(0, found_space), ',');
+	msg = arg.substr(found_space + 1);
 	for (std::size_t i = 0; i < names.size(); ++i)
 	{
-		if (names[i].find_first_of('#') != std::string::npos)
+		if (names[i].find_first_of('#') != std::string::npos) // # only first char
 		{
-			std::cout << "PRIVMSG to a channel!\n";
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
 			{
 				chann_ptr->sendToOthers(clnt, \
-					proto.clntPrivmsgChann(clnt, msg, chann_ptr));
+					proto.clntPrivmsgToChann(clnt, msg, chann_ptr));
+			}
+		}
+		else
+		{
+			clnt_recv_ptr = sv_->findClient(names[i]);
+			if (clnt_recv_ptr)
+			{
+				clnt_recv_ptr->appendToSendBuf(proto.clntPrivmsgToClnt(\
+												clnt, msg, clnt_recv_ptr));
 			}
 		}
 	}
