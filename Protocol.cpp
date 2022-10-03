@@ -199,13 +199,27 @@ std::string		Protocol::msgPong(std::string token)
 	return ret;
 }
 
-std::string		Protocol::clntPrivmsgChann(Client* clnt, std::string msg, Channel* chann)
+std::string		Protocol::clntPrivmsgToChann(Client* clnt, std::string msg, \
+											Channel* chann)
 {
 	std::string	ret;
 
 	ret = clnt->getNamesPrefix();
 	ret += "PRIVMSG ";
 	ret += chann->getName();
+	ret += " " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
+											Client* clnt_recv)
+{
+	std::string	ret;
+
+	ret = clnt_send->getNamesPrefix();
+	ret += "PRIVMSG ";
+	ret += clnt_recv->getNickname();
 	ret += " " + msg;
 	ret += "\r\n";
 	return ret;

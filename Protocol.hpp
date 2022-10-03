@@ -46,7 +46,10 @@ public:
 
 	std::string		msgPong(std::string token);
 
-	std::string		clntPrivmsgChann(Client* clnt, std::string msg, Channel* chann);
+	std::string		clntPrivmsgToChann(Client* clnt, std::string msg, \
+										Channel* chann);
+	std::string		clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
+										Client* clnt_recv);
 
 private:
 	Server* getServer_();
