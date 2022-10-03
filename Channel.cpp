@@ -110,6 +110,17 @@ void		Channel::sendToAll(std::string msg)
 	}
 }
 
+void		Channel::sendToOthers(Client* clnt, std::string msg)
+{
+	for (std::map<std::string, Client*>::iterator user_it = users_.begin()
+		; user_it != users_.end()
+		; ++user_it)
+	{
+		if (user_it->second != clnt)
+			user_it->second->appendToSendBuf(msg);
+	}
+}
+
 /*
 void Channel::eraseUser(STRING nick)
 {

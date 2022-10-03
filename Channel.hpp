@@ -40,6 +40,8 @@ public:
 
 	void				sendToAll(std::string msg);
 
+	void				sendToOthers(Client* clnt, std::string msg);
+
 private:
 	bool				isAlreadyIn(Client* clnt); // todo: remove
 

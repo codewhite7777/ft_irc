@@ -165,6 +165,32 @@ void	Command::ping(Client* clnt)
 		clnt->appendToSendBuf(proto.msgPong(token));
 }
 
+/*
+	-[] chatting in channel
+*/
+void    Command::privmsg(Client* clnt)
+{
+	Protocol					proto(sv_);
+	std::vector<std::string>	args(split(clnt->getParam(), ' '));
+	std::vector<std::string>	names(split(args[0], ','));
+	std::string&				msg(args[1]);
+	Channel*					chann_ptr(NULL);
+
+	for (std::size_t i = 0; i < names.size(); ++i)
+	{
+		if (names[i].find_first_of('#') != std::string::npos)
+		{
+			std::cout << "PRIVMSG to a channel!\n";
+			chann_ptr = sv_->findChannel(names[i]);
+			if (chann_ptr)
+			{
+				chann_ptr->sendToOthers(clnt, \
+					proto.clntPrivmsgChann(clnt, msg, chann_ptr));
+			}
+		}
+	}
+}
+
 void	Command::quit(Client* clnt)
 {
 	(void)clnt;

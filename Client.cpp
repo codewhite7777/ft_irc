@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/10/01 16:45:25 by mgo              ###   ########.fr       */
+/*   Updated: 2022/10/03 13:52:29 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,6 +268,10 @@ void	Client::processCommand()
 		cmd_->part(this);
 	else if (command_ == "PING")
 		cmd_->ping(this);
+	else if (command_ == "PRIVMSG")
+		cmd_->privmsg(this);
+	else if (command_ == "QUIT")
+		cmd_->quit(this);
 }
 
 std::string&	Client::getSendBuf(void)

@@ -41,7 +41,7 @@ public:
 	void    part(Client* clnt);
 
 	// PRIVMSG
-	void    privmsg();
+	void    privmsg(Client* clnt);
 
 	// QUIT
 	void    quit(Client* clnt);
