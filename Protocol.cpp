@@ -237,6 +237,18 @@ std::string		Protocol::errNoSuchNick(Client* clnt, std::string nick)
 	return ret;
 }
 
+std::string		Protocol::errNoSuchChannel(Client* clnt, std::string chann_name)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NOSUCHCHANNEL;
+	ret += " " + clnt->getNickname();
+	ret += " " + chann_name + " :No such channel";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

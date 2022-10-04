@@ -195,6 +195,10 @@ void    Command::privmsg(Client* clnt)
 				chann_ptr->sendToOthers(clnt, \
 					proto.clntPrivmsgToChann(clnt, msg, chann_ptr));
 			}
+			else
+			{
+				clnt->appendToSendBuf(proto.errNoSuchChannel(clnt, names[i]));
+			}
 		}
 		else
 		{

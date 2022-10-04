@@ -52,6 +52,7 @@ public:
 										Client* clnt_recv);
 
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
+	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);
 
 private:
 	Server* getServer_();
