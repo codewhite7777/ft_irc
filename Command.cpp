@@ -15,38 +15,35 @@
 #include <string>
 #include <vector>
 
-Command::Command(Server* sv)
-	: sv_(sv), proto_(sv_->getProtocol()) {}
+Command::Command(Server* sv, Protocol* proto)
+	: sv_(sv), proto_(proto) {}
 
 Command::~Command(void) {}
 
 void    Command::pass(Client* clnt)
 {
-	Protocol    proto(sv_);
-
 	if (clnt->getParam() == sv_->getPwd())
 	{
 		clnt->setPassFlag(true);
-		clnt->appendToSendBuf(proto.rplPass());
+		clnt->appendToSendBuf(proto_->rplPass());
 	}
 	else
 	{
-		clnt->appendToSendBuf(proto.errWrongPasswd());
+		clnt->appendToSendBuf(proto_->errWrongPasswd());
 	}
 }
 
 void    Command::nick(Client* clnt)
 {
-	Protocol        proto(sv_);
 	std::string     tmp_nick(clnt->getParam());
 
 	if (sv_->isOverlapNickName(tmp_nick))
 	{
-		clnt->appendToSendBuf(proto.errNicknameInUse(tmp_nick));
+		clnt->appendToSendBuf(proto_->errNicknameInUse(tmp_nick));
 	}
 	else if (tmp_nick == "")
 	{
-		clnt->appendToSendBuf(proto.errNoNicknameGiven());
+		clnt->appendToSendBuf(proto_->errNoNicknameGiven());
 	}
 	else
 	{
@@ -65,7 +62,6 @@ void    Command::nick(Client* clnt)
 
 void    Command::user(Client* clnt)
 {
-	Protocol        proto(sv_);
 	std::string     args(clnt->getParam());
 	std::size_t     colon_pos;
 
@@ -101,18 +97,17 @@ void    Command::user(Client* clnt)
 		}
 		else
 		{
-			clnt->appendToSendBuf(proto.errNeedMoreParams());
+			clnt->appendToSendBuf(proto_->errNeedMoreParams());
 		}
 	}
 	else
 	{
-		clnt->appendToSendBuf(proto.errNeedMoreParams());
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 	}
 }
 
 void    Command::join(Client* clnt)
 {
-	Protocol        			proto(sv_);
 	std::vector<std::string>	chann_names(split(clnt->getParam(), ','));
 	Channel*					chann_ptr(NULL);
 
@@ -132,23 +127,23 @@ void    Command::join(Client* clnt)
 			chann_ptr->assignAsOperator(clnt);
 			chann_ptr->assignAsUser(clnt);
 		}
-		chann_ptr->sendToAll(proto.clntJoinChann(clnt, chann_ptr));
-		clnt->appendToSendBuf(proto.rplNamReply(clnt, chann_ptr));
-		clnt->appendToSendBuf(proto.rplEndOfNames(clnt, chann_ptr));
+		chann_ptr->sendToAll(proto_->clntJoinChann(clnt, chann_ptr));
+		clnt->appendToSendBuf(proto_->rplNamReply(clnt, chann_ptr));
+		clnt->appendToSendBuf(proto_->rplEndOfNames(clnt, chann_ptr));
 	}
 }
 
 void	Command::part(Client* clnt)
 {
-	Protocol		proto(sv_);
 	Channel*		chann_ptr(sv_->findChannel(clnt->getParam()));
 	std::string		msg_part;
 
+	// todo: process part when message argument is.
 	if (chann_ptr)
 	{
 		chann_ptr->eraseOperator(clnt);
 		chann_ptr->eraseUser(clnt);
-		msg_part = proto.clntPartChann(clnt, chann_ptr);
+		msg_part = proto_->clntPartChann(clnt, chann_ptr);
 		clnt->appendToSendBuf(msg_part);
 		chann_ptr->sendToAll(msg_part);
 	}
@@ -156,17 +151,15 @@ void	Command::part(Client* clnt)
 
 void	Command::ping(Client* clnt)
 {
-	Protocol	proto(sv_);
 	std::string	token(clnt->getParam());
 
 	// todo: if no param, send ERR_NEEDMOREPARAMS
 	if (token.empty() == false)
-		clnt->appendToSendBuf(proto.msgPong(token));
+		clnt->appendToSendBuf(proto_->msgPong(token));
 }
 
 void    Command::privmsg(Client* clnt)
 {
-	Protocol					proto(sv_);
 	std::string					arg(clnt->getParam());
 	std::size_t					found_space(0);
 	std::vector<std::string>	names;
@@ -177,7 +170,7 @@ void    Command::privmsg(Client* clnt)
 	found_space = arg.find(' ');
 	if (found_space == std::string::npos)
 	{
-		clnt->appendToSendBuf(proto.errNeedMoreParams());
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 	}
 	names = split(arg.substr(0, found_space), ',');
 	msg = arg.substr(found_space + 1);
@@ -188,18 +181,18 @@ void    Command::privmsg(Client* clnt)
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
 				chann_ptr->sendToOthers(clnt, \
-					proto.clntPrivmsgToChann(clnt, msg, chann_ptr));
+					proto_->clntPrivmsgToChann(clnt, msg, chann_ptr));
 			else
-				clnt->appendToSendBuf(proto.errNoSuchChannel(clnt, names[i]));
+				clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, names[i]));
 		}
 		else
 		{
 			clnt_recv_ptr = sv_->findClient(names[i]);
 			if (clnt_recv_ptr)
-				clnt_recv_ptr->appendToSendBuf(proto.clntPrivmsgToClnt(\
+				clnt_recv_ptr->appendToSendBuf(proto_->clntPrivmsgToClnt(\
 												clnt, msg, clnt_recv_ptr));
 			else
-				clnt->appendToSendBuf(proto.errNoSuchNick(clnt, names[i]));
+				clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, names[i]));
 		}
 	}
 }

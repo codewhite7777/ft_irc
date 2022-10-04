@@ -22,7 +22,7 @@ class Command
 {
 public:
 	// todo: OCCF
-	Command(Server* sv);
+	Command(Server* sv, Protocol* proto);
 	~Command(void);
 
 	// PASS
