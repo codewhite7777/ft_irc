@@ -16,6 +16,7 @@
 # include "utils.hpp"
 # include <netinet/in.h>
 # include <map>
+# include <list>
 
 //# include "Command.hpp"
 //# include "Protocol.hpp"
@@ -24,7 +25,6 @@ class Command;
 class Protocol;
 class Client;
 class Channel;
-
 
 class Server
 {
@@ -52,6 +52,8 @@ public:
 	void					assignNewChannel(Channel* new_chann);
 
 	Client*					findClient(std::string clnt_nickname);
+
+	std::list<Client*>*		makeOtherClntListInSameChanns(Client* clnt);
 
 private:
 	//configure port

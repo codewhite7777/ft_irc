@@ -54,6 +54,8 @@ public:
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);
 
+	std::string		rplErrorClosing(Client* clnt, std::string msg);
+
 private:
 	Server* getServer_();
 

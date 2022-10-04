@@ -249,6 +249,17 @@ std::string		Protocol::errNoSuchChannel(Client* clnt, std::string chann_name)
 	return ret;
 }
 
+std::string		Protocol::rplErrorClosing(Client* clnt, std::string msg)
+{
+	std::string	ret;
+
+	ret = "ERROR :Closing link: ";
+	ret += '(' + clnt->getUsername() + '@' + clnt->getHostname() + ')';
+	ret += " [Quit: " + msg + "]";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

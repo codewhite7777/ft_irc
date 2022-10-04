@@ -22,16 +22,6 @@ Channel::Channel(std::string name)
 
 Channel::~Channel(void) {}
 
-bool	Channel::isAlreadyIn(Client* clnt)
-{
-	std::map<std::string, Client*>::iterator clnt_it;
-	
-	clnt_it = users_.find(clnt->getNickname());
-	if (clnt_it == users_.end())
-		return (false);
-	return (true);
-}
-
 std::size_t		Channel::getCurrUserCount() const
 {
 	return curr_user_count_;
@@ -48,7 +38,7 @@ void	Channel::assignAsOperator(Client* clnt)
 	opers_.insert(std::make_pair(clnt->getNickname(), clnt));
 }
 
-void	Channel::eraseUser(Client* clnt)
+void	Channel::eraseAsUser(Client* clnt)
 {
 	std::map<std::string, Client*>::iterator	user_it;
 
@@ -57,7 +47,7 @@ void	Channel::eraseUser(Client* clnt)
 		users_.erase(user_it);
 }
 
-void	Channel::eraseOperator(Client* clnt)
+void	Channel::eraseAsOperator(Client* clnt)
 {
 	std::map<std::string, Client*>::iterator	oper_it;
 
@@ -119,6 +109,34 @@ void		Channel::sendToOthers(Client* clnt, std::string msg)
 		if (user_it->second != clnt)
 			user_it->second->appendToSendBuf(msg);
 	}
+}
+
+bool	Channel::isUserIn(Client* clnt)
+{
+	std::map<std::string, Client*>::iterator clnt_it;
+	
+	clnt_it = users_.find(clnt->getNickname());
+	if (clnt_it == users_.end())
+		return (false);
+	return (true);
+}
+
+std::list<Client*>*	Channel::makeClntListInChannExceptOne(Client* clnt_to_excpt)
+{
+	std::list<Client*>*	ret(NULL);
+	Client*				each_clnt(NULL);
+
+	ret = new std::list<Client*>;
+	for (std::map<std::string, Client*>::iterator user_it(users_.begin())
+		; user_it != users_.end()
+		; ++user_it)
+	{
+		each_clnt = user_it->second;
+		if (each_clnt != clnt_to_excpt)
+			ret->push_back(each_clnt);
+		each_clnt = NULL;
+	}
+	return ret;
 }
 
 /*

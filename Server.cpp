@@ -462,12 +462,35 @@ void		Server::assignNewChannel(Channel* new_chann)
 
 Client*		Server::findClient(std::string clnt_nickname)
 {
-	for (std::map<SOCKET, Client*>::iterator	clnt_it(client_map_.begin())
+	for (std::map<SOCKET, Client*>::iterator clnt_it(client_map_.begin())
 		; clnt_it != client_map_.end()
 		; ++clnt_it)
 	{
+		// todo: using clnt_ptr;
 		if (clnt_nickname == clnt_it->second->getNickname())
 			return (clnt_it->second);
 	}
 	return NULL;
+}
+
+std::list<Client*>*		Server::makeOtherClntListInSameChanns(Client* clnt)
+{
+	std::list<Client*>*	ret(NULL);
+	Channel*			chann_ptr(NULL);
+	std::list<Client*>*	each_clnt_list(NULL);
+
+	ret = new std::list<Client*>;
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		chann_ptr = chann_it->second;
+		each_clnt_list = chann_ptr->makeClntListInChannExceptOne(clnt);
+		ret->assign(each_clnt_list->begin(), each_clnt_list->end());
+		delete each_clnt_list;
+		each_clnt_list = NULL;
+		chann_ptr = NULL;
+	}
+	ret->unique();
+	return ret;
 }

@@ -141,8 +141,8 @@ void	Command::part(Client* clnt)
 	// todo: process part when message argument is.
 	if (chann_ptr)
 	{
-		chann_ptr->eraseOperator(clnt);
-		chann_ptr->eraseUser(clnt);
+		chann_ptr->eraseAsOperator(clnt);
+		chann_ptr->eraseAsUser(clnt);
 		msg_part = proto_->clntPartChann(clnt, chann_ptr);
 		clnt->appendToSendBuf(msg_part);
 		chann_ptr->sendToAll(msg_part);
@@ -197,7 +197,20 @@ void    Command::privmsg(Client* clnt)
 	}
 }
 
+#include <list>
+
 void	Command::quit(Client* clnt)
 {
-	(void)clnt;
+	std::string			msg(clnt->getParam());
+	std::list<Client*>*	clnts_in_same_channs;
+
+	if (':' == msg.front())
+		msg.erase(0, 1);
+	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, msg));
+	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt); // make user list in same channels
+	// loop -> each_client->appendSendBuf(proto_->clntQuit(clnt));
+	delete clnts_in_same_channs;
+
+	//sv_->requestChannsToEraseOne(clnt);
+	clnt->setDisconnectFlag(true);
 }
