@@ -191,27 +191,19 @@ void    Command::privmsg(Client* clnt)
 		{
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
-			{
 				chann_ptr->sendToOthers(clnt, \
 					proto.clntPrivmsgToChann(clnt, msg, chann_ptr));
-			}
 			else
-			{
 				clnt->appendToSendBuf(proto.errNoSuchChannel(clnt, names[i]));
-			}
 		}
 		else
 		{
 			clnt_recv_ptr = sv_->findClient(names[i]);
 			if (clnt_recv_ptr)
-			{
 				clnt_recv_ptr->appendToSendBuf(proto.clntPrivmsgToClnt(\
 												clnt, msg, clnt_recv_ptr));
-			}
 			else
-			{
 				clnt->appendToSendBuf(proto.errNoSuchNick(clnt, names[i]));
-			}
 		}
 	}
 }
