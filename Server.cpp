@@ -494,3 +494,17 @@ std::list<Client*>*		Server::makeOtherClntListInSameChanns(Client* clnt)
 	ret->unique();
 	return ret;
 }
+
+void				Server::requestChannsToEraseOne(Client* clnt)
+{
+	Channel*	each_chann_ptr(NULL);
+
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		each_chann_ptr = chann_it->second;
+		each_chann_ptr->eraseClntIfIs(clnt);
+		each_chann_ptr = NULL;
+	}
+}

@@ -139,6 +139,12 @@ std::list<Client*>*	Channel::makeClntListInChannExceptOne(Client* clnt_to_excpt)
 	return ret;
 }
 
+void			Channel::eraseClntIfIs(Client* clnt)
+{
+	eraseAsUser(clnt);
+	eraseAsOperator(clnt);
+}
+
 /*
 void Channel::eraseUser(STRING nick)
 {

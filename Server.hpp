@@ -55,6 +55,8 @@ public:
 
 	std::list<Client*>*		makeOtherClntListInSameChanns(Client* clnt);
 
+	void					requestChannsToEraseOne(Client* clnt);
+
 private:
 	//configure port
 	bool		configPort(std::string port);
@@ -104,12 +106,12 @@ private:
 
 	//client
 	unsigned int				sock_count_;
-	std::map<SOCKET, Client *>	client_map_;
+	std::map<SOCKET, Client*>	client_map_;
 	fd_set						read_set_;
 	fd_set						write_set_;
 
 	//channel
-	std::map<std::string, Channel *>	chann_map_;
+	std::map<std::string, Channel*>	chann_map_;
 };
 
 

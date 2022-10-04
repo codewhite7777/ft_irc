@@ -218,9 +218,7 @@ void	Command::quit(Client* clnt)
 		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, msg));
 		each_clnt_ptr = NULL;
 	}
-
 	delete clnts_in_same_channs;
-
-	//sv_->requestChannsToEraseOne(clnt);
+	sv_->requestChannsToEraseOne(clnt);
 	clnt->setDisconnectFlag(true);
 }

@@ -52,6 +52,8 @@ public:
 
 	std::list<Client*>*	makeClntListInChannExceptOne(Client* clnt_to_excpt);
 
+	void				eraseClntIfIs(Client* clnt);
+
 private:
 	Channel(void);
 
