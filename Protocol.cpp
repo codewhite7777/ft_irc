@@ -225,6 +225,18 @@ std::string		Protocol::clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 	return ret;
 }
 
+std::string		Protocol::errNoSuchNick(Client* clnt, std::string nick)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NOSUCHNICK;
+	ret += " " + clnt->getNickname();
+	ret += " " + nick + " :No such nick";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

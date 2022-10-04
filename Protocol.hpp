@@ -51,6 +51,8 @@ public:
 	std::string		clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
 
+	std::string		errNoSuchNick(Client* clnt, std::string nick);
+
 private:
 	Server* getServer_();
 

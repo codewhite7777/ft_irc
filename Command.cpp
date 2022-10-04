@@ -187,7 +187,7 @@ void    Command::privmsg(Client* clnt)
 	msg = arg.substr(found_space + 1);
 	for (std::size_t i = 0; i < names.size(); ++i)
 	{
-		if (names[i].find_first_of('#') != std::string::npos) // # only first char
+		if (names[i].find_first_of('#') != std::string::npos) // todo: # only first char
 		{
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
@@ -203,6 +203,10 @@ void    Command::privmsg(Client* clnt)
 			{
 				clnt_recv_ptr->appendToSendBuf(proto.clntPrivmsgToClnt(\
 												clnt, msg, clnt_recv_ptr));
+			}
+			else
+			{
+				clnt->appendToSendBuf(proto.errNoSuchNick(clnt, names[i]));
 			}
 		}
 	}
