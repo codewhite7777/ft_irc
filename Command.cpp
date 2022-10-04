@@ -202,13 +202,23 @@ void    Command::privmsg(Client* clnt)
 void	Command::quit(Client* clnt)
 {
 	std::string			msg(clnt->getParam());
-	std::list<Client*>*	clnts_in_same_channs;
+	std::list<Client*>*	clnts_in_same_channs(NULL);
+	Client*				each_clnt_ptr(NULL);
 
 	if (':' == msg.front())
 		msg.erase(0, 1);
 	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, msg));
 	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt); // make user list in same channels
 	// loop -> each_client->appendSendBuf(proto_->clntQuit(clnt));
+	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
+		; each_clnt_it != clnts_in_same_channs->end()
+		; ++each_clnt_it)
+	{
+		each_clnt_ptr = *each_clnt_it;
+		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, msg));
+		each_clnt_ptr = NULL;
+	}
+
 	delete clnts_in_same_channs;
 
 	//sv_->requestChannsToEraseOne(clnt);

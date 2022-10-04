@@ -260,6 +260,17 @@ std::string		Protocol::rplErrorClosing(Client* clnt, std::string msg)
 	return ret;
 }
 
+std::string		Protocol::clntQuit(Client* clnt, std::string msg)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "QUIT :";
+	ret += "Quit: " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

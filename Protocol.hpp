@@ -56,6 +56,8 @@ public:
 
 	std::string		rplErrorClosing(Client* clnt, std::string msg);
 
+	std::string		clntQuit(Client* clnt, std::string msg);
+
 private:
 	Server* getServer_();
 
