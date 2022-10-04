@@ -11,10 +11,16 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Command.hpp"
+#include "Protocol.hpp"
 
 int	main(int argc, char *argv[])
 {
-	Server	irc_server(argc, argv);
+	Server		irc_server(argc, argv);
+	Command		cmd(&irc_server);
+	Protocol	proto(&irc_server);
+
+	irc_server.equipCommandAndProtocol(&cmd, &proto);
 	while (irc_server.getStatus())
 		irc_server.Run();
 	return (0);

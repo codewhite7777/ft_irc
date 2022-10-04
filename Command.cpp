@@ -54,10 +54,12 @@ void    Command::nick(Client* clnt)
 		clnt->setNickFlagOn();
 
 		// test: print
+		{
 		std::cout << "\n\t-----------------------------------" << std::endl;
 		std::cout << "\tSuccessfully set Client Nickname!\n";
 		std::cout << "\tClient Nickname: [" << clnt->getNickname() << "]\n";
 		std::cout << "\t-----------------------------------\n" << std::endl;
+		}
 	}
 }
 
@@ -130,7 +132,6 @@ void    Command::join(Client* clnt)
 			chann_ptr->assignAsOperator(clnt);
 			chann_ptr->assignAsUser(clnt);
 		}
-		//send Protocols
 		chann_ptr->sendToAll(proto.clntJoinChann(clnt, chann_ptr));
 		clnt->appendToSendBuf(proto.rplNamReply(clnt, chann_ptr));
 		clnt->appendToSendBuf(proto.rplEndOfNames(clnt, chann_ptr));
@@ -147,8 +148,6 @@ void	Command::part(Client* clnt)
 	{
 		chann_ptr->eraseOperator(clnt);
 		chann_ptr->eraseUser(clnt);
-		
-		//send Protocols
 		msg_part = proto.clntPartChann(clnt, chann_ptr);
 		clnt->appendToSendBuf(msg_part);
 		chann_ptr->sendToAll(msg_part);
@@ -160,14 +159,11 @@ void	Command::ping(Client* clnt)
 	Protocol	proto(sv_);
 	std::string	token(clnt->getParam());
 
-	//if no param, send ERR_NEEDMOREPARAMS
+	// todo: if no param, send ERR_NEEDMOREPARAMS
 	if (token.empty() == false)
 		clnt->appendToSendBuf(proto.msgPong(token));
 }
 
-/*
-	-[] chatting in channel
-*/
 void    Command::privmsg(Client* clnt)
 {
 	Protocol					proto(sv_);
@@ -187,7 +183,7 @@ void    Command::privmsg(Client* clnt)
 	msg = arg.substr(found_space + 1);
 	for (std::size_t i = 0; i < names.size(); ++i)
 	{
-		if ('#' == names[i].front()) // todo: # only first char
+		if ('#' == names[i].front())
 		{
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)

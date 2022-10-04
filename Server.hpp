@@ -17,16 +17,23 @@
 # include <netinet/in.h>
 # include <map>
 
+//# include "Command.hpp"
+//# include "Protocol.hpp"
+
 class Command;
 class Protocol;
 class Client;
 class Channel;
+
 
 class Server
 {
 public:
 	Server(int argc, char *argv[]);
 	~Server(void);
+
+	void					equipCommandAndProtocol(\
+								Command* cmd, Protocol* proto);
 
 	bool					getStatus(void) const;
 	void					Run(void);

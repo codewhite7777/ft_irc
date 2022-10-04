@@ -30,8 +30,8 @@
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
-	, cmd_(new Command(this))
-	, proto_(new Protocol(this))
+	, cmd_(NULL)
+	, proto_(NULL)
 	, name_("irc.server")
 	, version_("ft_irc-mandatory")
 	, sock_count_(0)
@@ -69,8 +69,12 @@ Server::Server(int argc, char *argv[])
 Server::~Server(void)
 {
 	networkClose();
-	delete cmd_;
-	delete proto_;
+}
+
+void	Server::equipCommandAndProtocol(Command* cmd, Protocol* proto)
+{
+	cmd_ = cmd;
+	proto_ = proto;
 }
 
 bool	Server::getStatus(void) const
