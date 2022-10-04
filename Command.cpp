@@ -187,7 +187,7 @@ void    Command::privmsg(Client* clnt)
 	msg = arg.substr(found_space + 1);
 	for (std::size_t i = 0; i < names.size(); ++i)
 	{
-		if (names[i].find_first_of('#') != std::string::npos) // todo: # only first char
+		if ('#' == names[i].front()) // todo: # only first char
 		{
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
