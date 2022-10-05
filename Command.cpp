@@ -181,9 +181,10 @@ void	Command::ping(Client* clnt)
 {
 	std::string	token(clnt->getParam());
 
-	// todo: if no param, send ERR_NEEDMOREPARAMS
 	if (token.empty() == false)
 		clnt->appendToSendBuf(proto_->msgPong(token));
+	else
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 }
 
 void    Command::privmsg(Client* clnt)
