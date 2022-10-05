@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 
 Command::Command(Server* sv, Protocol* proto)
 	: sv_(sv), proto_(proto) {}
@@ -197,8 +198,6 @@ void    Command::privmsg(Client* clnt)
 	}
 }
 
-#include <list>
-
 void	Command::quit(Client* clnt)
 {
 	std::string			msg(clnt->getParam());
@@ -208,8 +207,7 @@ void	Command::quit(Client* clnt)
 	if (':' == msg.front())
 		msg.erase(0, 1);
 	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, msg));
-	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt); // make user list in same channels
-	// loop -> each_client->appendSendBuf(proto_->clntQuit(clnt));
+	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
 	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
 		; each_clnt_it != clnts_in_same_channs->end()
 		; ++each_clnt_it)
