@@ -13,10 +13,11 @@
 #ifndef PROTOCOL_HPP
 # define PROTOCOL_HPP
 
-#include "irc_protocol.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include <string>
+# include <string>
+
+class Server;
+class Client;
+class Channel;
 
 class Protocol
 {
@@ -42,7 +43,7 @@ public:
 	std::string		rplNamReply(Client* clnt, Channel* chann);
 	std::string		rplEndOfNames(Client* clnt, Channel* chann);
 
-	std::string		clntPartChann(Client* clnt, Channel* chann);
+	std::string		clntPartChann(Client* clnt, std::string msg);
 
 	std::string		msgPong(std::string token);
 
@@ -53,6 +54,7 @@ public:
 
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);
+	std::string		errNotOnChannel(Client* clnt, Channel* chann);
 
 	std::string		rplErrorClosing(Client* clnt, std::string msg);
 

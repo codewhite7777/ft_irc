@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include "Protocol.hpp"
+#include "irc_protocol.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 #include "Channel.hpp"
 
 Protocol::Protocol(Server* sv)
@@ -176,13 +179,13 @@ std::string		Protocol::rplEndOfNames(Client* clnt, Channel* chann)
 	return ret;
 }
 
-std::string		Protocol::clntPartChann(Client* clnt, Channel* chann)
+std::string		Protocol::clntPartChann(Client* clnt, std::string msg)
 {
 	std::string	ret;
 
 	ret = clnt->getNamesPrefix();
-	ret += "PART :";
-	ret += chann->getName();
+	ret += "PART ";
+	ret += msg;
 	ret += "\r\n";
 	return ret;
 }
@@ -245,6 +248,19 @@ std::string		Protocol::errNoSuchChannel(Client* clnt, std::string chann_name)
 	ret += ERR_NOSUCHCHANNEL;
 	ret += " " + clnt->getNickname();
 	ret += " " + chann_name + " :No such channel";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::errNotOnChannel(Client* clnt, Channel* chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NOTONCHANNEL;
+	ret += " " + clnt->getNickname();
+	ret += " " + chann->getName();
+	ret += " :You're not on that channel";
 	ret += "\r\n";
 	return ret;
 }

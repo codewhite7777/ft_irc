@@ -136,17 +136,52 @@ void    Command::join(Client* clnt)
 
 void	Command::part(Client* clnt)
 {
-	Channel*		chann_ptr(sv_->findChannel(clnt->getParam()));
+	std::string		recved_arg(clnt->getParam());
+	std::string		chann_name;
 	std::string		msg_part;
+	std::size_t		found_space(0);
+	Channel*		chann_ptr(NULL);
+	std::string		protocol_msg_to_send;
 
 	// todo: process part when message argument is.
+	/*
+		check ':' is
+		if ':' is, split channel name and msg with making msg
+		else recved_arg is just channel name with making msg
+	*/
+	if (recved_arg.find_first_of(":") == std::string::npos)
+	{
+		chann_name = recved_arg;
+		msg_part = ':' + chann_name;
+	}
+	else
+	{
+		found_space = recved_arg.find(' ');
+		if (found_space == std::string::npos)
+			clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		chann_name = recved_arg.substr(0, found_space);
+		msg_part = recved_arg;
+	}
+	chann_ptr = sv_->findChannel(chann_name);
 	if (chann_ptr)
 	{
-		chann_ptr->eraseAsOperator(clnt);
-		chann_ptr->eraseAsUser(clnt);
-		msg_part = proto_->clntPartChann(clnt, chann_ptr);
-		clnt->appendToSendBuf(msg_part);
-		chann_ptr->sendToAll(msg_part);
+		// if client is not in the channel -> errNotOnChannel
+		if (chann_ptr->isUserIn(clnt) == true)
+		{
+			chann_ptr->eraseClntIfIs(clnt);
+			protocol_msg_to_send = proto_->clntPartChann(clnt, msg_part);
+			clnt->appendToSendBuf(protocol_msg_to_send);
+			chann_ptr->sendToAll(protocol_msg_to_send);
+		}
+		else
+		{
+			clnt->appendToSendBuf(proto_->errNotOnChannel(clnt, chann_ptr));
+		}
+	}
+	else
+	{
+		// errNoSuchChannel
+		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
 	}
 }
 
@@ -200,20 +235,20 @@ void    Command::privmsg(Client* clnt)
 
 void	Command::quit(Client* clnt)
 {
-	std::string			msg(clnt->getParam());
+	std::string			recved_quit_msg(clnt->getParam());
 	std::list<Client*>*	clnts_in_same_channs(NULL);
 	Client*				each_clnt_ptr(NULL);
 
-	if (':' == msg.front())
-		msg.erase(0, 1);
-	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, msg));
+	if (':' == recved_quit_msg.front())
+		recved_quit_msg.erase(0, 1);
+	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, recved_quit_msg));
 	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
 	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
 		; each_clnt_it != clnts_in_same_channs->end()
 		; ++each_clnt_it)
 	{
 		each_clnt_ptr = *each_clnt_it;
-		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, msg));
+		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, recved_quit_msg));
 		each_clnt_ptr = NULL;
 	}
 	delete clnts_in_same_channs;
