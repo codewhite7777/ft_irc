@@ -50,7 +50,7 @@ public:
 	void    invite();
 
 	void	ping(Client* clnt);
-	void	pong(Client* clnt);
+	//void	pong(Client* clnt);
 
 private:
 	Server*     sv_;

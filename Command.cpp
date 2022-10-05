@@ -143,12 +143,6 @@ void	Command::part(Client* clnt)
 	Channel*		chann_ptr(NULL);
 	std::string		protocol_msg_to_send;
 
-	// todo: process part when message argument is.
-	/*
-		check ':' is
-		if ':' is, split channel name and msg with making msg
-		else recved_arg is just channel name with making msg
-	*/
 	if (recved_arg.find_first_of(":") == std::string::npos)
 	{
 		chann_name = recved_arg;
@@ -165,7 +159,6 @@ void	Command::part(Client* clnt)
 	chann_ptr = sv_->findChannel(chann_name);
 	if (chann_ptr)
 	{
-		// if client is not in the channel -> errNotOnChannel
 		if (chann_ptr->isUserIn(clnt) == true)
 		{
 			chann_ptr->eraseClntIfIs(clnt);
@@ -180,7 +173,6 @@ void	Command::part(Client* clnt)
 	}
 	else
 	{
-		// errNoSuchChannel
 		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
 	}
 }
