@@ -200,6 +200,7 @@ void    Command::privmsg(Client* clnt)
 	if (found_space == std::string::npos)
 	{
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		// todo: return ;
 	}
 	names = split(arg.substr(0, found_space), ',');
 	msg = arg.substr(found_space + 1);
@@ -247,4 +248,47 @@ void	Command::quit(Client* clnt)
 	delete clnts_in_same_channs;
 	sv_->requestChannsToEraseOne(clnt);
 	clnt->setDisconnectFlag(true);
+}
+
+void	Command::kick(Client* clnt)
+{
+	std::string		params(clnt->getParam());
+	std::string		chann_name;
+	std::string		nicks;
+	std::size_t		found_space(0);
+	std::size_t		pos_to_parse(0);
+
+	// parsing for chann_name and nicks
+	found_space = params.find(' ');
+	if (found_space == std::string::npos)
+	{
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
+	}
+	chann_name = params.substr(pos_to_parse, found_space);
+	pos_to_parse = found_space + 1;
+	found_space = params.find(' ', pos_to_parse);
+	if (found_space == std::string::npos)
+	{
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
+	}
+	nicks = params.substr(pos_to_parse, found_space - pos_to_parse);
+	
+	// check condition: find the channel and the client
+	// todo: consider multiple nicks
+
+	// check commander client is operator of the channel
+
+	// if condition is good, eject a client
+		// loop processing each client (find, check, )
+	// else, send error protocols
+
+
+	// test: print static variables
+	{
+	std::cout << "\n<In Command.kick()>\n";
+	std::cout << "chann_name: [" << chann_name << "]\n";
+	std::cout << "user_nick: [" << nicks << "]\n";
+	}
 }

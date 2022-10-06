@@ -46,8 +46,10 @@ public:
 	// QUIT
 	void    quit(Client* clnt);
 
+	void	kick(Client* clnt);
+
 	// INVITE
-	void    invite();
+	void    invite(Client* clnt);
 
 	void	ping(Client* clnt);
 	//void	pong(Client* clnt);
