@@ -26,39 +26,32 @@ public:
 	~Protocol(void);
 
 	std::string		rplPass();
-	std::string		errWrongPasswd();
-	std::string		errNotPassCmd();
-
-	std::string		errNicknameInUse(const std::string& nick);
-	std::string		errNoNicknameGiven();
-
-	std::string		errNeedMoreParams();
-
 	std::string		rplWelcome(Client* clnt);
 	std::string		rplYourHost(Client* clnt);
 	std::string		rplCreated(Client* clnt);
 	std::string		rplMyInfo(Client* clnt);
-
-	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		rplNamReply(Client* clnt, Channel* chann);
 	std::string		rplEndOfNames(Client* clnt, Channel* chann);
-
+	
+	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		clntPartChann(Client* clnt, std::string msg);
-
-	std::string		msgPong(std::string token);
-
 	std::string		clntPrivmsgToChann(Client* clnt, std::string msg, \
 										Channel* chann);
 	std::string		clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
+	std::string		clntQuit(Client* clnt, std::string msg);
+	std::string		rplErrorClosing(Client* clnt, std::string msg);
+	std::string		msgPong(std::string token);
 
+	std::string		errWrongPasswd();
+	std::string		errNotPassCmd();
+	std::string		errNicknameInUse(const std::string& nick);
+	std::string		errNoNicknameGiven();
+	std::string		errNeedMoreParams();	
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);
-	std::string		errNotOnChannel(Client* clnt, Channel* chann);
-
-	std::string		rplErrorClosing(Client* clnt, std::string msg);
-
-	std::string		clntQuit(Client* clnt, std::string msg);
+	std::string		errNotOnChannel(Client* clnt, Channel* chann);	
+	std::string		errChanOPrivsNeeded(Client* clnt, Channel* chann);
 
 private:
 	Server* getServer_();

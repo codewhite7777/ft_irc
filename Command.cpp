@@ -257,6 +257,7 @@ void	Command::kick(Client* clnt)
 	std::string		nicks;
 	std::size_t		found_space(0);
 	std::size_t		pos_to_parse(0);
+	Channel*		chann_ptr(NULL);
 
 	// parsing for chann_name and nicks
 	found_space = params.find(' ');
@@ -275,13 +276,25 @@ void	Command::kick(Client* clnt)
 	}
 	nicks = params.substr(pos_to_parse, found_space - pos_to_parse);
 	
-	// check condition: find the channel and the client
-	// todo: consider multiple nicks
+	// finding the channel
+	chann_ptr = sv_->findChannel(chann_name);
+	if (chann_ptr == NULL)
+	{
+		// send ERR_NOSUCHCHANNEL
+		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
+		return ;
+	}
 
 	// check commander client is operator of the channel
+	if (chann_ptr->isOperator(clnt) == false)
+	{
+		// send ERR_CHANOPRIVSNEEDED
+		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, chann_ptr));
+		return ;
+	}
 
-	// if condition is good, eject a client
-		// loop processing each client (find, check, )
+	// if the channel is, loop processing nicks for each client (find, check)
+		// condition is good, eject a client
 	// else, send error protocols
 
 

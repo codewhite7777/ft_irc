@@ -287,6 +287,19 @@ std::string		Protocol::clntQuit(Client* clnt, std::string msg)
 	return ret;
 }
 
+std::string		Protocol::errChanOPrivsNeeded(Client* clnt, Channel* chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_CHANOPRIVSNEEDED;
+	ret += " " + clnt->getNickname();
+	ret += " " + chann->getName();
+	ret += " :You must be a channel operator";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;
