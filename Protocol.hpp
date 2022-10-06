@@ -42,6 +42,8 @@ public:
 	std::string		clntQuit(Client* clnt, std::string msg);
 	std::string		rplErrorClosing(Client* clnt, std::string msg);
 	std::string		msgPong(std::string token);
+	std::string		clntKickUserInChann(Client* clnt, \
+								Channel* chann, Client* user, std::string msg);
 
 	std::string		errWrongPasswd();
 	std::string		errNotPassCmd();
@@ -52,6 +54,8 @@ public:
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);
 	std::string		errNotOnChannel(Client* clnt, Channel* chann);	
 	std::string		errChanOPrivsNeeded(Client* clnt, Channel* chann);
+	std::string		errUserNotInChannel(Client* clnt, \
+										Client* user, Channel *chann);
 
 private:
 	Server* getServer_();

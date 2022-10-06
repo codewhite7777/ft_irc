@@ -254,12 +254,14 @@ void	Command::kick(Client* clnt)
 {
 	std::string		params(clnt->getParam());
 	std::string		chann_name;
-	std::string		nicks;
+	std::string		nick;
+	std::string		recved_msg;
 	std::size_t		found_space(0);
 	std::size_t		pos_to_parse(0);
-	Channel*		chann_ptr(NULL);
+	Channel*		ptr_chann(NULL);
+	Client*			ptr_clnt_to_be_kicked(NULL);
 
-	// parsing for chann_name and nicks
+	// parsing for chann_name and nick
 	found_space = params.find(' ');
 	if (found_space == std::string::npos)
 	{
@@ -274,34 +276,56 @@ void	Command::kick(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 		return ;
 	}
-	nicks = params.substr(pos_to_parse, found_space - pos_to_parse);
-	
+	nick = params.substr(pos_to_parse, found_space - pos_to_parse);
+	recved_msg = params.substr(found_space + 1);
+
 	// finding the channel
-	chann_ptr = sv_->findChannel(chann_name);
-	if (chann_ptr == NULL)
+	ptr_chann = sv_->findChannel(chann_name);
+	if (ptr_chann == NULL)
 	{
 		// send ERR_NOSUCHCHANNEL
 		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
 		return ;
 	}
-
 	// check commander client is operator of the channel
-	if (chann_ptr->isOperator(clnt) == false)
+	if (ptr_chann->isOperator(clnt) == false)
 	{
 		// send ERR_CHANOPRIVSNEEDED
-		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, chann_ptr));
+		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, ptr_chann));
 		return ;
 	}
-
-	// if the channel is, loop processing nicks for each client (find, check)
-		// condition is good, eject a client
-	// else, send error protocols
-
+	
+	// finding the client who has the nick
+	ptr_clnt_to_be_kicked = sv_->findClient(nick);
+	if (ptr_clnt_to_be_kicked)
+	{
+		// checking whether the client is in the channel
+		if (ptr_chann->isUserIn(ptr_clnt_to_be_kicked) == true)
+		{
+			// sending KICK protocol to clients in the channel
+			ptr_chann->sendToAll(proto_->clntKickUserInChann(clnt, \
+								ptr_chann, ptr_clnt_to_be_kicked, recved_msg));
+			// erasing the client in the channel
+			ptr_chann->eraseClntIfIs(ptr_clnt_to_be_kicked);
+		}
+		else
+		{
+			// sending ERR_USERNOTINCHANNEL
+			clnt->appendToSendBuf(proto_->errUserNotInChannel(clnt, \
+											ptr_clnt_to_be_kicked, ptr_chann));
+		}
+	}
+	else
+	{
+		// send ERR_NOSUCHNICK
+		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, nick));
+	}
 
 	// test: print static variables
 	{
 	std::cout << "\n<In Command.kick()>\n";
 	std::cout << "chann_name: [" << chann_name << "]\n";
-	std::cout << "user_nick: [" << nicks << "]\n";
+	std::cout << "user_nick: [" << nick << "]\n";
+	std::cout << "recved_msg: [" << recved_msg << "]\n";
 	}
 }

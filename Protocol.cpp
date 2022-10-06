@@ -300,6 +300,35 @@ std::string		Protocol::errChanOPrivsNeeded(Client* clnt, Channel* chann)
 	return ret;
 }
 
+std::string		Protocol::errUserNotInChannel(Client* clnt, \
+										Client* user, Channel *chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_USERNOTINCHANNEL;
+	ret += " " + clnt->getNickname();
+	ret += " " + user->getNickname();
+	ret += " " + chann->getName();
+	ret += " :The client is not on that channel";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntKickUserInChann(Client* clnt, \
+								Channel* chann, Client* user, std::string msg)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "KICK";
+	ret += " " + chann->getName();
+	ret += " " + user->getNickname();
+	ret += " " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;
