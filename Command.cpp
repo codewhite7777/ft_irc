@@ -63,14 +63,16 @@ void    Command::nick(Client* clnt)
 
 void    Command::user(Client* clnt)
 {
-	std::string     args(clnt->getParam());
-	std::size_t     colon_pos;
+	std::string     			args(clnt->getParam());
+	std::size_t     			colon_pos(0);
+	std::size_t 				cnt_arg(0);
+	std::size_t 				space_pos(0);
+	std::vector<std::string>    spltd_args;
 
 	colon_pos = args.find_first_of(':');
 	if (colon_pos != std::string::npos)
 	{
-		std::size_t cnt_arg(0);
-		std::size_t space_pos(args.rfind(' ', colon_pos));
+		space_pos = args.rfind(' ', colon_pos);
 		while (space_pos != std::string::npos)
 		{
 			++cnt_arg;
@@ -80,8 +82,7 @@ void    Command::user(Client* clnt)
 		{
 			clnt->setRealname(args.substr(colon_pos + 1));
 			args.erase(colon_pos, std::string::npos);
-
-			std::vector<std::string>    spltd_args(split(args, ' '));
+			spltd_args = split(args, ' ');
 			clnt->setUsername(spltd_args[0]);
 			clnt->setHostname(spltd_args[2]);
 			clnt->setUserFlagOn();

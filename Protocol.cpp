@@ -30,56 +30,6 @@ std::string    Protocol::rplPass()
 	return ret;
 }
 
-std::string     Protocol::errWrongPasswd()
-{
-	std::string ret;
-
-	ret = ERR_PASSWDMISMATCH;
-	ret += " " + sv_->getName() + " :info) Wrong password\r\n";
-	return ret;
-}
-
-std::string     Protocol::errNotPassCmd()
-{
-	std::string ret;
-
-	ret = ERR_PASSWDMISMATCH;
-	ret += " " + sv_->getName() + " :ex) <PASS> <password>\r\n";
-	return ret;
-}
-
-std::string     Protocol::errNicknameInUse(const std::string& nick)
-{
-	std::string ret;
-
-	ret = sv_->getNamePrefix();
-	ret += ERR_NICKNAMEINUSE;
-	ret += " *";
-	ret += " " + nick;
-	ret += " :Nickname is already in use.\r\n";
-	return ret;
-}
-
-std::string     Protocol::errNoNicknameGiven()
-{
-	std::string ret;
-
-	ret = sv_->getNamePrefix();
-	ret = ERR_NONICKNAMEGIVEN;
-	ret += " :No nickname is given.\r\n";
-	return ret;
-}
-
-std::string     Protocol::errNeedMoreParams()
-{
-	std::string ret;
-
-	ret = sv_->getNamePrefix();
-	ret = ERR_NEEDMOREPARAMS;
-	ret += " :Not enough parameters.\r\n";
-	return ret;
-}
-
 // 001
 std::string     Protocol::rplWelcome(Client* clnt)
 {
@@ -109,6 +59,7 @@ std::string     Protocol::rplYourHost(Client* clnt)
 	ret += "\r\n";
 	return ret;
 }
+
 // 003
 std::string     Protocol::rplCreated(Client* clnt)
 {
@@ -140,18 +91,6 @@ std::string     Protocol::rplMyInfo(Client* clnt)
 	return ret;
 }
 
-
-std::string		Protocol::clntJoinChann(Client* clnt, Channel* chann)
-{
-	std::string	ret;
-
-	ret = clnt->getNamesPrefix();
-	ret += "JOIN :";
-	ret += chann->getName();
-	ret += "\r\n";
-	return ret;
-}
-
 std::string		Protocol::rplNamReply(Client* clnt, Channel* chann)
 {
 	std::string	ret;
@@ -175,6 +114,17 @@ std::string		Protocol::rplEndOfNames(Client* clnt, Channel* chann)
 	ret += " " + clnt->getNickname();
 	ret += " " + chann->getName();
 	ret += " :End of /NAMES list.";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntJoinChann(Client* clnt, Channel* chann)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "JOIN :";
+	ret += chann->getName();
 	ret += "\r\n";
 	return ret;
 }
@@ -228,6 +178,123 @@ std::string		Protocol::clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 	return ret;
 }
 
+std::string		Protocol::rplErrorClosing(Client* clnt, std::string msg)
+{
+	std::string	ret;
+
+	ret = "ERROR :Closing link: ";
+	ret += '(' + clnt->getUsername() + '@' + clnt->getHostname() + ')';
+	ret += " [Quit: " + msg + "]";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntQuit(Client* clnt, std::string msg)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "QUIT :";
+	ret += "Quit: " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntKickUserInChann(Client* clnt, \
+								Channel* chann, Client* user, std::string msg)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "KICK";
+	ret += " " + chann->getName();
+	ret += " " + user->getNickname();
+	ret += " " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
+
+std::string		Protocol::errChanOPrivsNeeded(Client* clnt, Channel* chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_CHANOPRIVSNEEDED;
+	ret += " " + clnt->getNickname();
+	ret += " " + chann->getName();
+	ret += " :You must be a channel operator";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::errUserNotInChannel(Client* clnt, \
+										Client* user, Channel *chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_USERNOTINCHANNEL;
+	ret += " " + clnt->getNickname();
+	ret += " " + user->getNickname();
+	ret += " " + chann->getName();
+	ret += " :The client is not on that channel";
+	ret += "\r\n";
+	return ret;
+}
+
+
+std::string     Protocol::errWrongPasswd()
+{
+	std::string ret;
+
+	ret = ERR_PASSWDMISMATCH;
+	ret += " " + sv_->getName() + " :info) Wrong password\r\n";
+	return ret;
+}
+
+std::string     Protocol::errNotPassCmd()
+{
+	std::string ret;
+
+	ret = ERR_PASSWDMISMATCH;
+	ret += " " + sv_->getName() + " :ex) <PASS> <password>\r\n";
+	return ret;
+}
+
+std::string     Protocol::errNicknameInUse(const std::string& nick)
+{
+	std::string ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NICKNAMEINUSE;
+	ret += " *";
+	ret += " " + nick;
+	ret += " :Nickname is already in use.\r\n";
+	return ret;
+}
+
+std::string     Protocol::errNoNicknameGiven()
+{
+	std::string ret;
+
+	ret = sv_->getNamePrefix();
+	ret = ERR_NONICKNAMEGIVEN;
+	ret += " :No nickname is given.\r\n";
+	return ret;
+}
+
+std::string     Protocol::errNeedMoreParams()
+{
+	std::string ret;
+
+	ret = sv_->getNamePrefix();
+	ret = ERR_NEEDMOREPARAMS;
+	ret += " :Not enough parameters.\r\n";
+	return ret;
+}
+
+
 std::string		Protocol::errNoSuchNick(Client* clnt, std::string nick)
 {
 	std::string	ret;
@@ -265,69 +332,6 @@ std::string		Protocol::errNotOnChannel(Client* clnt, Channel* chann)
 	return ret;
 }
 
-std::string		Protocol::rplErrorClosing(Client* clnt, std::string msg)
-{
-	std::string	ret;
-
-	ret = "ERROR :Closing link: ";
-	ret += '(' + clnt->getUsername() + '@' + clnt->getHostname() + ')';
-	ret += " [Quit: " + msg + "]";
-	ret += "\r\n";
-	return ret;
-}
-
-std::string		Protocol::clntQuit(Client* clnt, std::string msg)
-{
-	std::string	ret;
-
-	ret = clnt->getNamesPrefix();
-	ret += "QUIT :";
-	ret += "Quit: " + msg;
-	ret += "\r\n";
-	return ret;
-}
-
-std::string		Protocol::errChanOPrivsNeeded(Client* clnt, Channel* chann)
-{
-	std::string	ret;
-
-	ret = sv_->getNamePrefix();
-	ret += ERR_CHANOPRIVSNEEDED;
-	ret += " " + clnt->getNickname();
-	ret += " " + chann->getName();
-	ret += " :You must be a channel operator";
-	ret += "\r\n";
-	return ret;
-}
-
-std::string		Protocol::errUserNotInChannel(Client* clnt, \
-										Client* user, Channel *chann)
-{
-	std::string	ret;
-
-	ret = sv_->getNamePrefix();
-	ret += ERR_USERNOTINCHANNEL;
-	ret += " " + clnt->getNickname();
-	ret += " " + user->getNickname();
-	ret += " " + chann->getName();
-	ret += " :The client is not on that channel";
-	ret += "\r\n";
-	return ret;
-}
-
-std::string		Protocol::clntKickUserInChann(Client* clnt, \
-								Channel* chann, Client* user, std::string msg)
-{
-	std::string	ret;
-
-	ret = clnt->getNamesPrefix();
-	ret += "KICK";
-	ret += " " + chann->getName();
-	ret += " " + user->getNickname();
-	ret += " " + msg;
-	ret += "\r\n";
-	return ret;
-}
 
 Server* Protocol::getServer_(void)
 {
