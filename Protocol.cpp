@@ -332,6 +332,21 @@ std::string		Protocol::errNotOnChannel(Client* clnt, Channel* chann)
 	return ret;
 }
 
+std::string		Protocol::errUserOnChannel(Client* clnt, \
+										Client* user, Channel* chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_USERONCHANNEL;
+	ret += " " + clnt->getNickname();
+	ret += " " + user->getNickname();
+	ret += " " + chann->getName();
+	ret += " :is already on channel";
+	ret += "\r\n";
+	return ret;
+}
+
 
 Server* Protocol::getServer_(void)
 {

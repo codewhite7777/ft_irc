@@ -56,6 +56,8 @@ public:
 	std::string		errChanOPrivsNeeded(Client* clnt, Channel* chann);
 	std::string		errUserNotInChannel(Client* clnt, \
 										Client* user, Channel *chann);
+	std::string		errUserOnChannel(Client* clnt, \
+										Client* user, Channel* chann);
 
 private:
 	Server* getServer_();
