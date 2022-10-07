@@ -44,7 +44,10 @@ void	Channel::eraseAsUser(Client* clnt)
 
 	user_it = users_.find(clnt->getNickname());
 	if (user_it != users_.end())
+	{
 		users_.erase(user_it);
+		--curr_user_count_;
+	}
 }
 
 void	Channel::eraseAsOperator(Client* clnt)
