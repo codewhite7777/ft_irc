@@ -152,7 +152,10 @@ void	Command::part(Client* clnt)
 	{
 		found_space = recved_arg.find(' ');
 		if (found_space == std::string::npos)
+		{
 			clnt->appendToSendBuf(proto_->errNeedMoreParams());
+			return ;
+		}
 		chann_name = recved_arg.substr(0, found_space);
 		msg_part = recved_arg;
 	}
@@ -200,7 +203,7 @@ void    Command::privmsg(Client* clnt)
 	if (found_space == std::string::npos)
 	{
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
-		// todo: return ;
+		return ;
 	}
 	names = split(arg.substr(0, found_space), ',');
 	msg = arg.substr(found_space + 1);
