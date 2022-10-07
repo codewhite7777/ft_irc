@@ -356,7 +356,7 @@ void    Command::invite(Client* clnt)
 	}
 
 	// checking condition
-	if (ptr_chann->isUserIn(ptr_clnt_to_be_invtd) == false)
+	if (ptr_chann->isUserIn(ptr_clnt_to_be_invtd))
 	{
 		// ERR_USERONCHANNEL
 		clnt->appendToSendBuf(proto_->errUserOnChannel(clnt, \
@@ -369,9 +369,14 @@ void    Command::invite(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNotOnChannel(clnt, ptr_chann));
 		return ;
 	}
+
 	if (ptr_chann->isOperator(clnt))
 	{
 		// processing INVITE protocol
+		ptr_clnt_to_be_invtd->appendToSendBuf(proto_->clntInviteClnt(clnt, \
+										ptr_clnt_to_be_invtd, ptr_chann));
+		clnt->appendToSendBuf(proto_->rplInviting(clnt, \
+										ptr_clnt_to_be_invtd, ptr_chann));
 	}
 	else
 	{

@@ -118,6 +118,20 @@ std::string		Protocol::rplEndOfNames(Client* clnt, Channel* chann)
 	return ret;
 }
 
+std::string		Protocol::rplInviting(Client* clnt, \
+									Client* clnt_to_be_invtd, Channel* chann)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += RPL_INVITING;
+	ret += " " + clnt->getNickname();
+	ret += " " + clnt_to_be_invtd->getNickname();
+	ret += " :" + chann->getName();
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::clntJoinChann(Client* clnt, Channel* chann)
 {
 	std::string	ret;
@@ -214,6 +228,18 @@ std::string		Protocol::clntKickUserInChann(Client* clnt, \
 	return ret;
 }
 
+std::string		Protocol::clntInviteClnt(Client* clnt, \
+									Client* clnt_to_be_invtd, Channel* chann)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "INVITE";
+	ret += " " + clnt_to_be_invtd->getNickname();
+	ret += " :" + chann->getName();
+	ret += "\r\n";
+	return ret;
+}
 
 std::string		Protocol::errChanOPrivsNeeded(Client* clnt, Channel* chann)
 {

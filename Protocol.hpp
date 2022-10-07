@@ -32,6 +32,8 @@ public:
 	std::string		rplMyInfo(Client* clnt);
 	std::string		rplNamReply(Client* clnt, Channel* chann);
 	std::string		rplEndOfNames(Client* clnt, Channel* chann);
+	std::string		rplInviting(Client* clnt, \
+									Client* clnt_to_be_invtd, Channel* chann);
 	
 	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		clntPartChann(Client* clnt, std::string msg);
@@ -44,6 +46,8 @@ public:
 	std::string		msgPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg);
+	std::string		clntInviteClnt(Client* clnt, \
+									Client* clnt_to_be_invtd, Channel* chann);
 
 	std::string		errWrongPasswd();
 	std::string		errNotPassCmd();
