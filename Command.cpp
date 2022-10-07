@@ -327,7 +327,7 @@ void    Command::invite(Client* clnt)
 	Channel*		ptr_chann(NULL);
 	Client*			ptr_clnt_to_be_invtd(NULL);
 
-	// parsing
+	// parsing for nick and chann_name
 	pos_space_found = params.find(' ');
 	if (pos_space_found == std::string::npos)
 	{
@@ -337,42 +337,37 @@ void    Command::invite(Client* clnt)
 	nick = params.substr(0, pos_space_found);
 	chann_name = params.substr(pos_space_found + 1);
 
-	// checking channel
+	// chekcing a channel valid
 	ptr_chann = sv_->findChannel(chann_name);
 	if (ptr_chann == NULL)
 	{
-		// ERR_NOSUCHCHANNEL
 		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
 		return ;
 	}
 
-	// checking nick
+	// checking a client valid
 	ptr_clnt_to_be_invtd = sv_->findClient(nick);
 	if (ptr_clnt_to_be_invtd == NULL)
 	{
-		// ERR_NOSUCHNICK
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, nick));
 		return ;
 	}
 
-	// checking condition
+	// checking condition valid
 	if (ptr_chann->isUserIn(ptr_clnt_to_be_invtd))
 	{
-		// ERR_USERONCHANNEL
 		clnt->appendToSendBuf(proto_->errUserOnChannel(clnt, \
 										ptr_clnt_to_be_invtd, ptr_chann));
 		return ;
 	}
 	if (ptr_chann->isUserIn(clnt) == false)
 	{
-		// ERR_NOTONCHANNEL
 		clnt->appendToSendBuf(proto_->errNotOnChannel(clnt, ptr_chann));
 		return ;
 	}
 
 	if (ptr_chann->isOperator(clnt))
 	{
-		// processing INVITE protocol
 		ptr_clnt_to_be_invtd->appendToSendBuf(proto_->clntInviteClnt(clnt, \
 										ptr_clnt_to_be_invtd, ptr_chann));
 		clnt->appendToSendBuf(proto_->rplInviting(clnt, \
@@ -380,7 +375,6 @@ void    Command::invite(Client* clnt)
 	}
 	else
 	{
-		// ERR_CHANOPRIVSNEEDED
 		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, ptr_chann));
 	}
 }
