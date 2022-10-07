@@ -274,6 +274,8 @@ void	Client::processCommand()
 		cmd_->quit(this);
 	else if (command_ == "KICK")
 		cmd_->kick(this);
+	else if (command_ == "INVITE")
+		cmd_->invite(this);
 }
 
 std::string&	Client::getSendBuf(void)

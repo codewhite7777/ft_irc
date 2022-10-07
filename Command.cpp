@@ -317,3 +317,33 @@ void	Command::kick(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, nick));
 	}
 }
+
+void    Command::invite(Client* clnt)
+{
+	std::string		params(clnt->getParam());
+	std::string		nick;
+	std::string		chann_name;
+	std::size_t		pos_space_found(0);
+
+	// parsing
+	pos_space_found = params.find(' ');
+	if (pos_space_found == std::string::npos)
+	{
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
+	}
+	nick = params.substr(0, pos_space_found);
+	chann_name = params.substr(pos_space_found + 1);
+
+	// test: print nick and chann_name
+	{
+		std::cout << "\n<Command.invite()>\n";
+		std::cout << "nick: [" << nick << "]\n";
+		std::cout << "chann_name: [" << chann_name << "]\n";
+		std::cout << "\n";
+	}
+
+	// checking channel
+	// checking nick
+	// checking privilege
+}

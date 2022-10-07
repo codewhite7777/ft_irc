@@ -34,6 +34,10 @@ public:
 	// USER
 	void    user(Client* clnt);
 
+	// PING
+	void	ping(Client* clnt);
+	//void	pong(Client* clnt);
+
 	// JOIN
 	void    join(Client* clnt);
 
@@ -46,13 +50,12 @@ public:
 	// QUIT
 	void    quit(Client* clnt);
 
+	// KICK
 	void	kick(Client* clnt);
 
 	// INVITE
 	void    invite(Client* clnt);
 
-	void	ping(Client* clnt);
-	//void	pong(Client* clnt);
 
 private:
 	Server*     sv_;
