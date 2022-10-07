@@ -30,7 +30,6 @@ std::string    Protocol::rplPass()
 	return ret;
 }
 
-// 001
 std::string     Protocol::rplWelcome(Client* clnt)
 {
 	std::string ret;
@@ -44,7 +43,6 @@ std::string     Protocol::rplWelcome(Client* clnt)
 	return ret;
 }
 
-// 002
 std::string     Protocol::rplYourHost(Client* clnt)
 {
 	std::string ret;
@@ -60,7 +58,6 @@ std::string     Protocol::rplYourHost(Client* clnt)
 	return ret;
 }
 
-// 003
 std::string     Protocol::rplCreated(Client* clnt)
 {
 	std::string ret;
@@ -74,7 +71,6 @@ std::string     Protocol::rplCreated(Client* clnt)
 	return ret;
 }
 
-// 004
 std::string     Protocol::rplMyInfo(Client* clnt)
 {
 	std::string ret;
@@ -84,9 +80,9 @@ std::string     Protocol::rplMyInfo(Client* clnt)
 	ret += " " + clnt->getNickname();
 	ret += " " + sv_->getName();
 	ret += " " + sv_->getVersion();
-	ret += " iosw"; // available user modes
-	ret += " biklmnopstv"; // available channel modes
-	ret += " :bklov";
+	ret += " o"; // available user modes
+	ret += " o"; // available channel modes
+	//ret += " :bklov";
 	ret += "\r\n";
 	return ret;
 }
@@ -269,7 +265,6 @@ std::string		Protocol::errUserNotInChannel(Client* clnt, \
 	return ret;
 }
 
-
 std::string     Protocol::errWrongPasswd()
 {
 	std::string ret;
@@ -319,7 +314,6 @@ std::string     Protocol::errNeedMoreParams()
 	ret += " :Not enough parameters.\r\n";
 	return ret;
 }
-
 
 std::string		Protocol::errNoSuchNick(Client* clnt, std::string nick)
 {
@@ -372,7 +366,6 @@ std::string		Protocol::errUserOnChannel(Client* clnt, \
 	ret += "\r\n";
 	return ret;
 }
-
 
 Server* Protocol::getServer_(void)
 {

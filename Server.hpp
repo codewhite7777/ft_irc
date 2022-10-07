@@ -94,7 +94,8 @@ private:
 	Protocol*					proto_;
 
 	//server info
-	//std::string					s_operator_pwd_;
+	std::string					oper_name_;
+	std::string					oper_pwd_;
 	std::string					name_;
 	const std::string			version_;
 
@@ -113,65 +114,5 @@ private:
 	//channel
 	std::map<std::string, Channel*>	chann_map_;
 };
-
-
-	// ---------------------------------------------------------------------
-	// to remove
-	//network packet marshalling
-	// void		packetMarshalling(void);
-	// void		packetAnalysis(std::map<SOCKET, Client *>::iterator &iter);
-	// std::string	takeFirstProtocol(std::string& packet);
-	/*
-	//packet request :: PASS
-	void		requestAuth(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	//packet request :: NICK
-	void		requestSetNickName(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	
-
-	//packet request :: USER
-	void		requestSetUserName(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	//packet request :: COMMAND
-	void		requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	//packet request :: PRIVMSG
-	void		requestPrivateMsg(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	//packet request :: JOIN
-	void		requestJoin(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	//packet request :: OPER
-	void		requestMode(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-						
-	void		quitTest(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-
-	void		inviteTest(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	*/
-	//void		insertSendBuffer(Client* target_client, const std::string& msg);
-	//std::string	buildErrPacket(std::string err_code, std::string user_name, std::string err_msg);
-	//std::string	buildReplyPacket(std::string reply_code, std::string user_name, std::string reply_msg);
-	//std::string	getUserInfo(std::string nickname, std::string username, std::string hostname);
-	/*
-	void requestPart(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	void requestPartMsg(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	void kickTest(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	void requestKickMsg(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param);
-	*/
-	// ---------------------------------------------------------------------
-
 
 #endif

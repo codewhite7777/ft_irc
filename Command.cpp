@@ -318,6 +318,16 @@ void	Command::kick(Client* clnt)
 	}
 }
 
+void	Command::mode(Client* clnt)
+{
+	std::string		params(clnt->getParam());
+	//std::string		target;
+	//std::string		modestring;
+	//std::string		mode_args;
+
+	(void)params;
+}
+
 void    Command::invite(Client* clnt)
 {
 	std::string		params(clnt->getParam());

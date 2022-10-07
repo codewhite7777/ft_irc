@@ -53,6 +53,9 @@ public:
 	// KICK
 	void	kick(Client* clnt);
 
+	// MODE
+	void	mode(Client* clnt);
+
 	// INVITE
 	void    invite(Client* clnt);
 
