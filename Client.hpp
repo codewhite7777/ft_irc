@@ -74,6 +74,7 @@ public:
 	std::string				getNamesPrefix() const;
 
 	void					setSvOperFlagOn();
+	bool					getSvOperFlag() const;
 
 private:
 	void					marshalMessage(std::string& command, std::string& param);

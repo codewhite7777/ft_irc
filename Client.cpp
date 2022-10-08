@@ -174,6 +174,11 @@ void				Client::setSvOperFlagOn()
 	this->sv_oper_flag_ = true;
 }
 
+bool				Client::getSvOperFlag() const
+{
+	return (this->sv_oper_flag_);
+}
+
 void	Client::marshalMessage(std::string& command__, std::string& param__)
 {
 	std::string	tmp_msg;

@@ -446,7 +446,14 @@ void		Command::kill(Client* clnt)
 	if (':' == comment.front())
 		comment.erase(0, 1);
 
-	
+	// checking permission valid
+	if (clnt->getSvOperFlag() == false)
+	{
+		// ERR_NOPRIVILEGES
+		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
+		return ;
+	}
+
 
 	// test: print target_nick and comment
 	{

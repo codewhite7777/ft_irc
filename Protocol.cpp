@@ -403,6 +403,19 @@ std::string		Protocol::errNoOperHost(Client* clnt)
 	return ret;
 }
 
+std::string		Protocol::errNoPrivileges(Client* clnt)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NOPRIVILEGES;
+	ret += " " + clnt->getNickname();
+	ret += " :Permission Denied";
+	ret += " - You do not have the required operator privileges";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

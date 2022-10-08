@@ -65,6 +65,7 @@ public:
 	std::string		errUserOnChannel(Client* clnt, \
 										Client* user, Channel* chann);
 	std::string		errNoOperHost(Client* clnt);
+	std::string		errNoPrivileges(Client* clnt);
 
 private:
 	Server* getServer_();
