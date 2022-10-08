@@ -353,67 +353,6 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-/*
-void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	// if (command == "PONG")
-	// 	return ;
-	if (command == "PASS" || command == "USER")
-		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
-	else if (command == "PING")
-	{
-		STRING msg = ":" + host_name_ + " PONG "+ host_name_ +  " :\r\n";
-		insertSendBuffer(iter->second, msg);
-		// PONG csd.bu.edu tolsun.oulu.fi
-	}
-	else if (command == "PONG")
-		return ;
-	else if (command == "JOIN")
-	{
-		//TODO : 채널 구조 구상 및 구현
-		std::cout << "command : join " << std::endl;
-		requestJoin(iter, command, param);
-	}
-	else if (command == "PART")
-	{
-		std::cout << "command : PART " << std::endl;
-		requestPart(iter, command, param);
-	}
-	else if (command == "QUIT")
-	{
-		std::cout << "command : quit " << std::endl;
-
-		iter->second->setDisconnectFlag(true);
-		quitTest(iter, command, param);
-		return ;
-	}
-	else if (command == "PRIVMSG" || command == "NOTICE")
-	{
-		std::cout << "command : privmsg" << std::endl;
-		requestPrivateMsg(iter, command, param);
-	}
-	else if (command == "MODE")
-	{
-		std::cout << "command : " << command << ", param : " << param << std::endl;
-		//requestMode(iter, command, param);
-	}
-	else if (command == "KICK")
-	{
-		std::cout << "command : KICK " << std::endl;
-		requestKickMsg(iter, command, param);
-	}
-	else if (command == "INVITE")
-	{
-		std::cout << "command : INVITE " << std::endl;
-		inviteTest(iter, command, param);
-	}
-	else
-		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
-	return ;
-}
-*/
-
 void	Server::processClientMessages()
 {
 	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()\
@@ -436,11 +375,13 @@ void	Server::clientDisconnect(void)
 	{
 		if (iter->second->getDisconnectFlag() == true)
 		{
-			std::cout << iter->first << " Socket Disconnected" << std::endl;
+			if (iter->second->getSendBufLength() > 0)
+				sendPacket(iter);
 			close(iter->first);
 			delete iter->second; // critical point
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
+			std::cout << iter->first << " Socket Disconnected" << std::endl;
 		}
 		else
 			iter++;
