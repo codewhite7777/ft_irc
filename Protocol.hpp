@@ -43,13 +43,17 @@ public:
 	std::string		clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
 	std::string		clntQuit(Client* clnt, std::string msg);
-	std::string		rplErrorClosing(Client* clnt, std::string msg);
+	std::string		errorClosingLink(Client* clnt, std::string msg);
 	std::string		msgPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg);
 	std::string		clntInviteClnt(Client* clnt, \
 									Client* clnt_to_be_invtd, Channel* chann);
 	std::string		svModeClntAddOper(Client* clnt);
+	std::string		clntKillClnt(Client* clnt, \
+									Client* target_clnt, std::string comment);
+
+	//std::string		errorClosingLinkKilled(Client* clnt, std::string msg);
 
 	std::string		errWrongPasswd();
 	std::string		errNotPassCmd();

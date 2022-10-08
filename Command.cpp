@@ -233,20 +233,21 @@ void    Command::privmsg(Client* clnt)
 
 void	Command::quit(Client* clnt)
 {
-	std::string			recved_quit_msg(clnt->getParam());
+	std::string			reason(clnt->getParam());
 	std::list<Client*>*	clnts_in_same_channs(NULL);
 	Client*				each_clnt_ptr(NULL);
 
-	if (':' == recved_quit_msg.front())
-		recved_quit_msg.erase(0, 1);
-	clnt->appendToSendBuf(proto_->rplErrorClosing(clnt, recved_quit_msg));
+	if (':' == reason.front())
+		reason.erase(0, 1);
+	reason.insert(0, "Quit: ");
+	clnt->appendToSendBuf(proto_->errorClosingLink(clnt, reason));
 	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
 	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
 		; each_clnt_it != clnts_in_same_channs->end()
 		; ++each_clnt_it)
 	{
 		each_clnt_ptr = *each_clnt_it;
-		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, recved_quit_msg));
+		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(clnt, reason));
 		each_clnt_ptr = NULL;
 	}
 	delete clnts_in_same_channs;
@@ -455,6 +456,7 @@ void		Command::kill(Client* clnt)
 		return ;
 	}
 
+	// checking target_nick valid
 	target_clnt = sv_->findClient(target_nick);
 	if (target_clnt == NULL)
 	{
@@ -462,11 +464,10 @@ void		Command::kill(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, target_nick));
 	}
 
-
-	// test: print target_nick and comment
-	{
-	std::cout << "<Command.kill()>\n";
-	std::cout << "target_nick: [" << target_nick << "]\n";
-	std::cout << "comment: [" << comment << "]\n";
-	}
+	// sending KILL and Closing_link protocols to the target
+	target_clnt->appendToSendBuf(\
+		proto_->clntKillClnt(clnt, target_clnt, comment));
+	//target_clnt->appendToSendBuf();
+	//proto_->errorClosingLinkKilled(target_clnt, comment);
+	
 }

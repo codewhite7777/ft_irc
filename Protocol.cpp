@@ -200,16 +200,29 @@ std::string		Protocol::clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 	return ret;
 }
 
-std::string		Protocol::rplErrorClosing(Client* clnt, std::string msg)
+std::string		Protocol::errorClosingLink(Client* clnt, std::string msg)
 {
 	std::string	ret;
 
 	ret = "ERROR :Closing link: ";
 	ret += '(' + clnt->getUsername() + '@' + clnt->getHostname() + ')';
-	ret += " [Quit: " + msg + "]";
+	ret += " [" + msg + "]";
 	ret += "\r\n";
 	return ret;
 }
+
+/*
+std::string		Protocol::errorClosingLinkKilled(Client* clnt, std::string msg)
+{
+	std::string	ret;
+
+	ret = "ERROR :Closing link: ";
+	ret += '(' + clnt->getUsername() + '@' + clnt->getHostname() + ')';
+	ret += " [Killed: " + msg + "]";
+	ret += "\r\n";
+	return ret;
+}
+*/
 
 std::string		Protocol::clntQuit(Client* clnt, std::string msg)
 {
@@ -217,7 +230,7 @@ std::string		Protocol::clntQuit(Client* clnt, std::string msg)
 
 	ret = clnt->getNamesPrefix();
 	ret += "QUIT :";
-	ret += "Quit: " + msg;
+	ret += msg;
 	ret += "\r\n";
 	return ret;
 }
@@ -257,6 +270,20 @@ std::string		Protocol::svModeClntAddOper(Client* clnt)
 	ret += "MODE";
 	ret += " " + clnt->getNickname();
 	ret += " +o";
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntKillClnt(Client* clnt, \
+									Client* target_clnt, std::string comment)
+{
+	std::string		ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "KILL";
+	ret += " " + target_clnt->getNickname();
+	ret += " :Killed (" + clnt->getNickname();
+	ret += " (" + comment + "))";
 	ret += "\r\n";
 	return ret;
 }
