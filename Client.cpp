@@ -286,6 +286,8 @@ void	Client::processCommand()
 		cmd_->invite(this);
 	else if (command_ == "OPER")
 		cmd_->oper(this);
+	else if (command_ == "kill")
+		cmd_->kill(this);
 }
 
 std::string&	Client::getSendBuf(void)

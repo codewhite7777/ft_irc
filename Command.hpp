@@ -62,6 +62,9 @@ public:
 	// OPER
 	void	oper(Client* clnt);
 
+	// KILL
+	void	kill(Client* clnt);
+
 
 private:
 	Server*     sv_;

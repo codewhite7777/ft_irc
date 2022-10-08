@@ -402,6 +402,7 @@ void	Command::oper(Client* clnt)
 	{
 		// ERR_NEEDMOREPARAMS
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
 	}
 	name = params.substr(0, pos_space_found);
 	password = params.substr(pos_space_found + 1);
@@ -422,5 +423,35 @@ void	Command::oper(Client* clnt)
 	{
 		// ERR_NOOPERHOST
 		clnt->appendToSendBuf(proto_->errNoOperHost(clnt));
+	}
+}
+
+void		Command::kill(Client* clnt)
+{
+	std::string		params(clnt->getParam());
+	std::string		target_nick;
+	std::string		comment;
+	std::size_t		pos_space_found(0);
+
+	// parsing for target_nick and comment
+	pos_space_found = params.find(' ');
+	if (pos_space_found == std::string::npos)
+	{
+		// ERR_NEEDMOREPARAMS
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
+	}
+	target_nick = params.substr(0, pos_space_found);
+	comment = params.substr(pos_space_found + 1);
+	if (':' == comment.front())
+		comment.erase(0, 1);
+
+	
+
+	// test: print target_nick and comment
+	{
+	std::cout << "<Command.kill()>\n";
+	std::cout << "target_nick: [" << target_nick << "]\n";
+	std::cout << "comment: [" << comment << "]\n";
 	}
 }
