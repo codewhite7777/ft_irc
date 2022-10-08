@@ -429,12 +429,14 @@ void	Command::oper(Client* clnt)
 
 void		Command::kill(Client* clnt)
 {
-	std::string		params(clnt->getParam());
-	std::string		target_nick;
-	std::string		comment;
-	std::size_t		pos_space_found(0);
-	std::string		msg_for_proto;
-	Client*			target_clnt;
+	std::string			params(clnt->getParam());
+	std::string			target_nick;
+	std::string			comment;
+	std::size_t			pos_space_found(0);
+	std::string			msg_for_proto;
+	Client*				target_clnt(NULL);
+	std::list<Client*>*	clnts_in_same_channs(NULL);
+	Client*				each_clnt_ptr(NULL);
 
 	// parsing for target_nick and comment
 	pos_space_found = params.find(' ');
@@ -450,7 +452,7 @@ void		Command::kill(Client* clnt)
 		comment.erase(0, 1);
 	
 	// setting comment message for protocols
-	msg_for_proto = " :Killed (" + clnt->getNickname();
+	msg_for_proto = "Killed (" + clnt->getNickname();
 	msg_for_proto += " (" + comment + "))";
 
 	// checking permission valid
@@ -475,4 +477,19 @@ void		Command::kill(Client* clnt)
 	target_clnt->appendToSendBuf(\
 		proto_->errorClosingLink(target_clnt, msg_for_proto));
 	
+	// sending QUIT of the target protocol to clients in the channel the target is in
+	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(target_clnt);
+	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
+		; each_clnt_it != clnts_in_same_channs->end()
+		; ++each_clnt_it)
+	{
+		each_clnt_ptr = *each_clnt_it;
+		each_clnt_ptr->appendToSendBuf(proto_->clntQuit(target_clnt, msg_for_proto));
+		each_clnt_ptr = NULL;
+	}
+	delete clnts_in_same_channs;
+	sv_->requestChannsToEraseOne(target_clnt);
+
+	// setting disconnect flag
+	target_clnt->setDisconnectFlag(true);
 }
