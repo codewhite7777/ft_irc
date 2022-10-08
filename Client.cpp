@@ -286,6 +286,8 @@ void	Client::processCommand()
 		cmd_->ping(this);
 	else if (command_ == "PRIVMSG")
 		cmd_->privmsg(this);
+	else if (command_ == "NOTICE")
+		cmd_->notice(this);
 	else if (command_ == "QUIT")
 		cmd_->quit(this);
 	else if (command_ == "KICK")

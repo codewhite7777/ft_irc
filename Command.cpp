@@ -231,6 +231,47 @@ void    Command::privmsg(Client* clnt)
 	}
 }
 
+void	Command::notice(Client* clnt)
+{
+	std::string					arg(clnt->getParam());
+	std::size_t					found_space(0);
+	std::vector<std::string>	names;
+	std::string					msg;
+	Channel*					chann_ptr(NULL);
+	Client*						clnt_recv_ptr(NULL);
+
+	found_space = arg.find(' ');
+	if (found_space == std::string::npos)
+	{
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
+		return ;
+	}
+	names = split(arg.substr(0, found_space), ',');
+	msg = arg.substr(found_space + 1);
+	for (std::size_t i = 0; i < names.size(); ++i)
+	{
+		if ('#' == names[i].front())
+		{
+			chann_ptr = sv_->findChannel(names[i]);
+			if (chann_ptr)
+				chann_ptr->sendToOthers(clnt, \
+					proto_->clntNoticeToChann(clnt, msg, chann_ptr));
+			else
+				clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, names[i]));
+		}
+		else
+		{
+			clnt_recv_ptr = sv_->findClient(names[i]);
+			if (clnt_recv_ptr)
+				clnt_recv_ptr->appendToSendBuf(proto_->clntNoticeToClnt(\
+												clnt, msg, clnt_recv_ptr));
+			else
+				clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, names[i]));
+		}
+	}
+
+}
+
 void	Command::quit(Client* clnt)
 {
 	std::string			reason(clnt->getParam());

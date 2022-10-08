@@ -42,6 +42,10 @@ public:
 										Channel* chann);
 	std::string		clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
+	std::string		clntNoticeToChann(Client* clnt, std::string msg, \
+										Channel* chann);
+	std::string		clntNoticeToClnt(Client* clnt_send, std::string msg, \
+										Client* clnt_recv);
 	std::string		clntQuit(Client* clnt, std::string msg);
 	std::string		errorClosingLink(Client* clnt, std::string msg);
 	std::string		msgPong(std::string token);

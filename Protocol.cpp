@@ -200,6 +200,32 @@ std::string		Protocol::clntPrivmsgToClnt(Client* clnt_send, std::string msg, \
 	return ret;
 }
 
+std::string		Protocol::clntNoticeToChann(Client* clnt, std::string msg, \
+										Channel* chann)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "NOTICE ";
+	ret += chann->getName();
+	ret += " " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::clntNoticeToClnt(Client* clnt_send, std::string msg, \
+									Client* clnt_recv)
+{
+	std::string	ret;
+
+	ret = clnt_send->getNamesPrefix();
+	ret += "NOTICE ";
+	ret += clnt_recv->getNickname();
+	ret += " " + msg;
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::errorClosingLink(Client* clnt, std::string msg)
 {
 	std::string	ret;
