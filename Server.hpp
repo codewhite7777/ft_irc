@@ -60,6 +60,7 @@ public:
 	bool					isOperName(std::string name);
 	bool					isOperPassword(std::string password);
 	bool					isOperHost(std::string hostname);
+	const std::string&		getOperType() const;
 
 private:
 	//configure port

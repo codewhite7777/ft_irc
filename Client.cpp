@@ -23,6 +23,7 @@ Client::Client(SOCKET sdes, std::string hostname, Server* sv)
 	, user_flag_(false)
 	, hostname_(hostname)
 	, disconnect_flag_(false)
+	, sv_oper_flag_(false)
 	, passed_(false)
 	, welcomed_(false)
 	, sv_(sv)
@@ -166,6 +167,11 @@ bool				Client::getUserFlag() const
 std::string			Client::getNamesPrefix() const
 {
 	return (":" + nickname_ + "!" + username_ + "@" + hostname_ + " ");
+}
+
+void				Client::setSvOperFlagOn()
+{
+	this->sv_oper_flag_ = true;
 }
 
 void	Client::marshalMessage(std::string& command__, std::string& param__)

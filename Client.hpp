@@ -73,6 +73,8 @@ public:
 
 	std::string				getNamesPrefix() const;
 
+	void					setSvOperFlagOn();
+
 private:
 	void					marshalMessage(std::string& command, std::string& param);
 	std::string				extractFirstMsg(std::string& recv_buf);
@@ -105,7 +107,7 @@ private:
 	std::string				realname_;
 
 	bool					disconnect_flag_;
-	//bool					operator_flag_;
+	bool					sv_oper_flag_;
 
 	bool					passed_;
 	bool					welcomed_; // refistered

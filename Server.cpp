@@ -536,3 +536,8 @@ bool		Server::isOperHost(std::string hostname)
 	else
 		return false;
 }
+
+const std::string&	Server::getOperType() const
+{
+	return (this->oper_type_);
+}

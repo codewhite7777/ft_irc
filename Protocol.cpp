@@ -128,6 +128,18 @@ std::string		Protocol::rplInviting(Client* clnt, \
 	return ret;
 }
 
+std::string		Protocol::rplYoureOper(Client* clnt)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += RPL_YOUREOPER;
+	ret += " " + clnt->getNickname();
+	ret += " :You are now a " + sv_->getOperType();
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::clntJoinChann(Client* clnt, Channel* chann)
 {
 	std::string	ret;
@@ -233,6 +245,18 @@ std::string		Protocol::clntInviteClnt(Client* clnt, \
 	ret += "INVITE";
 	ret += " " + clnt_to_be_invtd->getNickname();
 	ret += " :" + chann->getName();
+	ret += "\r\n";
+	return ret;
+}
+
+std::string		Protocol::svModeClntAddOper(Client* clnt)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += "MODE";
+	ret += " " + clnt->getNickname();
+	ret += " +o";
 	ret += "\r\n";
 	return ret;
 }

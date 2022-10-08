@@ -411,19 +411,16 @@ void	Command::oper(Client* clnt)
 	 && sv_->isOperPassword(password)\
 	 && sv_->isOperHost(clnt->getHostname()))
 	{
-		// setting the client oper privilege in server
+		// sending MODE protocol to give oper privilege
+		clnt->appendToSendBuf(proto_->svModeClntAddOper(clnt));
+		// setting sv_oper_flag ofr the client
+		clnt->setSvOperFlagOn();
 		// sending protocols to give oper privilege
+		clnt->appendToSendBuf(proto_->rplYoureOper(clnt));
 	}
 	else
 	{
 		// ERR_NOOPERHOST
 		clnt->appendToSendBuf(proto_->errNoOperHost(clnt));
-	}
-
-	// test: print name and password
-	{
-	std::cout << "<Command.oper()>\n";
-	std::cout << "name: [" << name << "]\n";
-	std::cout << "password: [" << password << "]\n";
 	}
 }
