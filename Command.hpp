@@ -59,6 +59,9 @@ public:
 	// INVITE
 	void    invite(Client* clnt);
 
+	// OPER
+	void	oper(Client* clnt);
+
 
 private:
 	Server*     sv_;

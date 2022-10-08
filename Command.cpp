@@ -388,3 +388,27 @@ void    Command::invite(Client* clnt)
 		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, ptr_chann));
 	}
 }
+
+void	Command::oper(Client* clnt)
+{
+	std::string		params(clnt->getParam());
+	std::string		name;
+	std::string		password;
+	std::size_t		pos_space_found(0);
+
+	// parsing for name and password
+	pos_space_found = params.find(' ');
+	if (pos_space_found == std::string::npos)
+	{
+		// ERR_PARAMS
+	}
+	name = params.substr(0, pos_space_found);
+	password = params.substr(pos_space_found + 1);
+
+	// test: print name and password
+	{
+	std::cout << "<Command.oper()>\n";
+	std::cout << "name: [" << name << "]\n";
+	std::cout << "password: [" << password << "]\n";
+	}
+}

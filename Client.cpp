@@ -278,6 +278,8 @@ void	Client::processCommand()
 		cmd_->mode(this);
 	else if (command_ == "INVITE")
 		cmd_->invite(this);
+	else if (command_ == "OPER")
+		cmd_->oper(this);
 }
 
 std::string&	Client::getSendBuf(void)
