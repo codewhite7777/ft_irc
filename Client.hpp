@@ -44,7 +44,9 @@ public:
 	// processMessage
 	void					processMessageInRecvBuf();
 
+	const std::string&		getCommand() const;
 	const std::string&		getParam() const;
+	
 
 	//client disconnect flag getter/setter
 	bool					getDisconnectFlag(void) const;
@@ -74,7 +76,7 @@ public:
 	std::string				getNamesPrefix() const;
 
 	void					setSvOperFlagOn();
-	bool					getSvOperFlag() const;
+	bool					isSvOper() const;
 
 private:
 	void					marshalMessage(std::string& command, std::string& param);

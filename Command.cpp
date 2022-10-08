@@ -251,7 +251,7 @@ void	Command::quit(Client* clnt)
 		each_clnt_ptr = NULL;
 	}
 	delete clnts_in_same_channs;
-	sv_->requestChannsToEraseOne(clnt);
+	sv_->requestAllChannsToEraseOneUser(clnt);
 	clnt->setDisconnectFlag(true);
 }
 
@@ -456,7 +456,7 @@ void		Command::kill(Client* clnt)
 	msg_for_proto += " (" + comment + "))";
 
 	// checking permission valid
-	if (clnt->getSvOperFlag() == false)
+	if (clnt->isSvOper() == false)
 	{
 		// ERR_NOPRIVILEGES
 		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
@@ -469,6 +469,7 @@ void		Command::kill(Client* clnt)
 	{
 		// ERR_NOSUCHNICK
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, target_nick));
+		return ;
 	}
 
 	// sending KILL and Closing_link protocols to the target
@@ -488,8 +489,41 @@ void		Command::kill(Client* clnt)
 		each_clnt_ptr = NULL;
 	}
 	delete clnts_in_same_channs;
-	sv_->requestChannsToEraseOne(target_clnt);
+	sv_->requestAllChannsToEraseOneUser(target_clnt);
 
 	// setting disconnect flag
 	target_clnt->setDisconnectFlag(true);
+}
+
+void		Command::die(Client* clnt)
+{
+	std::string		cmd(clnt->getCommand());
+	std::string		param(clnt->getParam());
+	std::string		msg_to_send;
+
+	msg_to_send = "Died (";
+	msg_to_send += clnt->getNickname();
+	if (clnt->getParam().empty())
+		msg_to_send += " (" + param + "))";
+	else
+		msg_to_send += " ())";
+	// chekcing permission
+	if (clnt->isSvOper())
+	{
+		// setting all channels to have no users
+		//sv_->requestAllChannsToEraseAllUser();
+
+		// setting disconnect_flag of all clients on
+		sv_->requestAllClientsToDisconnect();
+
+		// sending Error Closing Link protocol to all clients
+		sv_->sendErrorClosingLinkProtoToAllClientsWithMsg(msg_to_send);
+
+		// setting Server status off
+		sv_->setStatusOff();
+	}
+	{
+		// ERR_NOPRIVILEGES
+		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
+	}
 }

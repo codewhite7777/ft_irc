@@ -47,6 +47,9 @@ public:
 	// PRIVMSG
 	void    privmsg(Client* clnt);
 
+	// NOTICE
+	void	notice(Client* clnt);
+
 	// QUIT
 	void    quit(Client* clnt);
 
@@ -65,6 +68,8 @@ public:
 	// KILL
 	void	kill(Client* clnt);
 
+	// DIE
+	void	die(Client* clnt);
 
 private:
 	Server*     sv_;

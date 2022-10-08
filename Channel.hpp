@@ -54,6 +54,7 @@ public:
 
 	void				eraseClntIfIs(Client* clnt);
 
+
 private:
 	Channel(void);
 

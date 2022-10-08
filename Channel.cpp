@@ -144,22 +144,6 @@ std::list<Client*>*	Channel::makeClntListInChannExceptOne(Client* clnt_to_excpt)
 
 void			Channel::eraseClntIfIs(Client* clnt)
 {
-	eraseAsUser(clnt);
 	eraseAsOperator(clnt);
+	eraseAsUser(clnt);
 }
-
-/*
-void Channel::eraseUser(STRING nick)
-{
-	MAP<STRING, Client*>::iterator iter = users_.find(nick);
-	if (iter != users_.end())
-		users_.erase(iter);
-}
-
-void Channel::eraseOper(STRING nick)
-{
-	MAP<STRING, Client*>::iterator iter = opers_.find(nick);
-	if (iter != opers_.end())
-		opers_.erase(iter);
-}
-*/

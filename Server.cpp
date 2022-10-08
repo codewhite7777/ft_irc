@@ -63,9 +63,6 @@ Server::Server(int argc, char *argv[])
 		return ;
 	}
 
-	//set operator pwd
-	//s_operator_pwd_ = "admin";
-
 	//network init
 	networkInit();
 }
@@ -73,6 +70,16 @@ Server::Server(int argc, char *argv[])
 Server::~Server(void)
 {
 	networkClose();
+
+	// delete all channels
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		delete chann_it->second;
+		chann_it->second = NULL;
+		//chann_it = chann_map_.erase(chann_it);
+	}
 }
 
 void	Server::equipCommandAndProtocol(Command* cmd, Protocol* proto)
@@ -440,7 +447,7 @@ std::list<Client*>*		Server::makeOtherClntListInSameChanns(Client* clnt)
 	return ret;
 }
 
-void				Server::requestChannsToEraseOne(Client* clnt)
+void				Server::requestAllChannsToEraseOneUser(Client* clnt)
 {
 	Channel*	each_chann_ptr(NULL);
 
@@ -481,4 +488,32 @@ bool		Server::isOperHost(std::string hostname)
 const std::string&	Server::getOperType() const
 {
 	return (this->oper_type_);
+}
+
+void		Server::requestAllClientsToDisconnect()
+{
+	for (std::map<SOCKET, Client *>::iterator clnt_it = client_map_.begin()
+		; clnt_it != client_map_.end()
+		; clnt_it++)
+	{
+		clnt_it->second->setDisconnectFlag(true);
+	}
+}
+
+void		Server::sendErrorClosingLinkProtoToAllClientsWithMsg(\
+													std::string msg)
+{
+	Client*		each_clnt;
+	for (std::map<SOCKET, Client *>::iterator clnt_it = client_map_.begin()
+		; clnt_it != client_map_.end()
+		; clnt_it++)
+	{
+		each_clnt = clnt_it->second;
+		each_clnt->appendToSendBuf(proto_->errorClosingLink(each_clnt, msg));
+	}
+}
+
+void		Server::setStatusOff()
+{
+	this->status_ = false;
 }

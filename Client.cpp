@@ -74,6 +74,11 @@ void	Client::processMessageInRecvBuf()
 	//clearCommandAndParam();
 }
 
+const std::string&	Client::getCommand() const
+{
+	return command_;
+}
+
 const std::string&	Client::getParam(void) const
 {
 	return param_;
@@ -174,7 +179,7 @@ void				Client::setSvOperFlagOn()
 	this->sv_oper_flag_ = true;
 }
 
-bool				Client::getSvOperFlag() const
+bool				Client::isSvOper() const
 {
 	return (this->sv_oper_flag_);
 }
@@ -293,6 +298,9 @@ void	Client::processCommand()
 		cmd_->oper(this);
 	else if (command_ == "kill")
 		cmd_->kill(this);
+	else if (command_ == "die"\
+		 || (command_.empty() && param_ == "die"))
+		cmd_->die(this);
 }
 
 std::string&	Client::getSendBuf(void)
