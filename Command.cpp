@@ -433,6 +433,7 @@ void		Command::kill(Client* clnt)
 	std::string		target_nick;
 	std::string		comment;
 	std::size_t		pos_space_found(0);
+	std::string		msg_for_proto;
 	Client*			target_clnt;
 
 	// parsing for target_nick and comment
@@ -447,6 +448,10 @@ void		Command::kill(Client* clnt)
 	comment = params.substr(pos_space_found + 1);
 	if (':' == comment.front())
 		comment.erase(0, 1);
+	
+	// setting comment message for protocols
+	msg_for_proto = " :Killed (" + clnt->getNickname();
+	msg_for_proto += " (" + comment + "))";
 
 	// checking permission valid
 	if (clnt->getSvOperFlag() == false)
@@ -466,8 +471,8 @@ void		Command::kill(Client* clnt)
 
 	// sending KILL and Closing_link protocols to the target
 	target_clnt->appendToSendBuf(\
-		proto_->clntKillClnt(clnt, target_clnt, comment));
-	//target_clnt->appendToSendBuf();
-	//proto_->errorClosingLinkKilled(target_clnt, comment);
+		proto_->clntKillClnt(clnt, target_clnt, msg_for_proto));
+	target_clnt->appendToSendBuf(\
+		proto_->errorClosingLink(target_clnt, msg_for_proto));
 	
 }

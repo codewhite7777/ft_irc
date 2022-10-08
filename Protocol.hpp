@@ -51,7 +51,7 @@ public:
 									Client* clnt_to_be_invtd, Channel* chann);
 	std::string		svModeClntAddOper(Client* clnt);
 	std::string		clntKillClnt(Client* clnt, \
-									Client* target_clnt, std::string comment);
+									Client* target_clnt, std::string msg);
 
 	//std::string		errorClosingLinkKilled(Client* clnt, std::string msg);
 
