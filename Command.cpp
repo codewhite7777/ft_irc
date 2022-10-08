@@ -400,10 +400,25 @@ void	Command::oper(Client* clnt)
 	pos_space_found = params.find(' ');
 	if (pos_space_found == std::string::npos)
 	{
-		// ERR_PARAMS
+		// ERR_NEEDMOREPARAMS
+		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 	}
 	name = params.substr(0, pos_space_found);
 	password = params.substr(pos_space_found + 1);
+
+	// checking name and password valid
+	if (sv_->isOperName(name)\
+	 && sv_->isOperPassword(password)\
+	 && sv_->isOperHost(clnt->getHostname()))
+	{
+		// setting the client oper privilege in server
+		// sending protocols to give oper privilege
+	}
+	else
+	{
+		// ERR_NOOPERHOST
+		clnt->appendToSendBuf(proto_->errNoOperHost(clnt));
+	}
 
 	// test: print name and password
 	{

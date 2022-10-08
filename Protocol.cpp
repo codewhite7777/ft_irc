@@ -367,6 +367,18 @@ std::string		Protocol::errUserOnChannel(Client* clnt, \
 	return ret;
 }
 
+std::string		Protocol::errNoOperHost(Client* clnt)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_NOOPERHOST;
+	ret += " " + clnt->getNickname();
+	ret += " :Invalid oper credentials";
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;

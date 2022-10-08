@@ -35,6 +35,10 @@ Server::Server(int argc, char *argv[])
 	, name_("irc.server")
 	, version_("ft_irc-mandatory")
 	, sock_count_(0)
+	, oper_name_("root")
+	, oper_pwd_("12345")
+	, oper_host_("127.0.0.1")
+	, oper_type_("ServerAdmin")
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -507,4 +511,28 @@ void				Server::requestChannsToEraseOne(Client* clnt)
 		each_chann_ptr->eraseClntIfIs(clnt);
 		each_chann_ptr = NULL;
 	}
+}
+
+bool		Server::isOperName(std::string name)
+{
+	if (this->oper_name_ == name)
+		return true;
+	else
+		return false;
+}
+
+bool		Server::isOperPassword(std::string password)
+{
+	if (this->oper_pwd_ == password)
+		return true;
+	else
+		return false;
+}
+
+bool		Server::isOperHost(std::string hostname)
+{
+	if (this->oper_host_ == hostname)
+		return true;
+	else
+		return false;
 }

@@ -57,6 +57,10 @@ public:
 
 	void					requestChannsToEraseOne(Client* clnt);
 
+	bool					isOperName(std::string name);
+	bool					isOperPassword(std::string password);
+	bool					isOperHost(std::string hostname);
+
 private:
 	//configure port
 	bool		configPort(std::string port);
@@ -94,8 +98,6 @@ private:
 	Protocol*					proto_;
 
 	//server info
-	std::string					oper_name_;
-	std::string					oper_pwd_;
 	std::string					name_;
 	const std::string			version_;
 
@@ -104,9 +106,15 @@ private:
 	struct sockaddr_in			s_addr_in_;
 	unsigned short				s_port_;
 	std::string					s_ip_;
+	unsigned int				sock_count_;
+
+	//oper
+	const std::string			oper_name_;
+	const std::string			oper_pwd_;
+	const std::string			oper_host_;
+	const std::string			oper_type_;
 
 	//client
-	unsigned int				sock_count_;
 	std::map<SOCKET, Client*>	client_map_;
 	fd_set						read_set_;
 	fd_set						write_set_;
