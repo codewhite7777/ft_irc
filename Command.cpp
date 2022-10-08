@@ -432,6 +432,7 @@ void		Command::kill(Client* clnt)
 	std::string		target_nick;
 	std::string		comment;
 	std::size_t		pos_space_found(0);
+	Client*			target_clnt;
 
 	// parsing for target_nick and comment
 	pos_space_found = params.find(' ');
@@ -452,6 +453,13 @@ void		Command::kill(Client* clnt)
 		// ERR_NOPRIVILEGES
 		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
 		return ;
+	}
+
+	target_clnt = sv_->findClient(target_nick);
+	if (target_clnt == NULL)
+	{
+		// ERR_NOSUCHNICK
+		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, target_nick));
 	}
 
 
