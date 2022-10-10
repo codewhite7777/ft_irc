@@ -27,34 +27,25 @@ SRC_FILE	=	main.cpp \
 				utils.cpp \
 				Singleton.cpp
 
-#privmsg.cpp
-#quit.cpp
-#kick.cpp
-#invite.cpp
-#join.cpp
-#part.cpp
-#Message.cpp
-#mode.cpp
-
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
 
-.PHONY: all
-all: $(NAME)
+%.o	:	%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) -c $< -o $@
 
 $(NAME): $(OBJ_FILE)
 	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) $^ -o $@
 
-.PHONY: clean
+all: $(NAME)
+
 clean:
 	$(RM) $(OBJ_FILE)
 
-.PHONY: fclean
 fclean: clean
 	$(RM) $(NAME)
 
-.PHONY: re
 re:
 	make fclean
 	make all
 
+.PHONY: all clean fclean re
