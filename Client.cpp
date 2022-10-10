@@ -279,13 +279,12 @@ bool	Client::isWelcomed() const
 
 void	Client::processCommand()
 {
-	std::cout << "in processCommand() ^o^\n";
-	if (command_ == "JOIN")
+	if (command_ == "PING")
+		cmd_->ping(this);
+	else if (command_ == "JOIN")
 		cmd_->join(this);
 	else if (command_ == "PART")
 		cmd_->part(this);
-	else if (command_ == "PING")
-		cmd_->ping(this);
 	else if (command_ == "PRIVMSG")
 		cmd_->privmsg(this);
 	else if (command_ == "NOTICE")
