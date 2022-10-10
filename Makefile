@@ -11,7 +11,8 @@
 # **************************************************************************** #
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
+CXXFLAGS = -Wall -Wextra -Werror
+CXXDEBUG = -g -fsanitize=address
 CXX_VERSION = -std=c++98
 RM = rm -f
 
@@ -23,7 +24,8 @@ SRC_FILE	=	main.cpp \
 				Protocol.cpp \
 				Client.cpp \
 				Channel.cpp \
-				utils.cpp
+				utils.cpp \
+				Singleton.cpp
 
 #privmsg.cpp
 #quit.cpp
@@ -41,7 +43,7 @@ BONUS_FILE =
 all: $(NAME)
 
 $(NAME): $(OBJ_FILE)
-	$(CXX) $(CXXFLAGS) $(CXX_VERSION) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) $^ -o $@
 
 .PHONY: clean
 clean:
