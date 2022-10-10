@@ -385,10 +385,10 @@ void	Server::clientDisconnect(void)
 			if (iter->second->getSendBufLength() > 0)
 				sendPacket(iter);
 			close(iter->first);
+			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second; // critical point
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
-			std::cout << iter->first << " Socket Disconnected" << std::endl;
 		}
 		else
 			iter++;

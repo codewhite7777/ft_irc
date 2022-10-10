@@ -269,7 +269,6 @@ void	Command::notice(Client* clnt)
 				clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, names[i]));
 		}
 	}
-
 }
 
 void	Command::quit(Client* clnt)

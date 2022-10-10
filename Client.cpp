@@ -231,6 +231,8 @@ std::string	Client::extractFirstMsg(std::string& recv_buf)
 
 void	Client::processProtocol(void)
 {
+	if (command_.empty() && param_.empty())
+		return ;
 	if (isWelcomed() == false)
 		processToWelcome();
 	else
@@ -260,7 +262,7 @@ void	Client::processToWelcome()
 		welcomed_ = true;
 		appendToSendBuf(proto_->rplWelcome(this));
 		appendToSendBuf(proto_->rplYourHost(this));
-		appendToSendBuf(proto_->rplCreated(this));
+		//appendToSendBuf(proto_->rplCreated(this));
 		appendToSendBuf(proto_->rplMyInfo(this));
 	}
 }
