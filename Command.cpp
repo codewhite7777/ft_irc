@@ -563,6 +563,7 @@ void		Command::die(Client* clnt)
 		// setting Server status off
 		sv_->setStatusOff();
 	}
+	else
 	{
 		// ERR_NOPRIVILEGES
 		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
