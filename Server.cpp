@@ -33,7 +33,8 @@ Server::Server(int argc, char *argv[])
 	, cmd_(NULL)
 	, proto_(NULL)
 	, name_("irc.server")
-	, version_("ft_irc-mandatory")
+	, version_("ft_irc-v1.0")
+	, created_time_(time(NULL))
 	, sock_count_(0)
 	, oper_name_("root")
 	, oper_pwd_("12345")
@@ -108,6 +109,11 @@ Command*	Server::getCommand() const
 Protocol*	Server::getProtocol() const
 {
 	return proto_;
+}
+
+std::string		Server::getCreatedDateAsString() const
+{
+	return (ctime(&created_time_));
 }
 
 const std::string&	Server::getName(void) const

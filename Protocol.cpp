@@ -66,7 +66,7 @@ std::string     Protocol::rplCreated(Client* clnt)
 	ret += RPL_CREATED;
 	ret += " " + clnt->getNickname();
 	ret += " :This server was created ";
-	ret += "05:22:40 Sep 25 2022"; // todo: sv_->getCreatedDate()
+	ret += sv_->getCreatedDateAsString();
 	ret += "\r\n";
 	return ret;
 }
