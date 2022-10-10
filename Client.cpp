@@ -6,7 +6,7 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/10/01 16:45:25 by mgo              ###   ########.fr       */
+/*   Updated: 2022/10/03 13:52:29 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Client::Client(SOCKET sdes, std::string hostname, Server* sv)
 	, user_flag_(false)
 	, hostname_(hostname)
 	, disconnect_flag_(false)
+	, sv_oper_flag_(false)
 	, passed_(false)
 	, welcomed_(false)
 	, sv_(sv)
@@ -71,6 +72,11 @@ void	Client::processMessageInRecvBuf()
 	marshalMessage(command_, param_);
 	processProtocol();
 	//clearCommandAndParam();
+}
+
+const std::string&	Client::getCommand() const
+{
+	return command_;
 }
 
 const std::string&	Client::getParam(void) const
@@ -166,6 +172,16 @@ bool				Client::getUserFlag() const
 std::string			Client::getNamesPrefix() const
 {
 	return (":" + nickname_ + "!" + username_ + "@" + hostname_ + " ");
+}
+
+void				Client::setSvOperFlagOn()
+{
+	this->sv_oper_flag_ = true;
+}
+
+bool				Client::isSvOper() const
+{
+	return (this->sv_oper_flag_);
 }
 
 void	Client::marshalMessage(std::string& command__, std::string& param__)
@@ -268,6 +284,25 @@ void	Client::processCommand()
 		cmd_->part(this);
 	else if (command_ == "PING")
 		cmd_->ping(this);
+	else if (command_ == "PRIVMSG")
+		cmd_->privmsg(this);
+	else if (command_ == "NOTICE")
+		cmd_->notice(this);
+	else if (command_ == "QUIT")
+		cmd_->quit(this);
+	else if (command_ == "KICK")
+		cmd_->kick(this);
+	else if (command_ == "MODE")
+		cmd_->mode(this);
+	else if (command_ == "INVITE")
+		cmd_->invite(this);
+	else if (command_ == "OPER")
+		cmd_->oper(this);
+	else if (command_ == "kill")
+		cmd_->kill(this);
+	else if (command_ == "die"\
+		 || (command_.empty() && param_ == "die"))
+		cmd_->die(this);
 }
 
 std::string&	Client::getSendBuf(void)

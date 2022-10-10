@@ -16,6 +16,7 @@
 # include "Client.hpp"
 # include <string>
 # include <map>
+# include <list>
 
 class Channel
 {
@@ -23,14 +24,19 @@ public:
 	Channel(std::string name);	// todo: use reference?
 	~Channel(void);
 	// todo: OCCF
-
 	
 	std::size_t			getCurrUserCount(void) const;
 	void				assignAsUser(Client* clnt);
 	void				assignAsOperator(Client* clnt);
 
-	void				eraseUser(Client* clnt);
-	void				eraseOperator(Client* clnt);
+	// todo: eraseClntInChannel(Client* clnt);
+	/*
+		-> erase client as user in channel, 
+			if channel operator erase client as operator
+	*/
+
+	void				eraseAsUser(Client* clnt);
+	void				eraseAsOperator(Client* clnt);
 
 	const std::string&	getName(void) const;
 
@@ -40,9 +46,16 @@ public:
 
 	void				sendToAll(std::string msg);
 
-private:
-	bool				isAlreadyIn(Client* clnt); // todo: remove
+	void				sendToOthers(Client* clnt, std::string msg);
 
+	bool				isUserIn(Client* clnt);
+
+	std::list<Client*>*	makeClntListInChannExceptOne(Client* clnt_to_excpt);
+
+	void				eraseClntIfIs(Client* clnt);
+
+
+private:
 	Channel(void);
 
 	std::string						name_;

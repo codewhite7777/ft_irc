@@ -30,11 +30,15 @@
 
 Server::Server(int argc, char *argv[])
 	: status_(true)
-	, cmd_(new Command(this))
-	, proto_(new Protocol(this))
+	, cmd_(NULL)
+	, proto_(NULL)
 	, name_("irc.server")
 	, version_("ft_irc-mandatory")
 	, sock_count_(0)
+	, oper_name_("root")
+	, oper_pwd_("12345")
+	, oper_host_("127.0.0.1")
+	, oper_type_("ServerAdmin")
 {
 	//argument check (port, pwd)
 	if (argc != 3)
@@ -59,9 +63,6 @@ Server::Server(int argc, char *argv[])
 		return ;
 	}
 
-	//set operator pwd
-	//s_operator_pwd_ = "admin";
-
 	//network init
 	networkInit();
 }
@@ -69,8 +70,22 @@ Server::Server(int argc, char *argv[])
 Server::~Server(void)
 {
 	networkClose();
-	delete cmd_;
-	delete proto_;
+
+	// delete all channels
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		delete chann_it->second;
+		chann_it->second = NULL;
+		//chann_it = chann_map_.erase(chann_it);
+	}
+}
+
+void	Server::equipCommandAndProtocol(Command* cmd, Protocol* proto)
+{
+	cmd_ = cmd;
+	proto_ = proto;
 }
 
 bool	Server::getStatus(void) const
@@ -345,67 +360,6 @@ bool	Server::isOverlapNickName(std::string& search_nick)
 	return (false);
 }
 
-/*
-void	Server::requestCommand(std::map<SOCKET, Client*>::iterator &iter, \
-						std::string& command, std::string& param)
-{
-	// if (command == "PONG")
-	// 	return ;
-	if (command == "PASS" || command == "USER")
-		insertSendBuffer(iter->second, buildErrPacket(ERR_ALREADYREGISTRED, iter->second->getUserName(), "already registered \r\n"));
-	else if (command == "PING")
-	{
-		STRING msg = ":" + host_name_ + " PONG "+ host_name_ +  " :\r\n";
-		insertSendBuffer(iter->second, msg);
-		// PONG csd.bu.edu tolsun.oulu.fi
-	}
-	else if (command == "PONG")
-		return ;
-	else if (command == "JOIN")
-	{
-		//TODO : 채널 구조 구상 및 구현
-		std::cout << "command : join " << std::endl;
-		requestJoin(iter, command, param);
-	}
-	else if (command == "PART")
-	{
-		std::cout << "command : PART " << std::endl;
-		requestPart(iter, command, param);
-	}
-	else if (command == "QUIT")
-	{
-		std::cout << "command : quit " << std::endl;
-
-		iter->second->setDisconnectFlag(true);
-		quitTest(iter, command, param);
-		return ;
-	}
-	else if (command == "PRIVMSG" || command == "NOTICE")
-	{
-		std::cout << "command : privmsg" << std::endl;
-		requestPrivateMsg(iter, command, param);
-	}
-	else if (command == "MODE")
-	{
-		std::cout << "command : " << command << ", param : " << param << std::endl;
-		//requestMode(iter, command, param);
-	}
-	else if (command == "KICK")
-	{
-		std::cout << "command : KICK " << std::endl;
-		requestKickMsg(iter, command, param);
-	}
-	else if (command == "INVITE")
-	{
-		std::cout << "command : INVITE " << std::endl;
-		inviteTest(iter, command, param);
-	}
-	else
-		insertSendBuffer(iter->second, buildErrPacket(ERR_UNKNOWNCOMMAND, iter->second->getUserName(), "Unknown command \r\n"));
-	return ;
-}
-*/
-
 void	Server::processClientMessages()
 {
 	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()\
@@ -428,18 +382,19 @@ void	Server::clientDisconnect(void)
 	{
 		if (iter->second->getDisconnectFlag() == true)
 		{
-			std::cout << iter->first << " Socket Disconnected" << std::endl;
+			if (iter->second->getSendBufLength() > 0)
+				sendPacket(iter);
 			close(iter->first);
 			delete iter->second; // critical point
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
+			std::cout << iter->first << " Socket Disconnected" << std::endl;
 		}
 		else
 			iter++;
 	}
 }
 
-// join
 Channel*	Server::findChannel(std::string chann_name)
 {
 	std::map<std::string, Channel*>::iterator	chann_it;
@@ -454,5 +409,111 @@ Channel*	Server::findChannel(std::string chann_name)
 void		Server::assignNewChannel(Channel* new_chann)
 {
 	chann_map_.insert(std::make_pair(new_chann->getName(), new_chann));
-	// Channel.name is reference... is ok?
+	// Channel.name is reference... is ok? Watching continuely...
+}
+
+Client*		Server::findClient(std::string clnt_nickname)
+{
+	for (std::map<SOCKET, Client*>::iterator clnt_it(client_map_.begin())
+		; clnt_it != client_map_.end()
+		; ++clnt_it)
+	{
+		// todo: using clnt_ptr;
+		if (clnt_nickname == clnt_it->second->getNickname())
+			return (clnt_it->second);
+	}
+	return NULL;
+}
+
+std::list<Client*>*		Server::makeOtherClntListInSameChanns(Client* clnt)
+{
+	std::list<Client*>*	ret(NULL);
+	Channel*			chann_ptr(NULL);
+	std::list<Client*>*	each_clnt_list(NULL);
+
+	ret = new std::list<Client*>;
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		chann_ptr = chann_it->second;
+		each_clnt_list = chann_ptr->makeClntListInChannExceptOne(clnt);
+		ret->assign(each_clnt_list->begin(), each_clnt_list->end());
+		delete each_clnt_list;
+		each_clnt_list = NULL;
+		chann_ptr = NULL;
+	}
+	ret->unique();
+	return ret;
+}
+
+void				Server::requestAllChannsToEraseOneUser(Client* clnt)
+{
+	Channel*	each_chann_ptr(NULL);
+
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		each_chann_ptr = chann_it->second;
+		each_chann_ptr->eraseClntIfIs(clnt);
+		each_chann_ptr = NULL;
+	}
+}
+
+bool		Server::isOperName(std::string name)
+{
+	if (this->oper_name_ == name)
+		return true;
+	else
+		return false;
+}
+
+bool		Server::isOperPassword(std::string password)
+{
+	if (this->oper_pwd_ == password)
+		return true;
+	else
+		return false;
+}
+
+bool		Server::isOperHost(std::string hostname)
+{
+	if (this->oper_host_ == hostname)
+		return true;
+	else
+		return false;
+}
+
+const std::string&	Server::getOperType() const
+{
+	return (this->oper_type_);
+}
+
+void		Server::requestAllClientsToDisconnect()
+{
+	for (std::map<SOCKET, Client *>::iterator clnt_it = client_map_.begin()
+		; clnt_it != client_map_.end()
+		; clnt_it++)
+	{
+		clnt_it->second->setDisconnectFlag(true);
+	}
+}
+
+void		Server::sendErrorClosingLinkProtoToAllClientsWithMsg(\
+													std::string msg)
+{
+	Client*		each_clnt;
+	for (std::map<SOCKET, Client *>::iterator clnt_it = client_map_.begin()
+		; clnt_it != client_map_.end()
+		; clnt_it++)
+	{
+		each_clnt = clnt_it->second;
+		each_clnt->appendToSendBuf(proto_->errorClosingLink(each_clnt, msg));
+	}
+}
+
+void		Server::setStatusOff()
+{
+	this->status_ = false;
 }

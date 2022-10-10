@@ -22,7 +22,7 @@ class Command
 {
 public:
 	// todo: OCCF
-	Command(Server* sv);
+	Command(Server* sv, Protocol* proto);
 	~Command(void);
 
 	// PASS
@@ -34,6 +34,10 @@ public:
 	// USER
 	void    user(Client* clnt);
 
+	// PING
+	void	ping(Client* clnt);
+	//void	pong(Client* clnt);
+
 	// JOIN
 	void    join(Client* clnt);
 
@@ -41,16 +45,31 @@ public:
 	void    part(Client* clnt);
 
 	// PRIVMSG
-	void    privmsg();
+	void    privmsg(Client* clnt);
+
+	// NOTICE
+	void	notice(Client* clnt);
 
 	// QUIT
 	void    quit(Client* clnt);
 
-	// INVITE
-	void    invite();
+	// KICK
+	void	kick(Client* clnt);
 
-	void	ping(Client* clnt);
-	void	pong(Client* clnt);
+	// MODE
+	void	mode(Client* clnt);
+
+	// INVITE
+	void    invite(Client* clnt);
+
+	// OPER
+	void	oper(Client* clnt);
+
+	// KILL
+	void	kill(Client* clnt);
+
+	// DIE
+	void	die(Client* clnt);
 
 private:
 	Server*     sv_;
