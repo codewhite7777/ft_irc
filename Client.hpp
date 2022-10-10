@@ -87,6 +87,7 @@ private:
 	bool					isPassed() const;
 	bool					isWelcomed() const;
 	void					processCommand();
+	void					clearCommandAndParam();
 
 	std::string&			getRecvBuf(void);
 	std::string&			getSendBuf(void);

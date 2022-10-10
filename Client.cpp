@@ -71,7 +71,7 @@ void	Client::processMessageInRecvBuf()
 {
 	marshalMessage(command_, param_);
 	processProtocol();
-	//clearCommandAndParam();
+	clearCommandAndParam();
 }
 
 const std::string&	Client::getCommand() const
@@ -262,7 +262,7 @@ void	Client::processToWelcome()
 		welcomed_ = true;
 		appendToSendBuf(proto_->rplWelcome(this));
 		appendToSendBuf(proto_->rplYourHost(this));
-		//appendToSendBuf(proto_->rplCreated(this));
+		appendToSendBuf(proto_->rplCreated(this));
 		appendToSendBuf(proto_->rplMyInfo(this));
 	}
 }
@@ -304,6 +304,12 @@ void	Client::processCommand()
 	else if (command_ == "die"\
 		 || (command_.empty() && param_ == "die"))
 		cmd_->die(this);
+}
+
+void			Client::clearCommandAndParam()
+{
+	command_.clear();
+	param_.clear();
 }
 
 std::string&	Client::getSendBuf(void)

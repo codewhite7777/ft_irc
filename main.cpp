@@ -14,7 +14,6 @@
 #include "Command.hpp"
 #include "Protocol.hpp"
 #include "Singleton.hpp"
-
 #include <iostream>
 
 static void	singleton_equip_server(Server* ptr_sv)
