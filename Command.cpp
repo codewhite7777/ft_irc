@@ -40,11 +40,16 @@ void    Command::nick(Client* clnt)
 
 	if (sv_->isOverlapNickName(tmp_nick))
 	{
-		clnt->appendToSendBuf(proto_->errNicknameInUse(tmp_nick));
+		if (tmp_nick != clnt->getNickname())
+			clnt->appendToSendBuf(proto_->errNicknameInUse(tmp_nick));
 	}
-	else if (tmp_nick == "")
+	else if (tmp_nick.empty())
 	{
 		clnt->appendToSendBuf(proto_->errNoNicknameGiven());
+	}
+	else if (tmp_nick.length() > 30)
+	{
+		clnt->appendToSendBuf(proto_->errErroneusNickname(clnt, tmp_nick));
 	}
 	else
 	{

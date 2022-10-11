@@ -363,8 +363,20 @@ std::string     Protocol::errNoNicknameGiven()
 	std::string ret;
 
 	ret = sv_->getNamePrefix();
-	ret = ERR_NONICKNAMEGIVEN;
+	ret += ERR_NONICKNAMEGIVEN;
 	ret += " :No nickname is given.\r\n";
+	return ret;
+}
+
+std::string		Protocol::errErroneusNickname(Client* clnt, std::string nick)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_ERRONEUSNICKNAME;
+	ret += " " + clnt->getNickname();
+	ret += " " + nick;
+	ret += " :Erroneus Nickname\r\n";
 	return ret;
 }
 
