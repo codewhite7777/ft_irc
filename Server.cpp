@@ -467,6 +467,21 @@ void				Server::requestAllChannsToEraseOneUser(Client* clnt)
 	}
 }
 
+void				Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+														std::string nick_to_key)
+{
+	Channel*	each_chann_ptr(NULL);
+
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		each_chann_ptr = chann_it->second;
+		each_chann_ptr->replaceClntKeyNick(clnt, nick_to_key);
+		each_chann_ptr = NULL;
+	}
+}
+
 bool		Server::isOperName(std::string name)
 {
 	if (this->oper_name_ == name)

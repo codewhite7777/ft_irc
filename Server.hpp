@@ -59,7 +59,9 @@ public:
 	std::list<Client*>*		makeOtherClntListInSameChanns(Client* clnt);
 
 	void					requestAllChannsToEraseOneUser(Client* clnt);
-	
+	void					requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+														std::string nick_to_key);
+
 	bool					isOperName(std::string name);
 	bool					isOperPassword(std::string password);
 	bool					isOperHost(std::string hostname);
@@ -68,8 +70,8 @@ public:
 	void					requestAllClientsToDisconnect();
 	void					sendErrorClosingLinkProtoToAllClientsWithMsg(\
 															std::string msg);
-	void					setStatusOff();
-	
+
+	void					setStatusOff();	
 
 private:
 	//configure port

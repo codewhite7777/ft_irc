@@ -54,6 +54,9 @@ public:
 
 	void				eraseClntIfIs(Client* clnt);
 
+	void				replaceClntKeyNick(Client* clnt, \
+											std::string nick_to_key);
+
 
 private:
 	Channel(void);

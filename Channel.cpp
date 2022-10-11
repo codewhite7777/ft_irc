@@ -147,3 +147,23 @@ void			Channel::eraseClntIfIs(Client* clnt)
 	eraseAsOperator(clnt);
 	eraseAsUser(clnt);
 }
+
+void			Channel::replaceClntKeyNick(Client* clnt, \
+											std::string nick_to_key)
+{
+	std::map<std::string, Client*>::iterator	user_it;
+	std::map<std::string, Client*>::iterator	oper_it;
+
+	user_it = users_.find(clnt->getNickname());
+	if (user_it != users_.end())
+	{
+		users_.erase(user_it);
+		users_.insert(std::make_pair(nick_to_key, clnt));
+	}
+	oper_it = opers_.find(clnt->getNickname());
+	if (oper_it != opers_.end())
+	{
+		opers_.erase(oper_it);
+		opers_.insert(std::make_pair(nick_to_key, clnt));
+	}
+}

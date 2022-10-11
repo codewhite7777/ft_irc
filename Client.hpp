@@ -46,7 +46,8 @@ public:
 
 	const std::string&		getCommand() const;
 	const std::string&		getParam() const;
-	
+
+	bool					isWelcomed() const;
 
 	//client disconnect flag getter/setter
 	bool					getDisconnectFlag(void) const;
@@ -85,7 +86,7 @@ private:
 	void					processProtocol();
 	void					processAuthToWelcome();
 	bool					isPassed() const;
-	bool					isWelcomed() const;
+	
 	void					processCommand();
 	void					clearCommandAndParam();
 

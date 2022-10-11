@@ -61,13 +61,13 @@ bool	isNotAlnumIn(std::string str)
 void    Command::nick(Client* clnt)
 {
 	std::string			param(clnt->getParam());
-	std::string     	tmp_nick(clnt->getParam());
+	std::string     	tmp_nick;
 	std::size_t			pos_found_ws(0);
-	//std::list<Client*>*	clnts_in_same_channs(NULL);
+	std::list<Client*>*	clnts_in_same_channs(NULL);
+	Client*				each_clnt_ptr(NULL);
 
 	pos_found_ws = param.find_first_of(" \n\r\t\f\v");
 	tmp_nick = param.substr(0, pos_found_ws);
-	std::cout << "tmp_nick: [" << tmp_nick << "]\n";
 	if (sv_->isOverlapNickName(tmp_nick))
 	{
 		if (tmp_nick != clnt->getNickname())
@@ -84,14 +84,28 @@ void    Command::nick(Client* clnt)
 	}
 	else
 	{
-		// sending to the commander and others in channels the commander is in.
-		//proto_->clntNick(clnt, tmp_nick);
-		
-
+		if (clnt->isWelcomed())
+		{
+			// sending client nick protocol to the commander and others in channels the commander is in.
+			clnt->appendToSendBuf(proto_->clntNick(clnt, tmp_nick));
+			clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
+			for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
+				; each_clnt_it != clnts_in_same_channs->end()
+				; ++each_clnt_it)
+			{
+				each_clnt_ptr = *each_clnt_it;
+				each_clnt_ptr->appendToSendBuf(proto_->clntNick(clnt, tmp_nick));
+				each_clnt_ptr = NULL;
+			}
+			delete clnts_in_same_channs;
+			// replacing client key nick in each channel
+			sv_->requestAllChannsToReplaceKeyNickOfUser(clnt, tmp_nick);
+		}
+		else
+		{
+			clnt->setNickFlagOn();
+		}
 		clnt->setNickname(tmp_nick);
-		clnt->setNickFlagOn();
-
-		// set client key nick value 
 
 		// test: print
 		{

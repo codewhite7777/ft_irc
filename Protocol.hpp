@@ -47,6 +47,7 @@ public:
 	std::string		clntNoticeToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
 	std::string		clntQuit(Client* clnt, std::string msg);
+	std::string		clntNick(Client* clnt, std::string nick);
 	std::string		errorClosingLink(Client* clnt, std::string msg);
 	std::string		msgPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \

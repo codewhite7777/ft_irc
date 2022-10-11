@@ -248,6 +248,17 @@ std::string		Protocol::clntQuit(Client* clnt, std::string msg)
 	return ret;
 }
 
+std::string		Protocol::clntNick(Client* clnt, std::string nick)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "NICK :";
+	ret += nick;
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg)
 {
