@@ -17,8 +17,10 @@
 # include <netinet/in.h>
 # include <map>
 # include <list>
-# include <ctime>
 
+#include "Chatbot.hpp"
+
+# include <ctime>
 //# include "Command.hpp"
 //# include "Protocol.hpp"
 
@@ -70,8 +72,7 @@ public:
 	void					requestAllClientsToDisconnect();
 	void					sendErrorClosingLinkProtoToAllClientsWithMsg(\
 															std::string msg);
-
-	void					setStatusOff();	
+	void					setStatusOff();
 
 private:
 	//configure port
@@ -134,6 +135,9 @@ private:
 
 	//channel
 	std::map<std::string, Channel*>	chann_map_;
+
+	// bot
+	ChatBot night_bot;
 };
 
 #endif

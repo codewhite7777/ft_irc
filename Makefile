@@ -25,7 +25,8 @@ SRC_FILE	=	main.cpp \
 				Client.cpp \
 				Channel.cpp \
 				utils.cpp \
-				Singleton.cpp
+				Singleton.cpp \
+				Chatbot.cpp
 
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 BONUS_FILE =
