@@ -66,7 +66,7 @@ std::string     Protocol::rplCreated(Client* clnt)
 	ret += RPL_CREATED;
 	ret += " " + clnt->getNickname();
 	ret += " :This server was created ";
-	ret += "05:22:40 Sep 25 2022"; // todo: sv_->getCreatedDate()
+	ret += sv_->getCreatedDateAsString();
 	ret += "\r\n";
 	return ret;
 }
@@ -248,6 +248,17 @@ std::string		Protocol::clntQuit(Client* clnt, std::string msg)
 	return ret;
 }
 
+std::string		Protocol::clntNick(Client* clnt, std::string nick)
+{
+	std::string	ret;
+
+	ret = clnt->getNamesPrefix();
+	ret += "NICK :";
+	ret += nick;
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg)
 {
@@ -346,25 +357,38 @@ std::string     Protocol::errNotPassCmd()
 	return ret;
 }
 
-std::string     Protocol::errNicknameInUse(const std::string& nick)
+std::string     Protocol::errNicknameInUse(Client* clnt, std::string nick)
 {
 	std::string ret;
 
 	ret = sv_->getNamePrefix();
 	ret += ERR_NICKNAMEINUSE;
-	ret += " *";
+	ret += " " + clnt->getNickname();
 	ret += " " + nick;
 	ret += " :Nickname is already in use.\r\n";
 	return ret;
 }
 
-std::string     Protocol::errNoNicknameGiven()
+std::string     Protocol::errNoNicknameGiven(Client* clnt)
 {
 	std::string ret;
 
 	ret = sv_->getNamePrefix();
-	ret = ERR_NONICKNAMEGIVEN;
+	ret += ERR_NONICKNAMEGIVEN;
+	ret += " " + clnt->getNickname();
 	ret += " :No nickname is given.\r\n";
+	return ret;
+}
+
+std::string		Protocol::errErroneusNickname(Client* clnt, std::string nick)
+{
+	std::string	ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_ERRONEUSNICKNAME;
+	ret += " " + clnt->getNickname();
+	ret += " " + nick;
+	ret += " :Erroneus Nickname\r\n";
 	return ret;
 }
 

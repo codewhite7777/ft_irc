@@ -47,6 +47,7 @@ public:
 	std::string		clntNoticeToClnt(Client* clnt_send, std::string msg, \
 										Client* clnt_recv);
 	std::string		clntQuit(Client* clnt, std::string msg);
+	std::string		clntNick(Client* clnt, std::string nick);
 	std::string		errorClosingLink(Client* clnt, std::string msg);
 	std::string		msgPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \
@@ -57,12 +58,13 @@ public:
 	std::string		clntKillClnt(Client* clnt, \
 									Client* target_clnt, std::string msg);
 
-	//std::string		errorClosingLinkKilled(Client* clnt, std::string msg);
-
 	std::string		errWrongPasswd();
 	std::string		errNotPassCmd();
-	std::string		errNicknameInUse(const std::string& nick);
-	std::string		errNoNicknameGiven();
+
+	std::string		errNicknameInUse(Client* clnt, std::string nick);
+	std::string		errNoNicknameGiven(Client* clnt);
+	std::string		errErroneusNickname(Client* clnt, std::string nick);
+
 	std::string		errNeedMoreParams();	
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);

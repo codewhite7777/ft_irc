@@ -34,22 +34,55 @@ void    Command::pass(Client* clnt)
 	}
 }
 
+
 void    Command::nick(Client* clnt)
 {
-	std::string     tmp_nick(clnt->getParam());
+	std::string			param(clnt->getParam());
+	std::string     	tmp_nick;
+	std::size_t			pos_found_ws(0);
+	std::list<Client*>*	clnts_in_same_channs(NULL);
+	Client*				each_clnt_ptr(NULL);
 
+	pos_found_ws = param.find_first_of(" \n\r\t\f\v");
+	tmp_nick = param.substr(0, pos_found_ws);
 	if (sv_->isOverlapNickName(tmp_nick))
 	{
-		clnt->appendToSendBuf(proto_->errNicknameInUse(tmp_nick));
+		if (tmp_nick != clnt->getNickname())
+			clnt->appendToSendBuf(proto_->errNicknameInUse(clnt, tmp_nick));
 	}
-	else if (tmp_nick == "")
+	else if (tmp_nick.empty())
 	{
-		clnt->appendToSendBuf(proto_->errNoNicknameGiven());
+		clnt->appendToSendBuf(proto_->errNoNicknameGiven(clnt));
+	}
+	else if (tmp_nick.length() > 30 || isnumber(tmp_nick.front()) \
+			|| isOnlyNums(tmp_nick) || isNotAlnumAndUnderscore(tmp_nick))
+	{
+		clnt->appendToSendBuf(proto_->errErroneusNickname(clnt, tmp_nick));
 	}
 	else
 	{
+		if (clnt->isWelcomed())
+		{
+			// sending client nick protocol to the commander and others in channels the commander is in.
+			clnt->appendToSendBuf(proto_->clntNick(clnt, tmp_nick));
+			clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
+			for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
+				; each_clnt_it != clnts_in_same_channs->end()
+				; ++each_clnt_it)
+			{
+				each_clnt_ptr = *each_clnt_it;
+				each_clnt_ptr->appendToSendBuf(proto_->clntNick(clnt, tmp_nick));
+				each_clnt_ptr = NULL;
+			}
+			delete clnts_in_same_channs;
+			// replacing client key nick in each channel
+			sv_->requestAllChannsToReplaceKeyNickOfUser(clnt, tmp_nick);
+		}
+		else
+		{
+			clnt->setNickFlagOn();
+		}
 		clnt->setNickname(tmp_nick);
-		clnt->setNickFlagOn();
 
 		// test: print
 		{
@@ -269,7 +302,6 @@ void	Command::notice(Client* clnt)
 				clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, names[i]));
 		}
 	}
-
 }
 
 void	Command::quit(Client* clnt)
@@ -358,16 +390,6 @@ void	Command::kick(Client* clnt)
 	{
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, nick));
 	}
-}
-
-void	Command::mode(Client* clnt)
-{
-	std::string		params(clnt->getParam());
-	//std::string		target;
-	//std::string		modestring;
-	//std::string		mode_args;
-
-	(void)params;
 }
 
 void    Command::invite(Client* clnt)

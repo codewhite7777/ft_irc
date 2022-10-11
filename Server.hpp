@@ -17,6 +17,7 @@
 # include <netinet/in.h>
 # include <map>
 # include <list>
+# include <ctime>
 
 //# include "Command.hpp"
 //# include "Protocol.hpp"
@@ -41,6 +42,8 @@ public:
 	Command*				getCommand() const;
 	Protocol*				getProtocol() const;
 
+	std::string				getCreatedDateAsString() const;
+
 	const std::string&		getName(void) const;
 	std::string				getNamePrefix() const;
 	const std::string&		getVersion() const;
@@ -56,7 +59,9 @@ public:
 	std::list<Client*>*		makeOtherClntListInSameChanns(Client* clnt);
 
 	void					requestAllChannsToEraseOneUser(Client* clnt);
-	
+	void					requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+														std::string nick_to_key);
+
 	bool					isOperName(std::string name);
 	bool					isOperPassword(std::string password);
 	bool					isOperHost(std::string hostname);
@@ -65,8 +70,8 @@ public:
 	void					requestAllClientsToDisconnect();
 	void					sendErrorClosingLinkProtoToAllClientsWithMsg(\
 															std::string msg);
-	void					setStatusOff();
-	
+
+	void					setStatusOff();	
 
 private:
 	//configure port
@@ -107,6 +112,7 @@ private:
 	//server info
 	std::string					name_;
 	const std::string			version_;
+	const time_t				created_time_;
 
 	//network
 	SOCKET						listen_sock_;

@@ -33,7 +33,8 @@ Server::Server(int argc, char *argv[])
 	, cmd_(NULL)
 	, proto_(NULL)
 	, name_("irc.server")
-	, version_("ft_irc-mandatory")
+	, version_("ft_irc-v1.0")
+	, created_time_(time(NULL))
 	, sock_count_(0)
 	, oper_name_("root")
 	, oper_pwd_("12345")
@@ -108,6 +109,11 @@ Command*	Server::getCommand() const
 Protocol*	Server::getProtocol() const
 {
 	return proto_;
+}
+
+std::string		Server::getCreatedDateAsString() const
+{
+	return (ctime(&created_time_));
 }
 
 const std::string&	Server::getName(void) const
@@ -385,10 +391,10 @@ void	Server::clientDisconnect(void)
 			if (iter->second->getSendBufLength() > 0)
 				sendPacket(iter);
 			close(iter->first);
+			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second; // critical point
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
-			std::cout << iter->first << " Socket Disconnected" << std::endl;
 		}
 		else
 			iter++;
@@ -457,6 +463,21 @@ void				Server::requestAllChannsToEraseOneUser(Client* clnt)
 	{
 		each_chann_ptr = chann_it->second;
 		each_chann_ptr->eraseClntIfIs(clnt);
+		each_chann_ptr = NULL;
+	}
+}
+
+void				Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+														std::string nick_to_key)
+{
+	Channel*	each_chann_ptr(NULL);
+
+	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		each_chann_ptr = chann_it->second;
+		each_chann_ptr->replaceClntKeyNick(clnt, nick_to_key);
 		each_chann_ptr = NULL;
 	}
 }
