@@ -83,7 +83,7 @@ private:
 	std::string				extractFirstMsg(std::string& recv_buf);
 
 	void					processProtocol();
-	void					processToWelcome();
+	void					processAuthToWelcome();
 	bool					isPassed() const;
 	bool					isWelcomed() const;
 	void					processCommand();

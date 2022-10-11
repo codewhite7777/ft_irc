@@ -234,12 +234,12 @@ void	Client::processProtocol(void)
 	if (command_.empty() && param_.empty())
 		return ;
 	if (isWelcomed() == false)
-		processToWelcome();
+		processAuthToWelcome();
 	else
 		processCommand();
 }
 
-void	Client::processToWelcome()
+void	Client::processAuthToWelcome()
 {
 	if (getPassFlag() == false)
 	{
@@ -295,6 +295,8 @@ void	Client::processCommand()
 		cmd_->kick(this);
 	else if (command_ == "INVITE")
 		cmd_->invite(this);
+	else if (command_ == "NICK")
+		cmd_->nick(this);
 	else if (command_ == "OPER")
 		cmd_->oper(this);
 	else if (command_ == "kill")

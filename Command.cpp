@@ -34,27 +34,64 @@ void    Command::pass(Client* clnt)
 	}
 }
 
+bool	isOnlyNums(std::string str)
+{
+	for (std::string::iterator it = str.begin()
+		; it != str.end()
+		; ++it)
+	{
+		if (isnumber(*it) == false)
+			return false;
+	}
+	return true;
+}
+
+bool	isNotAlnumIn(std::string str)
+{
+	for (std::string::iterator it = str.begin()
+		; it != str.end()
+		; ++it)
+	{
+		if (isalnum(*it) == false)
+			return true;
+	}
+	return false;
+}
+
 void    Command::nick(Client* clnt)
 {
-	std::string     tmp_nick(clnt->getParam());
+	std::string			param(clnt->getParam());
+	std::string     	tmp_nick(clnt->getParam());
+	std::size_t			pos_found_ws(0);
+	//std::list<Client*>*	clnts_in_same_channs(NULL);
 
+	pos_found_ws = param.find_first_of(" \n\r\t\f\v");
+	tmp_nick = param.substr(0, pos_found_ws);
+	std::cout << "tmp_nick: [" << tmp_nick << "]\n";
 	if (sv_->isOverlapNickName(tmp_nick))
 	{
 		if (tmp_nick != clnt->getNickname())
-			clnt->appendToSendBuf(proto_->errNicknameInUse(tmp_nick));
+			clnt->appendToSendBuf(proto_->errNicknameInUse(clnt, tmp_nick));
 	}
 	else if (tmp_nick.empty())
 	{
-		clnt->appendToSendBuf(proto_->errNoNicknameGiven());
+		clnt->appendToSendBuf(proto_->errNoNicknameGiven(clnt));
 	}
-	else if (tmp_nick.length() > 30)
+	else if (tmp_nick.length() > 30 || isnumber(tmp_nick.front()) \
+			|| isOnlyNums(tmp_nick) || isNotAlnumIn(tmp_nick))
 	{
 		clnt->appendToSendBuf(proto_->errErroneusNickname(clnt, tmp_nick));
 	}
 	else
 	{
+		// sending to the commander and others in channels the commander is in.
+		//proto_->clntNick(clnt, tmp_nick);
+		
+
 		clnt->setNickname(tmp_nick);
 		clnt->setNickFlagOn();
+
+		// set client key nick value 
 
 		// test: print
 		{
