@@ -46,7 +46,8 @@ public:
 
 	const std::string&		getCommand() const;
 	const std::string&		getParam() const;
-	
+
+	bool					isWelcomed() const;
 
 	//client disconnect flag getter/setter
 	bool					getDisconnectFlag(void) const;
@@ -83,10 +84,11 @@ private:
 	std::string				extractFirstMsg(std::string& recv_buf);
 
 	void					processProtocol();
-	void					processToWelcome();
+	void					processAuthToWelcome();
 	bool					isPassed() const;
-	bool					isWelcomed() const;
+	
 	void					processCommand();
+	void					clearCommandAndParam();
 
 	std::string&			getRecvBuf(void);
 	std::string&			getSendBuf(void);

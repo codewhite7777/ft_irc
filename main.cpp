@@ -14,7 +14,6 @@
 #include "Command.hpp"
 #include "Protocol.hpp"
 #include "Singleton.hpp"
-
 #include <iostream>
 
 static void	singleton_equip_server(Server* ptr_sv)
@@ -27,15 +26,24 @@ static void	singleton_equip_server(Server* ptr_sv)
 static void	set_server_off(int sig)
 {
 	Singleton&	sngltn(Singleton::getInstance());
+	Server*		sv;
+	Protocol*	prtcl;
 
-	(void)sig;
-	sngltn.getServerPtr()->setStatusOff();
-	std::cout << "\nServer status offed in ser_server_off!\n";
+	sv = sngltn.getServerPtr();
+	prtcl = sv->getProtocol();
+	sv->requestAllClientsToDisconnect();
+	if (sig == SIGINT)
+		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGINT in server");
+	else if (sig == SIGQUIT)
+		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGQUIT in server");
+	sv->setStatusOff();
+	std::cout << "signum: [" << sig << "]\n";
 }
 
 static void	set_signal_handler(void)
 {
 	signal(SIGINT, set_server_off);
+	signal(SIGQUIT, set_server_off);
 }
 
 int	main(int argc, char *argv[])

@@ -21,6 +21,7 @@ Client::Client(SOCKET sdes, std::string hostname, Server* sv)
 	, pass_flag_(false)
 	, nick_flag_(false)
 	, user_flag_(false)
+	, nickname_("*")
 	, hostname_(hostname)
 	, disconnect_flag_(false)
 	, sv_oper_flag_(false)
@@ -71,7 +72,7 @@ void	Client::processMessageInRecvBuf()
 {
 	marshalMessage(command_, param_);
 	processProtocol();
-	//clearCommandAndParam();
+	clearCommandAndParam();
 }
 
 const std::string&	Client::getCommand() const
@@ -231,13 +232,15 @@ std::string	Client::extractFirstMsg(std::string& recv_buf)
 
 void	Client::processProtocol(void)
 {
+	if (command_.empty() && param_.empty())
+		return ;
 	if (isWelcomed() == false)
-		processToWelcome();
+		processAuthToWelcome();
 	else
 		processCommand();
 }
 
-void	Client::processToWelcome()
+void	Client::processAuthToWelcome()
 {
 	if (getPassFlag() == false)
 	{
@@ -277,13 +280,12 @@ bool	Client::isWelcomed() const
 
 void	Client::processCommand()
 {
-	std::cout << "in processCommand() ^o^\n";
-	if (command_ == "JOIN")
+	if (command_ == "PING")
+		cmd_->ping(this);
+	else if (command_ == "JOIN")
 		cmd_->join(this);
 	else if (command_ == "PART")
 		cmd_->part(this);
-	else if (command_ == "PING")
-		cmd_->ping(this);
 	else if (command_ == "PRIVMSG")
 		cmd_->privmsg(this);
 	else if (command_ == "NOTICE")
@@ -292,10 +294,10 @@ void	Client::processCommand()
 		cmd_->quit(this);
 	else if (command_ == "KICK")
 		cmd_->kick(this);
-	else if (command_ == "MODE")
-		cmd_->mode(this);
 	else if (command_ == "INVITE")
 		cmd_->invite(this);
+	else if (command_ == "NICK")
+		cmd_->nick(this);
 	else if (command_ == "OPER")
 		cmd_->oper(this);
 	else if (command_ == "kill")
@@ -303,6 +305,12 @@ void	Client::processCommand()
 	else if (command_ == "die"\
 		 || (command_.empty() && param_ == "die"))
 		cmd_->die(this);
+}
+
+void			Client::clearCommandAndParam()
+{
+	command_.clear();
+	param_.clear();
 }
 
 std::string&	Client::getSendBuf(void)
