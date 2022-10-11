@@ -31,15 +31,16 @@ typedef enum e_buf
 	// BUFFER_MAX = 100,
 }			t_buf;
 
-// configure port
-bool	isValidPort(const std::string& port);
-t_port	getPortType(int value);
-bool	setPortNumber(const char *str, int *o_value);
+bool						isNotAlnumAndUnderscore(const std::string& str);
+bool						isOnlyNums(std::string str);
+bool						isSpecialCharactor(const std::string& str);
 
-// configure pwd
-bool	isValidPwd(const std::string& pwd);
-bool	isSpecialCharactor(const std::string& str);
+bool						isValidPort(const std::string& port);
+t_port						getPortType(int value);
+bool						setPortNumber(const char *str, int *o_value);
 
+bool						isValidPwd(const std::string& pwd);
 
-std::vector<std::string> split(std::string input, char delimiter);
+std::vector<std::string>	split(std::string input, char delimiter);
+
 #endif

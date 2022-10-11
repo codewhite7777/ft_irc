@@ -12,6 +12,20 @@
 
 #include "utils.hpp"
 #include <string>
+#include <vector>
+#include <sstream>
+
+bool	isOnlyNums(std::string str)
+{
+	for (std::string::iterator it = str.begin()
+		; it != str.end()
+		; ++it)
+	{
+		if (isnumber(*it) == false)
+			return false;
+	}
+	return true;
+}
 
 bool	isValidPort(const std::string& port)
 {
@@ -47,6 +61,20 @@ bool	setPortNumber(const char *str, int *o_value)
 	return (true);
 }
 
+bool	isNotAlnumAndUnderscore(const std::string& str)
+{
+	size_t i = 0;
+	while (i < str.size())
+	{
+		if ((std::isalnum(str[i]) == false) && (str[i] != '_'))
+		{
+			return (true);
+		}
+		++i;
+	}
+	return (false);
+}
+
 bool	isSpecialCharactor(const std::string& str)
 {
 	size_t i = 0;
@@ -68,16 +96,15 @@ bool	isValidPwd(const std::string& pwd)
 	return (true);
 }
 
-#include <vector>
-#include <sstream>
-std::vector<std::string> split(std::string input, char delimiter) {
-    std::vector<std::string> answer;
-    std::stringstream ss(input);
-    std::string temp;
- 
-    while (getline(ss, temp, delimiter)) {
+std::vector<std::string> split(std::string input, char delimiter)
+{
+    std::vector<std::string>	answer;
+    std::stringstream			ss(input);
+    std::string					temp;
+
+    while (getline(ss, temp, delimiter))
+	{
         answer.push_back(temp);
     }
- 
     return answer;
 }

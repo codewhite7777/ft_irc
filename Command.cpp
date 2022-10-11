@@ -34,29 +34,6 @@ void    Command::pass(Client* clnt)
 	}
 }
 
-bool	isOnlyNums(std::string str)
-{
-	for (std::string::iterator it = str.begin()
-		; it != str.end()
-		; ++it)
-	{
-		if (isnumber(*it) == false)
-			return false;
-	}
-	return true;
-}
-
-bool	isNotAlnumIn(std::string str)
-{
-	for (std::string::iterator it = str.begin()
-		; it != str.end()
-		; ++it)
-	{
-		if (isalnum(*it) == false)
-			return true;
-	}
-	return false;
-}
 
 void    Command::nick(Client* clnt)
 {
@@ -78,7 +55,7 @@ void    Command::nick(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNoNicknameGiven(clnt));
 	}
 	else if (tmp_nick.length() > 30 || isnumber(tmp_nick.front()) \
-			|| isOnlyNums(tmp_nick) || isNotAlnumIn(tmp_nick))
+			|| isOnlyNums(tmp_nick) || isNotAlnumAndUnderscore(tmp_nick))
 	{
 		clnt->appendToSendBuf(proto_->errErroneusNickname(clnt, tmp_nick));
 	}
