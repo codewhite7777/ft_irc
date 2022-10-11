@@ -32,14 +32,18 @@ static void	set_server_off(int sig)
 	sv = sngltn.getServerPtr();
 	prtcl = sv->getProtocol();
 	sv->requestAllClientsToDisconnect();
-	sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGINT in server");
+	if (sig == SIGINT)
+		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGINT in server");
+	else if (sig == SIGQUIT)
+		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGQUIT in server");
 	sv->setStatusOff();
-	std::cout << "signum: [" << sig << "]\nServer status offed in ser_server_off!\n";
+	std::cout << "signum: [" << sig << "]\n";
 }
 
 static void	set_signal_handler(void)
 {
 	signal(SIGINT, set_server_off);
+	signal(SIGQUIT, set_server_off);
 }
 
 int	main(int argc, char *argv[])
