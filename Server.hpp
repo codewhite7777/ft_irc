@@ -17,7 +17,7 @@
 # include <netinet/in.h>
 # include <map>
 # include <list>
-
+#include "Chatbot.hpp"
 //# include "Command.hpp"
 //# include "Protocol.hpp"
 
@@ -67,7 +67,6 @@ public:
 															std::string msg);
 	void					setStatusOff();
 	
-
 private:
 	//configure port
 	bool		configPort(std::string port);
@@ -128,6 +127,9 @@ private:
 
 	//channel
 	std::map<std::string, Channel*>	chann_map_;
+
+	// bot
+	ChatBot night_bot;
 };
 
 #endif

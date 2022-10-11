@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Command.hpp"
+#include "Chatbot.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -51,7 +52,6 @@ void    Command::nick(Client* clnt)
 		clnt->setNickname(tmp_nick);
 		clnt->setNickFlagOn();
 
-		// test: print
 		{
 		std::cout << "\n\t-----------------------------------" << std::endl;
 		std::cout << "\tSuccessfully set Client Nickname!\n";
@@ -199,7 +199,8 @@ void    Command::privmsg(Client* clnt)
 	std::string					msg;
 	Channel*					chann_ptr(NULL);
 	Client*						clnt_recv_ptr(NULL);
-
+	ChatBot						bot;
+	
 	found_space = arg.find(' ');
 	if (found_space == std::string::npos)
 	{
@@ -214,8 +215,18 @@ void    Command::privmsg(Client* clnt)
 		{
 			chann_ptr = sv_->findChannel(names[i]);
 			if (chann_ptr)
+			{
+				std::string bot_msg = "";
+				// TODO::/
+				bool ret = bot.CheckChatBotCommand(msg, bot_msg);
+				if (ret)
+				{	
+					// easy
+					chann_ptr->sendToAll(":NIGHTBOT!bot@localhost PRIVMSG " + chann_ptr->getName() + " :" + bot_msg + "\r\n");
+				}
 				chann_ptr->sendToOthers(clnt, \
 					proto_->clntPrivmsgToChann(clnt, msg, chann_ptr));
+			}
 			else
 				clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, names[i]));
 		}
@@ -467,6 +478,7 @@ void	Command::oper(Client* clnt)
 		clnt->appendToSendBuf(proto_->errNoOperHost(clnt));
 	}
 }
+
 
 void		Command::kill(Client* clnt)
 {
