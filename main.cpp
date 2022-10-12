@@ -44,6 +44,7 @@ static void	set_signal_handler(void)
 {
 	signal(SIGINT, set_server_off);
 	signal(SIGQUIT, set_server_off);
+	signal(SIGPIPE, SIG_IGN);
 }
 
 int	main(int argc, char *argv[])
