@@ -204,9 +204,8 @@ void	Client::marshalMessageToCmdAndParam(void)
 
 	// test: print command_ and param_
 	{
-	std::cout << "command_: [" << command_ << "], ";
-	std::cout << "param_: [" << param_ << "] ";
-	std::cout << "in marshalMessage()\n";
+	std::cout << "Command: [" << command_ << "], ";
+	std::cout << "Parameter: [" << param_ << "]\n\n";
 	}
 }
 

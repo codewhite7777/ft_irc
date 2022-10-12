@@ -108,7 +108,17 @@ Protocol*	Server::getProtocol() const
 
 std::string		Server::getCreatedDateAsString() const
 {
-	return (ctime(&created_time_));
+	std::string		ret;
+	struct tm*		t;
+
+	t = localtime(&created_time_);
+	ret = std::to_string(t->tm_year + 1900) + "/";
+	ret += std::to_string(t->tm_mon + 1) + "/";
+	ret += std::to_string(t->tm_mday) + "/";
+	ret += std::to_string(t->tm_hour) + ":";
+	ret += std::to_string(t->tm_min)+ ":";
+	ret += std::to_string(t->tm_sec);
+	return (ret);
 }
 
 const std::string&	Server::getName(void) const
@@ -261,11 +271,11 @@ void	Server::networkProcess(void)
 			; iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
-				recvPacket(iter);
+				recvMessage(iter);
 			if ((iter->second->getDisconnectFlag() == false) \
 			&& FD_ISSET(iter->first, &write_set_) \
 			&& iter->second->getSendBufLength() > 0)
-				sendPacket(iter);
+				sendMessage(iter);
 			// -> todo: refactoring and checking
 			/*
 			if ((iter->second->getSendBufLength() > 0) \
@@ -308,15 +318,17 @@ void	Server::acceptClient(SOCKET listen_sock)
 	sock_count_ += 1;
 
 	// test: display client network info
+	{
 	std::cout << "-------------------" << std::endl;
 	std::cout << "client connected" << std::endl;
 	std::cout << "client socket : " << client_sock << std::endl;
 	std::cout << "client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
 	std::cout << "client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
 	std::cout << "-------------------" << std::endl;
+	}
 }
 
-void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
+void	Server::recvMessage(std::map<SOCKET, Client*>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int				recv_ret(0);
@@ -330,12 +342,18 @@ void	Server::recvPacket(std::map<SOCKET, Client *>::iterator &iter)
 		iter->second->appendToRecvBuf(buf); //iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
 
 		// test: print RecvBuf
-		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
-			 << " recvPacket: " << "[" << buf << "]\n";
+		{
+		//std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
+		//	 << " recvPacket: " << "[" << buf << "]\n";
+		std::cout << "Received message from <SD: " << iter->second->getSocket();
+		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
+			 << "[" << buf << "]\n";
+		}
+
 	}
 }
 
-void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
+void	Server::sendMessage(std::map<SOCKET, Client*>::iterator &iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int				send_ret(0);
@@ -347,8 +365,11 @@ void	Server::sendPacket(std::map<SOCKET, Client *>::iterator &iter)
 	else if (send_ret > 0)
 	{
 		// test: print SendBuf
-		std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
-			 << " sendPacket: " << "[" << buf << "]\n";
+		{
+		std::cout << "Sended message to <SD: " << iter->second->getSocket();
+		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
+			 << "[" << buf << "]\n\n";
+		}
 
 		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
 	}
@@ -387,7 +408,7 @@ void	Server::clientDisconnect(void)
 		if (iter->second->getDisconnectFlag() == true)
 		{
 			if (iter->second->getSendBufLength() > 0)
-				sendPacket(iter);
+				sendMessage(iter);
 			close(iter->first);
 			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second;
