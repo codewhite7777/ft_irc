@@ -15,6 +15,7 @@
 #include "Server.hpp"
 #include <string>
 #include <map>
+#include <list>
 
 Channel::Channel(std::string name)
 	: name_(name)
