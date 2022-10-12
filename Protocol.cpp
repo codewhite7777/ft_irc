@@ -39,7 +39,7 @@ std::string     Protocol::rplWelcome(Client* clnt)
 	ret += " " + clnt->getNickname();
 	ret += " :Welcome to the IRC Network ";
 	ret += clnt->getUserRealHostNamesInfo();
-	ret += "\r\n"; // todo: getRCLF()
+	ret += "\r\n";
 	return ret;
 }
 
@@ -80,9 +80,8 @@ std::string     Protocol::rplMyInfo(Client* clnt)
 	ret += " " + clnt->getNickname();
 	ret += " " + sv_->getName();
 	ret += " " + sv_->getVersion();
-	ret += " o"; // available user modes
-	ret += " o"; // available channel modes
-	//ret += " :bklov";
+	ret += " o";
+	ret += " o";
 	ret += "\r\n";
 	return ret;
 }
@@ -344,7 +343,9 @@ std::string     Protocol::errWrongPasswd()
 	std::string ret;
 
 	ret = ERR_PASSWDMISMATCH;
-	ret += " " + sv_->getName() + " :info) Wrong password\r\n";
+	ret += " " + sv_->getName();
+	ret += " :info) Wrong password";
+	ret += "\r\n";
 	return ret;
 }
 
@@ -353,7 +354,9 @@ std::string     Protocol::errNotPassCmd()
 	std::string ret;
 
 	ret = ERR_PASSWDMISMATCH;
-	ret += " " + sv_->getName() + " :ex) <PASS> <password>\r\n";
+	ret += " " + sv_->getName();
+	ret += " :ex) <PASS> <password>";
+	ret += "\r\n";
 	return ret;
 }
 
@@ -365,7 +368,8 @@ std::string     Protocol::errNicknameInUse(Client* clnt, std::string nick)
 	ret += ERR_NICKNAMEINUSE;
 	ret += " " + clnt->getNickname();
 	ret += " " + nick;
-	ret += " :Nickname is already in use.\r\n";
+	ret += " :Nickname is already in use.";
+	ret += "\r\n";
 	return ret;
 }
 
@@ -376,7 +380,8 @@ std::string     Protocol::errNoNicknameGiven(Client* clnt)
 	ret = sv_->getNamePrefix();
 	ret += ERR_NONICKNAMEGIVEN;
 	ret += " " + clnt->getNickname();
-	ret += " :No nickname is given.\r\n";
+	ret += " :No nickname is given.";
+	ret += "\r\n";
 	return ret;
 }
 
@@ -388,7 +393,8 @@ std::string		Protocol::errErroneusNickname(Client* clnt, std::string nick)
 	ret += ERR_ERRONEUSNICKNAME;
 	ret += " " + clnt->getNickname();
 	ret += " " + nick;
-	ret += " :Erroneus Nickname\r\n";
+	ret += " :Erroneus Nickname";
+	ret += "\r\n";
 	return ret;
 }
 
@@ -398,7 +404,8 @@ std::string     Protocol::errNeedMoreParams()
 
 	ret = sv_->getNamePrefix();
 	ret = ERR_NEEDMOREPARAMS;
-	ret += " :Not enough parameters.\r\n";
+	ret += " :Not enough parameters.";
+	ret += "\r\n";
 	return ret;
 }
 

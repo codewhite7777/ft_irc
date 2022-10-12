@@ -14,13 +14,7 @@
 #include <unistd.h>
 
 Singleton::Singleton(void)
-{
-    ptr_sv_ = NULL;
-}
-
-Singleton::Singleton(const Singleton&) {}
-
-void    Singleton::operator=(Singleton const&) {}
+    : ptr_sv_(NULL) {}
 
 Singleton::~Singleton(void) {}
 
