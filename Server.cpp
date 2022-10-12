@@ -159,7 +159,6 @@ void	Server::networkInit(void)
 {
 	int	retval(0);
 	int optval(1);
-	//struct timeval optval = {0, 1000};
 
 	// getting listen socket
 	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -174,7 +173,7 @@ void	Server::networkInit(void)
 	fcntl(listen_sock_, F_SETFL, O_NONBLOCK);
 
 	// setting listen_sock_ SO_REUSEADDR
-	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR,
+	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR, \
 		&optval, sizeof(optval));
 	if (retval == -1)
 	{
@@ -184,7 +183,8 @@ void	Server::networkInit(void)
 	}
 
 	// unsetting Nagle algorithm
-	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, \
+		&optval, sizeof(optval));
 	if (retval == -1)
 	{
 		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
@@ -196,8 +196,9 @@ void	Server::networkInit(void)
 	memset(&s_addr_in_, 0x00, sizeof(s_addr_in_));
 	s_addr_in_.sin_family = AF_INET;
 	s_addr_in_.sin_addr.s_addr = htonl(INADDR_ANY);
-	s_addr_in_.sin_port = htons(s_port_); // SERVERPORT
-	retval = bind(listen_sock_, reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
+	s_addr_in_.sin_port = htons(s_port_);
+	retval = bind(listen_sock_, \
+		reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
 	if (retval == -1)
 	{
 		std::cerr << "Error: listen_sock_ bind() failed" << std::endl;
@@ -214,9 +215,7 @@ void	Server::networkInit(void)
 		return ;
 	}
 
-	//client count
 	sock_count_ += 1;
-
 	std::cout << "IRC Server started" << std::endl;
 }
 
@@ -225,9 +224,9 @@ void	Server::networkClose(void)
 	close(listen_sock_);
 }
 
-int	Server::getMaxFD(SOCKET sock)
+int	Server::getMaxSD(void)
 {
-	int	max_fd(sock);
+	int	max_fd(listen_sock_);
 
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
 		; iter != client_map_.end()
@@ -256,7 +255,8 @@ void	Server::networkProcess(void)
 	}
 	time_out.tv_sec = 0;
 	time_out.tv_usec = 0;
-	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
+	select_result = select(getMaxSD() + 1, &read_set_, &write_set_, NULL, \
+		&time_out);
 	if (select_result > 0)
 	{
 		if (FD_ISSET(listen_sock_, &read_set_))
@@ -300,7 +300,8 @@ void	Server::sendMsgEachClnt(SOCKET sdes, Client* clnt)
 	int				send_ret(0);
 
 	memcpy(buf, clnt->getSendBufCStr(), clnt->getSendBufLength() + 1);
-	send_ret = send(sdes, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
+	send_ret = send(sdes, reinterpret_cast<void *>(buf), \
+		strlen(reinterpret_cast<char *>(buf)), 0);
 	if (send_ret == -1)
 		clnt->setDisconnectFlag(true);
 	else if (send_ret > 0)
@@ -317,31 +318,22 @@ void	Server::acceptClient(SOCKET listen_sock)
 	socklen_t			c_addr_len(sizeof(c_addr_in));
 
 	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
-	//accept(...)
-	client_sock = accept(listen_sock, reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
+	client_sock = accept(listen_sock, \
+		reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
 	if (client_sock == -1)
 		return ;
-
-	//if current client's counts are over select function's set socket max counts, accepted socket is closed.
 	if (sock_count_ >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
 	}
-
-	//set client_sock O_NONBLOCK
 	fcntl(client_sock, F_SETFL, O_NONBLOCK);
-
-	//create client session
-	Client*	new_client = new Client(client_sock, inet_ntoa(c_addr_in.sin_addr), this);
-
-	//push client socket
+	Client*	new_client = new Client(client_sock, \
+		inet_ntoa(c_addr_in.sin_addr), this);
 	client_map_.insert(std::make_pair(client_sock, new_client));
-
-	//client count
 	sock_count_ += 1;
 
-	// test: display client network info
+	// todo: Server.displayConnectingClientInfo()
 	{
 	std::cout << "\t------------------------" << std::endl;
 	std::cout << "\tConnecting with a client" << std::endl;
@@ -354,7 +346,9 @@ void	Server::acceptClient(SOCKET listen_sock)
 
 bool	Server::isOverlapNickName(std::string& search_nick)
 {
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		; iter != client_map_.end()
+		; iter++)
 	{
 		if (iter->second->getNickname() == search_nick)
 			return (true);
@@ -460,7 +454,7 @@ void				Server::requestAllChannsToEraseOneUser(Client* clnt)
 	}
 }
 
-void				Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+void			Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
 														std::string nick_to_key)
 {
 	Channel*	each_chann_ptr(NULL);

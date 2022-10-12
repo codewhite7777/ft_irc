@@ -77,7 +77,7 @@ private:
 	void					networkInit(void);
 	void					networkClose(void);
 
-	int						getMaxFD(SOCKET sock);
+	int						getMaxSD(void);
 	void					networkProcess(void);
 	void					acceptClient(SOCKET listen_sock);
 	void					recvMsgEachClnt(SOCKET sd, Client* clnt);
