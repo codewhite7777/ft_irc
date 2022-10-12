@@ -5,29 +5,26 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/19 15:06:49 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 16:58:15 by mgo              ###   ########.fr       */
+/*   Created: 2022/10/12 11:20:04 by mgo               #+#    #+#             */
+/*   Updated: 2022/10/12 11:20:05 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRC_PROTOCOL_HPP
 # define IRC_PROTOCOL_HPP
 
-// RPL
-# define RPL_WELCOME	"001"
-# define RPL_YOURHOST	"002"
-# define RPL_CREATED	"003"
-# define RPL_MYINFO     "004"
+# define RPL_WELCOME	        "001"
+# define RPL_YOURHOST	        "002"
+# define RPL_CREATED	        "003"
+# define RPL_MYINFO             "004"
+# define RPL_NONE		        "300"
+# define RPL_AWAY		        "301"
+# define RPL_TOPIC		        "332"
+# define RPL_INVITING	        "341"
+# define RPL_NAMREPLY           "353"
+# define RPL_ENDOFNAMES         "366"
+# define RPL_YOUREOPER	        "381"
 
-# define RPL_NONE		"300"
-# define RPL_AWAY		"301"
-# define RPL_TOPIC		"332"
-# define RPL_INVITING	"341"
-# define RPL_NAMREPLY   "353"
-# define RPL_ENDOFNAMES "366"
-# define RPL_YOUREOPER	"381"
-
-// ERR
 # define ERR_NOSUCHNICK			"401"
 # define ERR_NOSUCHCHANNEL		"403"
 # define ERR_CANNOTSENDTOCHAN	"404"

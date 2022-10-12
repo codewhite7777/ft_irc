@@ -5,6 +5,9 @@
 #include "Channel.hpp"
 #include <time.h>
 
+#include <string>
+#include <map>
+
 ChatBot::ChatBot()
 {
 	// 넣고 싶은거 알아서 넣음 됨

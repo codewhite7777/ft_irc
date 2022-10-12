@@ -18,7 +18,7 @@ class Server;
 class Singleton
 {
 public:
-    static  Singleton&  getInstance()
+    static  Singleton&  getInstance(void)
     {
         static Singleton    instance;
 
@@ -30,8 +30,6 @@ public:
 
 private:
 	Singleton(void);
-    Singleton(const Singleton&);
-    void    operator=(Singleton const&);
     ~Singleton(void);
 
 	Server*				ptr_sv_;

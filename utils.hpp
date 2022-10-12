@@ -15,8 +15,6 @@
 
 # include <string>
 
-typedef int	SOCKET;
-
 typedef enum e_port
 {
 	WELL_KNOWN_PORT,
@@ -24,12 +22,6 @@ typedef enum e_port
 	DYNAMIC_PORT,
 	INVALID_PORT,
 }			t_port;
-
-typedef enum e_buf
-{
-	BUFFER_MAX = 1024 << 4,
-	// BUFFER_MAX = 100,
-}			t_buf;
 
 bool						isNotAlnumAndUnderscore(const std::string& str);
 bool						isOnlyNums(std::string str);

@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/17 01:01:59 by alee              #+#    #+#             */
-/*   Updated: 2022/10/03 13:52:29 by mgo              ###   ########.fr       */
+/*   Created: 2022/10/12 11:19:48 by mgo               #+#    #+#             */
+/*   Updated: 2022/10/12 11:19:50 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "Server.hpp"
 #include "Command.hpp"
 #include "Protocol.hpp"
+#include <string>
 #include <iostream>
 
 Client::Client(SOCKET sdes, std::string hostname, Server* sv)
@@ -43,7 +44,7 @@ void	Client::appendToRecvBuf(unsigned char* buf)
 	getRecvBuf().append(reinterpret_cast<char *>(buf));
 }
 
-size_t		Client::getRecvBufLength()
+size_t		Client::getRecvBufLength(void)
 {
 	return (getRecvBuf().length());
 }
@@ -53,12 +54,12 @@ void		Client::appendToSendBuf(const std::string& str)
 	getSendBuf().append(str);
 }
 
-const char*	Client::getSendBufCStr()
+const char*	Client::getSendBufCStr(void)
 {
 	return (getSendBuf().c_str());
 }
 
-size_t		Client::getSendBufLength()
+size_t		Client::getSendBufLength(void)
 {
 	return (getSendBuf().length());
 }
@@ -68,14 +69,14 @@ void		Client::eraseSendBufSize(int size)
 	getSendBuf().erase(0, size);
 }
 
-void	Client::processMessageInRecvBuf()
+void	Client::processMessageInRecvBuf(void)
 {
-	marshalMessage(command_, param_);
+	marshalMessageToCmdAndParam();
 	processProtocol();
 	clearCommandAndParam();
 }
 
-const std::string&	Client::getCommand() const
+const std::string&	Client::getCommand(void) const
 {
 	return command_;
 }
@@ -110,7 +111,7 @@ void			Client::setNickname(std::string nickname)
 	nickname_ = nickname;
 }
 
-const std::string&	Client::getNickname() const
+const std::string&	Client::getNickname(void) const
 {
 	return nickname_;
 }
@@ -140,82 +141,74 @@ void			Client::setRealname(std::string realname)
 	realname_ = realname;
 }
 
-const std::string&	Client::getUsername() const
+const std::string&	Client::getUsername(void) const
 {
 	return username_;
 }
 
-const std::string&	Client::getHostname() const
+const std::string&	Client::getHostname(void) const
 {
 	return hostname_;
 }
 
-const std::string&	Client::getRealname() const
+const std::string&	Client::getRealname(void) const
 {
 	return realname_;
 }
 
-const std::string	Client::getUserRealHostNamesInfo() const
+const std::string	Client::getUserRealHostNamesInfo(void) const
 {
 	return (nickname_ + "!" + username_ + "@" + hostname_);
 }
 
-void				Client::setUserFlagOn()
+void				Client::setUserFlagOn(void)
 {
 	user_flag_ = true;
 }
 
-bool				Client::getUserFlag() const
+bool				Client::getUserFlag(void) const
 {
 	return user_flag_;
 }
 
-std::string			Client::getNamesPrefix() const
+std::string			Client::getNamesPrefix(void) const
 {
 	return (":" + nickname_ + "!" + username_ + "@" + hostname_ + " ");
 }
 
-void				Client::setSvOperFlagOn()
+void				Client::setSvOperFlagOn(void)
 {
 	this->sv_oper_flag_ = true;
 }
 
-bool				Client::isSvOper() const
+bool				Client::isSvOper(void) const
 {
 	return (this->sv_oper_flag_);
 }
 
-void	Client::marshalMessage(std::string& command__, std::string& param__)
+void	Client::marshalMessageToCmdAndParam(void)
 {
 	std::string	tmp_msg;
 
 	tmp_msg = extractFirstMsg(getRecvBuf());
 	if (tmp_msg.find(' ') != std::string::npos)
 	{
-		command__ = tmp_msg.substr(0, tmp_msg.find(' '));
-		param__ = tmp_msg.substr(tmp_msg.find(' ') + 1);
+		command_ = tmp_msg.substr(0, tmp_msg.find(' '));
+		param_ = tmp_msg.substr(tmp_msg.find(' ') + 1);
 	}
 	else
 	{
-		command__ = "";
-		param__ = tmp_msg;
+		command_ = "";
+		param_ = tmp_msg;
 	}
 
-	// test: print command__ and param__
+	// test: print command_ and param_
 	{
-	std::cout << "command__: [" << command__ << "], ";
-	std::cout << "param__: [" << param__ << "] ";
-	std::cout << "in marshalMessage()\n";
+	std::cout << "Command: [" << command_ << "], ";
+	std::cout << "Parameter: [" << param_ << "]\n\n";
 	}
 }
 
-/*
-	extract first protocol message from packet
-
-	1) [one protocol] If no more behind \r\n, just return pure packet.
-	2) [more than one protocol] If something behind \r\n, split packet by first \r\n and return only first protocol.
-	3) [no protocol] If no \r\n, return empty.
-*/
 std::string	Client::extractFirstMsg(std::string& recv_buf)
 {
 	std::string	first_msg("");
@@ -240,7 +233,7 @@ void	Client::processProtocol(void)
 		processCommand();
 }
 
-void	Client::processAuthToWelcome()
+void	Client::processAuthToWelcome(void)
 {
 	if (getPassFlag() == false)
 	{
@@ -268,17 +261,17 @@ void	Client::processAuthToWelcome()
 	}
 }
 
-bool	Client::isPassed() const
+bool	Client::isPassed(void) const
 {
 	return passed_;
 }
 
-bool	Client::isWelcomed() const
+bool	Client::isWelcomed(void) const
 {
 	return welcomed_;
 }
 
-void	Client::processCommand()
+void	Client::processCommand(void)
 {
 	if (command_ == "PING")
 		cmd_->ping(this);
@@ -307,7 +300,7 @@ void	Client::processCommand()
 		cmd_->die(this);
 }
 
-void			Client::clearCommandAndParam()
+void			Client::clearCommandAndParam(void)
 {
 	command_.clear();
 	param_.clear();
