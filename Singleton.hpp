@@ -18,7 +18,7 @@ class Server;
 class Singleton
 {
 public:
-    static  Singleton&  getInstance()
+    static  Singleton&  getInstance(void)
     {
         static Singleton    instance;
 
