@@ -24,12 +24,6 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 
-//#include <cctype>
-//#include <cstring>
-//#include <sys/select.h>
-//#include <sys/time.h>
-//#include <sstream>
-
 Server::Server(int argc, char *argv[])
 	: status_(true)
 	, cmd_(NULL)
@@ -271,20 +265,43 @@ void	Server::networkProcess(void)
 			; iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
-				recvMessage(iter);
-			/*
-			if ((iter->second->getDisconnectFlag() == false) \
-			&& FD_ISSET(iter->first, &write_set_) \
-			&& iter->second->getSendBufLength() > 0)
-				sendMessage(iter);
-			*/
-			// -> todo: refactoring and checking
-			
+				recvMsgEachClnt(iter->first, iter->second);
 			if ((iter->second->getSendBufLength() > 0) \
-			&& FD_ISSET(iter->first, &write_set_))
-				sendMessage(iter);
-			
+				&& FD_ISSET(iter->first, &write_set_))
+				sendMsgEachClnt(iter->first, iter->second);
 		}
+	}
+}
+
+void	Server::recvMsgEachClnt(SOCKET sdes, Client* clnt)
+{
+	unsigned char	buf[BUFFER_MAX];
+	int				recv_ret(0);
+	
+	recv_ret = recv(sdes, reinterpret_cast<void *>(buf), sizeof(buf), 0);
+	if (recv_ret == 0)
+		clnt->setDisconnectFlag(true);
+	else if (recv_ret > 0)
+	{
+		buf[recv_ret] = '\0';
+		clnt->appendToRecvBuf(buf);
+		clnt->promptRecvedMsg();
+	}
+}
+
+void	Server::sendMsgEachClnt(SOCKET sdes, Client* clnt)
+{
+	unsigned char	buf[BUFFER_MAX];
+	int				send_ret(0);
+
+	memcpy(buf, clnt->getSendBufCStr(), clnt->getSendBufLength() + 1);
+	send_ret = send(sdes, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
+	if (send_ret == -1)
+		clnt->setDisconnectFlag(true);
+	else if (send_ret > 0)
+	{
+		clnt->promptSendedMsg();
+		clnt->eraseSendBufSize(send_ret);
 	}
 }
 
@@ -321,46 +338,13 @@ void	Server::acceptClient(SOCKET listen_sock)
 
 	// test: display client network info
 	{
-	std::cout << "-------------------" << std::endl;
-	std::cout << "client connected" << std::endl;
-	std::cout << "client socket : " << client_sock << std::endl;
-	std::cout << "client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
-	std::cout << "client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
-	std::cout << "-------------------" << std::endl;
+	std::cout << "------------------------" << std::endl;
+	std::cout << "Connecting with a client" << std::endl;
+	std::cout << "Client socket : " << client_sock << std::endl;
+	std::cout << "Client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
+	std::cout << "Client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
+	std::cout << "------------------------" << std::endl;
 	}
-}
-
-void	Server::recvMessage(std::map<SOCKET, Client*>::iterator& iter)
-{
-	unsigned char	buf[BUFFER_MAX];
-	int				recv_ret(0);
-	
-	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
-	if (recv_ret == 0)
-		iter->second->setDisconnectFlag(true);
-	else if (recv_ret > 0)
-	{
-		buf[recv_ret] = '\0';
-		iter->second->appendToRecvBuf(buf);
-		iter->second->promptRecvedMsg();
-	}
-}
-
-void	Server::sendMessage(std::map<SOCKET, Client*>::iterator& iter)
-{
-	unsigned char	buf[BUFFER_MAX];
-	int				send_ret(0);
-
-	memcpy(buf, iter->second->getSendBufCStr(), iter->second->getSendBufLength() + 1);
-	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
-	if (send_ret == -1)
-		iter->second->setDisconnectFlag(true);
-	else if (send_ret > 0)
-	{
-		iter->second->promptSendedMsg();
-		iter->second->eraseSendBufSize(send_ret);
-	}
-	return ;
 }
 
 bool	Server::isOverlapNickName(std::string& search_nick)
@@ -395,7 +379,7 @@ void	Server::clientDisconnect(void)
 		if (iter->second->getDisconnectFlag() == true)
 		{
 			if (iter->second->getSendBufLength() > 0)
-				sendMessage(iter);
+				sendMsgEachClnt(iter->first, iter->second);
 			close(iter->first);
 			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second;
@@ -429,7 +413,6 @@ Client*		Server::findClient(std::string clnt_nickname)
 		; clnt_it != client_map_.end()
 		; ++clnt_it)
 	{
-		// todo: using clnt_ptr;
 		if (clnt_nickname == clnt_it->second->getNickname())
 			return (clnt_it->second);
 	}
