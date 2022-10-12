@@ -16,6 +16,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Chatbot.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <string>
 #include <vector>

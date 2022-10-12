@@ -1,5 +1,8 @@
 #ifndef _CHATBOT_HPP_
-#define _CHATBOT_HPP_
+# define _CHATBOT_HPP_
+
+# include <string>
+# include <map>
 
 class ChatBot
 {

@@ -12,13 +12,15 @@
 
 #include "Server.hpp"
 #include "Command.hpp"
-#include "Protocol.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Protocol.hpp"
 #include "irc_protocol.hpp"
+#include "utils.hpp"
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <iostream>
+#include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
 
@@ -39,48 +41,41 @@ Server::Server(int argc, char *argv[])
 	, oper_name_("root")
 	, oper_pwd_("12345")
 	, oper_host_("127.0.0.1")
-	, oper_type_("ServerAdmin")
+	, oper_type_("ServerOperator")
 {
-	//argument check (port, pwd)
 	if (argc != 3)
 	{
-		std::cerr << "Error : Invalid Argument" << std::endl;
+		std::cerr << "Error: Invalid Argument" << std::endl;
 		std::cerr << "./ircserv <port> <server_pwd>" << std::endl;
 		status_ = false;
 		return ;
 	}
-	//verify port, config port
 	if (configPort(argv[1]) == false)
 	{
-		std::cerr << "Error : Invalid Port" << std::endl;
+		std::cerr << "Error: Invalid Port" << std::endl;
 		status_ = false;
 		return ;
 	}
-	//verify pwd, config pwd
 	if (configPwd(argv[2]) == false)
 	{
-		std::cerr << "Error : Invalid password" << std::endl;
+		std::cerr << "Error: Invalid password" << std::endl;
 		status_ = false;
 		return ;
 	}
-
-	//network init
 	networkInit();
 }
 
 Server::~Server(void)
 {
 	networkClose();
-
-	// delete all channels
 	for (std::map<std::string, Channel*>::iterator chann_it(chann_map_.begin())
 		; chann_it != chann_map_.end()
 		; ++chann_it)
 	{
 		delete chann_it->second;
 		chann_it->second = NULL;
-		//chann_it = chann_map_.erase(chann_it);
 	}
+	chann_map_.clear();
 }
 
 void	Server::equipCommandAndProtocol(Command* cmd, Protocol* proto)
@@ -91,13 +86,13 @@ void	Server::equipCommandAndProtocol(Command* cmd, Protocol* proto)
 
 bool	Server::getStatus(void) const
 {
-	return (status_);
+	return status_;
 }
 
 void	Server::Run(void)
 {
 	networkProcess();
-	processClientMessages(); //packetMarshalling();
+	processClientMessages();
 	clientDisconnect();
 }
 
@@ -121,7 +116,7 @@ const std::string&	Server::getName(void) const
 	return name_;
 }
 
-std::string	Server::getNamePrefix() const
+std::string		Server::getNamePrefix() const
 {
 	return (":" + name_ + " ");
 }
@@ -138,7 +133,8 @@ const std::string&	Server::getPwd(void) const
 
 bool	Server::configPort(std::string port)
 {
-	int	retPort;
+	int	retPort(0);
+
 	if (isValidPort(port) == false)
 		return (false);
 	if (setPortNumber(port.c_str(), &retPort) == false)
@@ -157,9 +153,11 @@ bool	Server::configPwd(std::string pwd)
 
 void	Server::networkInit(void)
 {
-	int retval;
+	int	retval(0);
+	int optval(1);
+	//struct timeval optval = {0, 1000};
 
-	// socket
+	// getting listen socket
 	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listen_sock_ == -1)
 	{
@@ -167,12 +165,10 @@ void	Server::networkInit(void)
 		return ;
 	}
 
-	// set listen_sock_ O_NONBLOCK
+	// setting listen_sock_ O_NONBLOCK
 	fcntl(listen_sock_, F_SETFL, O_NONBLOCK);
 
-	// set listen_sock_ SO_REUSEADDR
-	//struct timeval optval = {0, 1000};
-	int optval = 1;
+	// setting listen_sock_ SO_REUSEADDR
 	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR,
 		&optval, sizeof(optval));
 	if (retval == -1)
@@ -181,8 +177,7 @@ void	Server::networkInit(void)
 		return ;
 	}
 
-	// unset Nagle algorithm
-	//int optval = 1;
+	// unsetting Nagle algorithm
 	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 	if (retval == -1)
 	{
@@ -223,8 +218,11 @@ void	Server::networkClose(void)
 
 int	Server::getMaxFD(SOCKET sock)
 {
-	int	max_fd = sock;
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	int	max_fd(sock);
+
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		; iter != client_map_.end()
+		; iter++)
 	{
 		if (max_fd < iter->first)
 			max_fd = iter->first;
@@ -234,38 +232,33 @@ int	Server::getMaxFD(SOCKET sock)
 
 void	Server::networkProcess(void)
 {
-	//FD ZERO
+	struct timeval	time_out;
+	int				select_result(0);
+
 	FD_ZERO(&read_set_);
 	FD_ZERO(&write_set_);
-
-	//listen socket add(read_set)
 	FD_SET(listen_sock_, &read_set_);
-
-	//client socket add(read_set, write_set)
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		; iter != client_map_.end()
+		; iter++)
 	{
 		FD_SET(iter->first, &read_set_);
 		FD_SET(iter->first, &write_set_);
 	}
-
-	//set timeout
-	struct timeval	time_out;
 	time_out.tv_sec = 0;
 	time_out.tv_usec = 0;
-
-	//select(...)
-	int	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
+	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
 	if (select_result > 0)
 	{
-		//new client
 		if (FD_ISSET(listen_sock_, &read_set_))
 		{
 			acceptClient(listen_sock_);
 			if (select_result == 1)
 				return ;
 		}
-		//current client
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+			; iter != client_map_.end()
+			; iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
 				recvPacket(iter);
@@ -273,15 +266,21 @@ void	Server::networkProcess(void)
 			&& FD_ISSET(iter->first, &write_set_) \
 			&& iter->second->getSendBufLength() > 0)
 				sendPacket(iter);
+			// -> todo: refactoring and checking
+			/*
+			if ((iter->second->getSendBufLength() > 0) \
+			&& FD_ISSET(iter->first, &write_set_))
+				sendPacket(iter);
+			*/
 		}
 	}
 }
 
 void	Server::acceptClient(SOCKET listen_sock)
 {
-	SOCKET				client_sock;
+	SOCKET				client_sock(-1);
 	struct sockaddr_in	c_addr_in;
-	socklen_t			c_addr_len = sizeof(c_addr_in);
+	socklen_t			c_addr_len(sizeof(c_addr_in));
 
 	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
 	//accept(...)
@@ -374,7 +373,6 @@ void	Server::processClientMessages()
 	{
 		if (iter->second->getRecvBufLength() > 0)
 		{
-			//packetAnalysis(iter);
 			iter->second->processMessageInRecvBuf();
 		}
 	}
@@ -392,7 +390,7 @@ void	Server::clientDisconnect(void)
 				sendPacket(iter);
 			close(iter->first);
 			std::cout << iter->first << " Socket Disconnected" << std::endl;
-			delete iter->second; // critical point
+			delete iter->second;
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
 		}
@@ -415,7 +413,6 @@ Channel*	Server::findChannel(std::string chann_name)
 void		Server::assignNewChannel(Channel* new_chann)
 {
 	chann_map_.insert(std::make_pair(new_chann->getName(), new_chann));
-	// Channel.name is reference... is ok? Watching continuely...
 }
 
 Client*		Server::findClient(std::string clnt_nickname)
