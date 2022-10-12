@@ -77,6 +77,8 @@ private:
 	std::string&			getRecvBuf(void);
 	std::string&			getSendBuf(void);
 
+	void					promptCommandAndParam(void);
+
 	SOCKET					sock_des_;
 	std::string				send_buf_;
 	std::string				recv_buf_;

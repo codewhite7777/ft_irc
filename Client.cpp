@@ -215,12 +215,13 @@ void	Client::marshalMessageToCmdAndParam(void)
 		command_ = tmp_msg;
 		param_ = "";
 	}
+	promptCommandAndParam();
+}
 
-	// Client.promptCmdAndParam()
-	{
+void		Client::promptCommandAndParam(void)
+{
 	std::cout << "\tCommand: [" << command_ << "]\n";
 	std::cout << "\tParameter: [" << param_ << "]\n\n";
-	}
 }
 
 std::string	Client::extractFirstMsg(std::string& recv_buf)

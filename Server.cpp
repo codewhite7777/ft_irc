@@ -338,12 +338,12 @@ void	Server::acceptClient(SOCKET listen_sock)
 
 	// test: display client network info
 	{
-	std::cout << "------------------------" << std::endl;
-	std::cout << "Connecting with a client" << std::endl;
-	std::cout << "Client socket : " << client_sock << std::endl;
-	std::cout << "Client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
-	std::cout << "Client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
-	std::cout << "------------------------" << std::endl;
+	std::cout << "\t------------------------" << std::endl;
+	std::cout << "\tConnecting with a client" << std::endl;
+	std::cout << "\tClient socket : " << client_sock << std::endl;
+	std::cout << "\tClient port   : " << ntohs(c_addr_in.sin_port) << std::endl;
+	std::cout << "\tClient ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
+	std::cout << "\t------------------------" << std::endl;
 	}
 }
 
