@@ -3,14 +3,44 @@
 #include <string>
 #include "Chatbot.hpp"
 #include "Channel.hpp"
+#include "Server.hpp"
 #include <time.h>
-
-ChatBot::ChatBot()
+#include <vector>
+#include "utils.hpp"
+using namespace std;
+std::string		ChatBot::CommandList()
 {
-	// 넣고 싶은거 알아서 넣음 됨
-	chatbot_command_list.insert(std::make_pair("!hi", "안녕하세요1"));
-	chatbot_command_list.insert(std::make_pair("!hello", "안녕하세요2"));
+	std::string list = "";
+	for (std::map< std::string, std::string>::iterator iter = chatbot_command_list.begin()
+		; iter != chatbot_command_list.end()
+		; ++iter)
+	{
+		list += iter->first + ' ';
+	}
+	return list;
+}
 
+void			ChatBot::AddCommand(std::string &contents)
+{
+	std::cout << "IN ADDCOMMAND\n";
+	std::vector<std::string> v = split(contents, ',');
+	std::cout <<"["<< v[0] <<"], [" << v[1] << "]\n";
+	if (v[0][0] == '!' && v[0] != "!add" && v[0] != "!delete" && v[0] != "!list")
+	{
+		std::cout << "size:[" << chatbot_command_list.size()<< "]\n";
+		chatbot_command_list[v[0]] = v[1];
+		std::cout << "size:[" << chatbot_command_list.size()<< "]\n";
+	}
+}
+
+void			ChatBot::DeleteCommand(std::string &command)
+{
+	if (command[0] == '!' && command != "!add" && command != "!delete" && command != "!list")
+		chatbot_command_list.erase(command);
+}
+
+std::string		ChatBot::GetNowTime()
+{
 	std::string	now = "";
 	time_t timer;
 	struct tm* t;
@@ -25,25 +55,56 @@ ChatBot::ChatBot()
 	now += std::to_string(t->tm_min)+ ":";
 	now += std::to_string(t->tm_sec);
 
-	chatbot_command_list.insert(std::make_pair("!now", now));
+	return now;
+}
+
+ChatBot::ChatBot()
+{
+	// !hi 
+	chatbot_command_list.insert(std::make_pair("!hi", "안녕하세요"));
+
+	// !now
+	chatbot_command_list.insert(std::make_pair("!now", GetNowTime()));
 }
 
 bool	ChatBot::CheckChatBotCommand(std::string param, std::string &ret)
 {
-	ret = "";
     std::map<std::string, std::string>::iterator 
-    iter = chatbot_command_list.find(param.substr(1));
+    iter = chatbot_command_list.find(param);
 	if (iter != chatbot_command_list.end())
 	{
-		ret = chatbot_command_list[param.substr(1)];
+		ret = chatbot_command_list[param];
 		return (true);
 	}
 	return (false);
 }
 
-void	BroadCast(std::string server_name)
+bool	ChatBot::ChatBotCommand(std::string& param, std::string &bot_msg)
 {
-	server_name = "";
+	std::cout << "CHAT BOT TEST START\n";
+	unsigned int ret = param.find(' ');
+	if ((int)ret != -1)
+	{
+		std::string chat_command = param.substr(1, ret - 1);
+		std::string chat_param = param.substr(ret + 1);
+		
+		if (chat_command == "!add")
+			AddCommand(chat_param);
+		else if (chat_command == "!delete")
+			DeleteCommand(chat_param);
+		return true;
+	}
+	else
+	{
+		std::string chat_command = param.substr(1);
+		if (chat_command == "!list")
+			bot_msg = CommandList();
+		else if (chat_command == "!now")
+			chatbot_command_list[chat_command] =  GetNowTime();
+		CheckChatBotCommand(chat_command, bot_msg);
+		return true;
+	}
+	return false;
 }
 
 ChatBot::~ChatBot()
