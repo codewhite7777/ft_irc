@@ -30,8 +30,6 @@ public:
 
 private:
 	Singleton(void);
-    Singleton(const Singleton&);
-    void    operator=(Singleton const&);
     ~Singleton(void);
 
 	Server*				ptr_sv_;
