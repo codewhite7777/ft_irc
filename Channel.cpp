@@ -23,7 +23,7 @@ Channel::Channel(std::string name)
 
 Channel::~Channel(void) {}
 
-std::size_t		Channel::getCurrUserCount() const
+std::size_t		Channel::getCurrUserCount(void) const
 {
 	return curr_user_count_;
 }
