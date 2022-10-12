@@ -235,7 +235,6 @@ void    Command::privmsg(Client* clnt)
 	std::string					msg;
 	Channel*					chann_ptr(NULL);
 	Client*						clnt_recv_ptr(NULL);
-	ChatBot						bot;
 	
 	found_space = arg.find(' ');
 	if (found_space == std::string::npos)
@@ -250,18 +249,22 @@ void    Command::privmsg(Client* clnt)
 		if ('#' == names[i].front())
 		{
 			chann_ptr = sv_->findChannel(names[i]);
+			
 			if (chann_ptr)
 			{
-				std::string bot_msg = "";
-				// todo: setting function in if statement with removing ret
-				bool ret = bot.CheckChatBotCommand(msg, bot_msg);
-				if (ret)
-				{
-					// todo: setting bot privmsg protocol
-					chann_ptr->sendToAll(":NIGHTBOT!bot@localhost PRIVMSG " + chann_ptr->getName() + " :" + bot_msg + "\r\n");
-				}
 				chann_ptr->sendToOthers(clnt, \
 					proto_->clntPrivmsgToChann(clnt, msg, chann_ptr));
+
+			
+				std::string bot_msg = "";
+				// todo: setting function in if statement with removing ret
+				bool ret = chann_ptr->GetChatBot().ChatBotCommand(msg, bot_msg);
+				if (ret)
+				{	
+					// todo: setting bot privmsg protocol
+					if (bot_msg != "")
+						chann_ptr->sendToAll(":NIGHTBOT!bot@localhost PRIVMSG " + chann_ptr->getName() + " :" + bot_msg + "\r\n");
+				}
 			}
 			else
 				clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, names[i]));

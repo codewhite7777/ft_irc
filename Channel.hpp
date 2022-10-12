@@ -17,6 +17,8 @@
 # include <map>
 # include <list>
 
+#include "Chatbot.hpp"
+
 class Client;
 
 class Channel
@@ -41,6 +43,10 @@ public:
 	void				replaceClntKeyNick(Client* clnt, \
 											std::string nick_to_key);
 
+
+	// chatbot
+	ChatBot&			GetChatBot();
+  
 private:
 	Channel(void);
 
@@ -48,6 +54,9 @@ private:
 	std::map<std::string, Client*>	users_;
 	std::map<std::string, Client*>	opers_;
 	std::size_t						curr_user_count_;
+	
+	// chatbot
+	ChatBot							chatbot;
 };
 
 #endif

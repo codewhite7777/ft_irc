@@ -16,7 +16,6 @@
 #include <string>
 #include <map>
 #include <list>
-
 Channel::Channel(std::string name)
 	: name_(name)
 	, curr_user_count_(0) {}
@@ -167,4 +166,9 @@ void			Channel::replaceClntKeyNick(Client* clnt, \
 		opers_.erase(oper_it);
 		opers_.insert(std::make_pair(nick_to_key, clnt));
 	}
+}
+
+ChatBot&			Channel::GetChatBot()
+{
+	return chatbot;
 }
