@@ -87,13 +87,6 @@ void    Command::nick(Client* clnt)
 			clnt->setNickFlagOn();
 		}
 		clnt->setNickname(tmp_nick);
-
-		{
-		std::cout << "\n\t-----------------------------------" << std::endl;
-		std::cout << "\tSuccessfully set Client Nickname!\n";
-		std::cout << "\tClient Nickname: [" << clnt->getNickname() << "]\n";
-		std::cout << "\t-----------------------------------\n" << std::endl;
-		}
 	}
 }
 
@@ -122,16 +115,6 @@ void    Command::user(Client* clnt)
 			clnt->setUsername(spltd_args[0]);
 			clnt->setHostname(spltd_args[2]);
 			clnt->setUserFlagOn();
-
-			// test: print
-			{
-			std::cout << "\n\t-----------------------------------" << std::endl;
-			std::cout << "\tSuccessfully processed USER command\n";
-			std::cout << "\tClient Username: [" << clnt->getUsername() << "]\n";
-			std::cout << "\tClient Hostname: [" << clnt->getHostname() << "]\n";
-			std::cout << "\tClient Realname: [" << clnt->getRealname() << "]\n";
-			std::cout << "\t-----------------------------------\n" << std::endl;
-			}
 		}
 		else
 		{
@@ -222,7 +205,7 @@ void	Command::ping(Client* clnt)
 	std::string	token(clnt->getParam());
 
 	if (token.empty() == false)
-		clnt->appendToSendBuf(proto_->msgPong(token));
+		clnt->appendToSendBuf(proto_->svPong(token));
 	else
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 }
@@ -569,10 +552,7 @@ void		Command::die(Client* clnt)
 	{
 		msg_to_send = "Died (";
 		msg_to_send += clnt->getNickname();
-		if (clnt->getParam().empty())
-			msg_to_send += " ())";
-		else
-			msg_to_send += " (" + param + "))";
+		msg_to_send += " (" + param + "))";
 		sv_->requestAllClientsToDisconnect();
 		sv_->sendErrorClosingLinkProtoToAllClientsWithMsg(msg_to_send);
 		sv_->setStatusOff();

@@ -36,6 +36,7 @@ public:
 									Client* clnt_to_be_invtd, Channel* chann);
 	std::string		rplYoureOper(Client* clnt);
 
+	std::string		svPrivmsgClntWhenInit(Client* clnt);
 	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		clntPartChann(Client* clnt, std::string msg);
 	std::string		clntPrivmsgToChann(Client* clnt, std::string msg, \
@@ -49,7 +50,7 @@ public:
 	std::string		clntQuit(Client* clnt, std::string msg);
 	std::string		clntNick(Client* clnt, std::string nick);
 	std::string		errorClosingLink(Client* clnt, std::string msg);
-	std::string		msgPong(std::string token);
+	std::string		svPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg);
 	std::string		clntInviteClnt(Client* clnt, \

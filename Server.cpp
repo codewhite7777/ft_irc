@@ -24,12 +24,6 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 
-//#include <cctype>
-//#include <cstring>
-//#include <sys/select.h>
-//#include <sys/time.h>
-//#include <sstream>
-
 Server::Server(int argc, char *argv[])
 	: status_(true)
 	, cmd_(NULL)
@@ -165,12 +159,12 @@ void	Server::networkInit(void)
 {
 	int	retval(0);
 	int optval(1);
-	//struct timeval optval = {0, 1000};
 
 	// getting listen socket
 	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listen_sock_ == -1)
 	{
+		std::cerr << "Error: listen_sock_ socket() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -179,18 +173,21 @@ void	Server::networkInit(void)
 	fcntl(listen_sock_, F_SETFL, O_NONBLOCK);
 
 	// setting listen_sock_ SO_REUSEADDR
-	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR,
+	retval = setsockopt(listen_sock_, SOL_SOCKET, SO_REUSEADDR, \
 		&optval, sizeof(optval));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
 
 	// unsetting Nagle algorithm
-	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, \
+		&optval, sizeof(optval));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -199,10 +196,12 @@ void	Server::networkInit(void)
 	memset(&s_addr_in_, 0x00, sizeof(s_addr_in_));
 	s_addr_in_.sin_family = AF_INET;
 	s_addr_in_.sin_addr.s_addr = htonl(INADDR_ANY);
-	s_addr_in_.sin_port = htons(s_port_); // SERVERPORT
-	retval = bind(listen_sock_, reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
+	s_addr_in_.sin_port = htons(s_port_);
+	retval = bind(listen_sock_, \
+		reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ bind() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -211,13 +210,12 @@ void	Server::networkInit(void)
 	retval = listen(listen_sock_, SOMAXCONN);
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ listen() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
 
-	//client count
 	sock_count_ += 1;
-
 	std::cout << "IRC Server started" << std::endl;
 }
 
@@ -226,9 +224,9 @@ void	Server::networkClose(void)
 	close(listen_sock_);
 }
 
-int	Server::getMaxFD(SOCKET sock)
+int	Server::getMaxSD(void)
 {
-	int	max_fd(sock);
+	int	max_fd(listen_sock_);
 
 	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
 		; iter != client_map_.end()
@@ -248,7 +246,7 @@ void	Server::networkProcess(void)
 	FD_ZERO(&read_set_);
 	FD_ZERO(&write_set_);
 	FD_SET(listen_sock_, &read_set_);
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()
 		; iter != client_map_.end()
 		; iter++)
 	{
@@ -257,7 +255,8 @@ void	Server::networkProcess(void)
 	}
 	time_out.tv_sec = 0;
 	time_out.tv_usec = 0;
-	select_result = select(getMaxFD(listen_sock_) + 1, &read_set_, &write_set_, NULL, &time_out);
+	select_result = select(getMaxSD() + 1, &read_set_, &write_set_, NULL, \
+		&time_out);
 	if (select_result > 0)
 	{
 		if (FD_ISSET(listen_sock_, &read_set_))
@@ -266,23 +265,49 @@ void	Server::networkProcess(void)
 			if (select_result == 1)
 				return ;
 		}
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()
 			; iter != client_map_.end()
 			; iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
-				recvMessage(iter);
-			if ((iter->second->getDisconnectFlag() == false) \
-			&& FD_ISSET(iter->first, &write_set_) \
-			&& iter->second->getSendBufLength() > 0)
-				sendMessage(iter);
-			// -> todo: refactoring and checking
-			/*
+				recvMsgEachClnt(iter->first, iter->second);
 			if ((iter->second->getSendBufLength() > 0) \
-			&& FD_ISSET(iter->first, &write_set_))
-				sendPacket(iter);
-			*/
+				&& FD_ISSET(iter->first, &write_set_))
+				sendMsgEachClnt(iter->first, iter->second);
 		}
+	}
+}
+
+void	Server::recvMsgEachClnt(SOCKET sdes, Client* clnt)
+{
+	unsigned char	buf[BUFFER_MAX];
+	int				recv_ret(0);
+	
+	recv_ret = recv(sdes, reinterpret_cast<void *>(buf), sizeof(buf), 0);
+	if (recv_ret == 0)
+		clnt->setDisconnectFlag(true);
+	else if (recv_ret > 0)
+	{
+		buf[recv_ret] = '\0';
+		clnt->appendToRecvBuf(buf);
+		clnt->promptRecvedMsg();
+	}
+}
+
+void	Server::sendMsgEachClnt(SOCKET sdes, Client* clnt)
+{
+	unsigned char	buf[BUFFER_MAX];
+	int				send_ret(0);
+
+	memcpy(buf, clnt->getSendBufCStr(), clnt->getSendBufLength() + 1);
+	send_ret = send(sdes, reinterpret_cast<void *>(buf), \
+		strlen(reinterpret_cast<char *>(buf)), 0);
+	if (send_ret == -1)
+		clnt->setDisconnectFlag(true);
+	else if (send_ret > 0)
+	{
+		clnt->promptSendedMsg();
+		clnt->eraseSendBufSize(send_ret);
 	}
 }
 
@@ -293,92 +318,37 @@ void	Server::acceptClient(SOCKET listen_sock)
 	socklen_t			c_addr_len(sizeof(c_addr_in));
 
 	memset(&c_addr_in, 0x00, sizeof(c_addr_in));
-	//accept(...)
-	client_sock = accept(listen_sock, reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
+	client_sock = accept(listen_sock, \
+		reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
 	if (client_sock == -1)
 		return ;
-
-	//if current client's counts are over select function's set socket max counts, accepted socket is closed.
 	if (sock_count_ >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
 	}
-
-	//set client_sock O_NONBLOCK
 	fcntl(client_sock, F_SETFL, O_NONBLOCK);
-
-	//create client session
-	Client*	new_client = new Client(client_sock, inet_ntoa(c_addr_in.sin_addr), this);
-
-	//push client socket
+	Client*	new_client = new Client(client_sock, \
+		inet_ntoa(c_addr_in.sin_addr), this);
 	client_map_.insert(std::make_pair(client_sock, new_client));
-
-	//client count
 	sock_count_ += 1;
 
-	// test: display client network info
+	// todo: Server.displayConnectingClientInfo()
 	{
-	std::cout << "-------------------" << std::endl;
-	std::cout << "client connected" << std::endl;
-	std::cout << "client socket : " << client_sock << std::endl;
-	std::cout << "client port   : " << ntohs(c_addr_in.sin_port) << std::endl;
-	std::cout << "client ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
-	std::cout << "-------------------" << std::endl;
+	std::cout << "\t------------------------" << std::endl;
+	std::cout << "\tConnecting with a client" << std::endl;
+	std::cout << "\tClient socket : " << client_sock << std::endl;
+	std::cout << "\tClient port   : " << ntohs(c_addr_in.sin_port) << std::endl;
+	std::cout << "\tClient ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
+	std::cout << "\t------------------------" << std::endl;
 	}
-}
-
-void	Server::recvMessage(std::map<SOCKET, Client*>::iterator &iter)
-{
-	unsigned char	buf[BUFFER_MAX];
-	int				recv_ret(0);
-	
-	recv_ret = recv(iter->first, reinterpret_cast<void *>(buf), sizeof(buf), 0);
-	if (recv_ret == 0)
-		iter->second->setDisconnectFlag(true);
-	else if (recv_ret > 0)
-	{
-		buf[recv_ret] = '\0';
-		iter->second->appendToRecvBuf(buf); //iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-
-		// test: print RecvBuf
-		{
-		//std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
-		//	 << " recvPacket: " << "[" << buf << "]\n";
-		std::cout << "Received message from <SD: " << iter->second->getSocket();
-		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
-			 << "[" << buf << "]\n";
-		}
-
-	}
-}
-
-void	Server::sendMessage(std::map<SOCKET, Client*>::iterator &iter)
-{
-	unsigned char	buf[BUFFER_MAX];
-	int				send_ret(0);
-
-	memcpy(buf, iter->second->getSendBufCStr(), iter->second->getSendBufLength() + 1);
-	send_ret = send(iter->first, reinterpret_cast<void *>(buf), strlen(reinterpret_cast<char *>(buf)), 0);
-	if (send_ret == -1)
-		iter->second->setDisconnectFlag(true);
-	else if (send_ret > 0)
-	{
-		// test: print SendBuf
-		{
-		std::cout << "Sended message to <SD: " << iter->second->getSocket();
-		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
-			 << "[" << buf << "]\n\n";
-		}
-
-		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
-	}
-	return ;
 }
 
 bool	Server::isOverlapNickName(std::string& search_nick)
 {
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin(); iter != client_map_.end(); iter++)
+	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		; iter != client_map_.end()
+		; iter++)
 	{
 		if (iter->second->getNickname() == search_nick)
 			return (true);
@@ -408,7 +378,7 @@ void	Server::clientDisconnect(void)
 		if (iter->second->getDisconnectFlag() == true)
 		{
 			if (iter->second->getSendBufLength() > 0)
-				sendMessage(iter);
+				sendMsgEachClnt(iter->first, iter->second);
 			close(iter->first);
 			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second;
@@ -442,7 +412,6 @@ Client*		Server::findClient(std::string clnt_nickname)
 		; clnt_it != client_map_.end()
 		; ++clnt_it)
 	{
-		// todo: using clnt_ptr;
 		if (clnt_nickname == clnt_it->second->getNickname())
 			return (clnt_it->second);
 	}
@@ -485,7 +454,7 @@ void				Server::requestAllChannsToEraseOneUser(Client* clnt)
 	}
 }
 
-void				Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
+void			Server::requestAllChannsToReplaceKeyNickOfUser(Client* clnt, \
 														std::string nick_to_key)
 {
 	Channel*	each_chann_ptr(NULL);

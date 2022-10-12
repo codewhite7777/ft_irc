@@ -186,6 +186,20 @@ bool				Client::isSvOper(void) const
 	return (this->sv_oper_flag_);
 }
 
+void			Client::promptRecvedMsg(void)
+{
+	std::cout << "Received message from <SD: " << this->getSocket();
+	std::cout << " | nickname: " << this->getNickname() << ">\n" \
+				<< "[" << this->getRecvBuf() << "]\n";
+}
+
+void			Client::promptSendedMsg(void)
+{
+	std::cout << "Sended message to <SD: " << this->getSocket();
+	std::cout << " | nickname: " << this->getNickname() << ">\n"\
+			<< "[" << this->getSendBuf() << "]\n\n";
+}
+
 void	Client::marshalMessageToCmdAndParam(void)
 {
 	std::string	tmp_msg;
@@ -198,15 +212,16 @@ void	Client::marshalMessageToCmdAndParam(void)
 	}
 	else
 	{
-		command_ = "";
-		param_ = tmp_msg;
+		command_ = tmp_msg;
+		param_ = "";
 	}
+	promptCommandAndParam();
+}
 
-	// test: print command_ and param_
-	{
-	std::cout << "Command: [" << command_ << "], ";
-	std::cout << "Parameter: [" << param_ << "]\n\n";
-	}
+void		Client::promptCommandAndParam(void)
+{
+	std::cout << "\tCommand: [" << command_ << "]\n";
+	std::cout << "\tParameter: [" << param_ << "]\n\n";
 }
 
 std::string	Client::extractFirstMsg(std::string& recv_buf)
@@ -258,6 +273,7 @@ void	Client::processAuthToWelcome(void)
 		appendToSendBuf(proto_->rplYourHost(this));
 		appendToSendBuf(proto_->rplCreated(this));
 		appendToSendBuf(proto_->rplMyInfo(this));
+		appendToSendBuf(proto_->svPrivmsgClntWhenInit(this));
 	}
 }
 

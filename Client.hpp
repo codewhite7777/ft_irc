@@ -63,6 +63,9 @@ public:
 	void					setSvOperFlagOn(void);
 	bool					isSvOper(void) const;
 
+	void					promptRecvedMsg(void);
+	void					promptSendedMsg(void);
+
 private:
 	void					marshalMessageToCmdAndParam(void);
 	std::string				extractFirstMsg(std::string& recv_buf);
@@ -73,6 +76,8 @@ private:
 	void					clearCommandAndParam(void);
 	std::string&			getRecvBuf(void);
 	std::string&			getSendBuf(void);
+
+	void					promptCommandAndParam(void);
 
 	SOCKET					sock_des_;
 	std::string				send_buf_;

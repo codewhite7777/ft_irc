@@ -71,20 +71,20 @@ public:
 	void					setStatusOff();
 
 private:
-	bool		configPort(std::string port);
-	bool		configPwd(std::string pwd);
+	bool					configPort(std::string port);
+	bool					configPwd(std::string pwd);
 
-	void		networkInit(void);
-	void		networkClose(void);
+	void					networkInit(void);
+	void					networkClose(void);
 
-	int			getMaxFD(SOCKET sock);
-	void		networkProcess(void);
-	void		acceptClient(SOCKET listen_sock);
-	void		recvMessage(std::map<SOCKET, Client *>::iterator &iter);
-	void		sendMessage(std::map<SOCKET, Client *>::iterator &iter);
-	void		processClientMessages(void);
+	int						getMaxSD(void);
+	void					networkProcess(void);
+	void					acceptClient(SOCKET listen_sock);
+	void					recvMsgEachClnt(SOCKET sd, Client* clnt);
+	void					sendMsgEachClnt(SOCKET sd, Client* clnt);
+	void					processClientMessages(void);
 
-	void		clientDisconnect(void);
+	void					clientDisconnect(void);
 
 	bool						status_;
 
