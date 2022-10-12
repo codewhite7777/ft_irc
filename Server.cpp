@@ -165,6 +165,7 @@ void	Server::networkInit(void)
 	listen_sock_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listen_sock_ == -1)
 	{
+		std::cerr << "Error: listen_sock_ socket() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -177,6 +178,7 @@ void	Server::networkInit(void)
 		&optval, sizeof(optval));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -185,6 +187,7 @@ void	Server::networkInit(void)
 	retval = setsockopt(listen_sock_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -197,6 +200,7 @@ void	Server::networkInit(void)
 	retval = bind(listen_sock_, reinterpret_cast<struct sockaddr *>(&s_addr_in_), sizeof(s_addr_in_));
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ bind() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -205,6 +209,7 @@ void	Server::networkInit(void)
 	retval = listen(listen_sock_, SOMAXCONN);
 	if (retval == -1)
 	{
+		std::cerr << "Error: listen_sock_ listen() failed" << std::endl;
 		status_ = false;
 		return ;
 	}
