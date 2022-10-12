@@ -80,8 +80,8 @@ private:
 	int			getMaxFD(SOCKET sock);
 	void		networkProcess(void);
 	void		acceptClient(SOCKET listen_sock);
-	void		recvMessage(std::map<SOCKET, Client *>::iterator &iter);
-	void		sendMessage(std::map<SOCKET, Client *>::iterator &iter);
+	void		recvMessage(std::map<SOCKET, Client*>::iterator &iter);
+	void		sendMessage(std::map<SOCKET, Client*>::iterator &iter);
 	void		processClientMessages(void);
 
 	void		clientDisconnect(void);

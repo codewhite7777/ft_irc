@@ -186,6 +186,20 @@ bool				Client::isSvOper(void) const
 	return (this->sv_oper_flag_);
 }
 
+void			Client::promptRecvedMsg(void)
+{
+	std::cout << "Received message from <SD: " << this->getSocket();
+	std::cout << " | nickname: " << this->getNickname() << ">\n" \
+				<< "[" << this->getRecvBuf() << "]\n";
+}
+
+void			Client::promptSendedMsg(void)
+{
+	std::cout << "Sended message to <SD: " << this->getSocket();
+	std::cout << " | nickname: " << this->getNickname() << ">\n"\
+			<< "[" << this->getSendBuf() << "]\n\n";
+}
+
 void	Client::marshalMessageToCmdAndParam(void)
 {
 	std::string	tmp_msg;
@@ -198,14 +212,14 @@ void	Client::marshalMessageToCmdAndParam(void)
 	}
 	else
 	{
-		command_ = "";
-		param_ = tmp_msg;
+		command_ = tmp_msg;
+		param_ = "";
 	}
 
-	// test: print command_ and param_
+	// Client.promptCmdAndParam()
 	{
-	std::cout << "Command: [" << command_ << "], ";
-	std::cout << "Parameter: [" << param_ << "]\n\n";
+	std::cout << "\tCommand: [" << command_ << "]\n";
+	std::cout << "\tParameter: [" << param_ << "]\n\n";
 	}
 }
 

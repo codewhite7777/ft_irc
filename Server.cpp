@@ -248,7 +248,7 @@ void	Server::networkProcess(void)
 	FD_ZERO(&read_set_);
 	FD_ZERO(&write_set_);
 	FD_SET(listen_sock_, &read_set_);
-	for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+	for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()
 		; iter != client_map_.end()
 		; iter++)
 	{
@@ -266,22 +266,24 @@ void	Server::networkProcess(void)
 			if (select_result == 1)
 				return ;
 		}
-		for (std::map<SOCKET, Client *>::iterator iter = client_map_.begin()
+		for (std::map<SOCKET, Client*>::iterator iter = client_map_.begin()
 			; iter != client_map_.end()
 			; iter++)
 		{
 			if (FD_ISSET(iter->first, &read_set_))
 				recvMessage(iter);
+			/*
 			if ((iter->second->getDisconnectFlag() == false) \
 			&& FD_ISSET(iter->first, &write_set_) \
 			&& iter->second->getSendBufLength() > 0)
 				sendMessage(iter);
+			*/
 			// -> todo: refactoring and checking
-			/*
+			
 			if ((iter->second->getSendBufLength() > 0) \
 			&& FD_ISSET(iter->first, &write_set_))
-				sendPacket(iter);
-			*/
+				sendMessage(iter);
+			
 		}
 	}
 }
@@ -328,7 +330,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 	}
 }
 
-void	Server::recvMessage(std::map<SOCKET, Client*>::iterator &iter)
+void	Server::recvMessage(std::map<SOCKET, Client*>::iterator& iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int				recv_ret(0);
@@ -339,21 +341,12 @@ void	Server::recvMessage(std::map<SOCKET, Client*>::iterator &iter)
 	else if (recv_ret > 0)
 	{
 		buf[recv_ret] = '\0';
-		iter->second->appendToRecvBuf(buf); //iter->second->getRecvBuf().append(reinterpret_cast<char *>(buf));
-
-		// test: print RecvBuf
-		{
-		//std::cout << "<" << iter->second->getSocket() << "|" << iter->second->getNickname() << ">"\
-		//	 << " recvPacket: " << "[" << buf << "]\n";
-		std::cout << "Received message from <SD: " << iter->second->getSocket();
-		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
-			 << "[" << buf << "]\n";
-		}
-
+		iter->second->appendToRecvBuf(buf);
+		iter->second->promptRecvedMsg();
 	}
 }
 
-void	Server::sendMessage(std::map<SOCKET, Client*>::iterator &iter)
+void	Server::sendMessage(std::map<SOCKET, Client*>::iterator& iter)
 {
 	unsigned char	buf[BUFFER_MAX];
 	int				send_ret(0);
@@ -364,14 +357,8 @@ void	Server::sendMessage(std::map<SOCKET, Client*>::iterator &iter)
 		iter->second->setDisconnectFlag(true);
 	else if (send_ret > 0)
 	{
-		// test: print SendBuf
-		{
-		std::cout << "Sended message to <SD: " << iter->second->getSocket();
-		std::cout << " | nickname: " << iter->second->getNickname() << ">\n"\
-			 << "[" << buf << "]\n\n";
-		}
-
-		iter->second->eraseSendBufSize(send_ret); //iter->second->getSendBuf().erase(0, send_ret);
+		iter->second->promptSendedMsg();
+		iter->second->eraseSendBufSize(send_ret);
 	}
 	return ;
 }
