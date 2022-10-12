@@ -273,6 +273,7 @@ void	Client::processAuthToWelcome(void)
 		appendToSendBuf(proto_->rplYourHost(this));
 		appendToSendBuf(proto_->rplCreated(this));
 		appendToSendBuf(proto_->rplMyInfo(this));
+		appendToSendBuf(proto_->svPrivmsgClntWhenInit(this));
 	}
 }
 

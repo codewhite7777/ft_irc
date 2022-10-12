@@ -36,6 +36,7 @@ public:
 									Client* clnt_to_be_invtd, Channel* chann);
 	std::string		rplYoureOper(Client* clnt);
 
+	std::string		svPrivmsgClntWhenInit(Client* clnt);
 	std::string		clntJoinChann(Client* clnt, Channel* chann);
 	std::string		clntPartChann(Client* clnt, std::string msg);
 	std::string		clntPrivmsgToChann(Client* clnt, std::string msg, \

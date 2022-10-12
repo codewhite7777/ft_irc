@@ -139,6 +139,18 @@ std::string		Protocol::rplYoureOper(Client* clnt)
 	return ret;
 }
 
+std::string		Protocol::svPrivmsgClntWhenInit(Client* clnt)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += "PRIVMSG";
+	ret += " " + clnt->getNickname();
+	ret += " :*** I/O logging is enabled on this server.";
+	ret += "\r\n";
+	return ret;
+}
+
 std::string		Protocol::clntJoinChann(Client* clnt, Channel* chann)
 {
 	std::string	ret;

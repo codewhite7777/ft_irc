@@ -85,11 +85,6 @@ void    Command::nick(Client* clnt)
 		else
 		{
 			clnt->setNickFlagOn();
-
-			// todo: proto_->svPrivmsgNickWhenInit();
-
-			std::string	test = sv_->getNamePrefix() + "PRIVMSG " + tmp_nick + " :*** I/O logging is enabled on this server.\r\n";
-			clnt->appendToSendBuf(test);
 		}
 		clnt->setNickname(tmp_nick);
 	}
