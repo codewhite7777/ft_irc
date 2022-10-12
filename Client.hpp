@@ -13,9 +13,9 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-#include <string>
+# include <string>
 
-typedef int	SOCKET; // todo: set typedefs
+typedef int	SOCKET;
 
 class Server;
 class Command;
@@ -28,95 +28,69 @@ public:
 	Client(SOCKET s, std::string host_name, Server* sv);
 	~Client(void);
 
-	//client socket
 	SOCKET&					getSocket(void);
 
-	//client network buf
-		// recvBuf
 	void					appendToRecvBuf(unsigned char* buf);
-	size_t					getRecvBufLength();
-		// sendBuf
+	size_t					getRecvBufLength(void);
 	void					appendToSendBuf(const std::string& str);
-	const char*				getSendBufCStr();
-	size_t					getSendBufLength();
+	const char*				getSendBufCStr(void);
+	size_t					getSendBufLength(void);
 	void					eraseSendBufSize(int size);
-
-	// processMessage
 	void					processMessageInRecvBuf();
+	const std::string&		getCommand(void) const;
+	const std::string&		getParam(void) const;
 
-	const std::string&		getCommand() const;
-	const std::string&		getParam() const;
-
-	bool					isWelcomed() const;
-
-	//client disconnect flag getter/setter
+	bool					isWelcomed(void) const;
 	bool					getDisconnectFlag(void) const;
 	void					setDisconnectFlag(bool flag);
-
-	//client PASS getter/setter
 	void					setPassFlag(bool flag);
 	bool					getPassFlag(void) const;
-
-	//client NICK getter/setter
 	void					setNickname(std::string nickname);
-	const std::string&		getNickname() const;
-	void					setNickFlagOn();
+	const std::string&		getNickname(void) const;
+	void					setNickFlagOn(void);
 	bool					getNickFlag(void) const;
-
-	//client USER getter/setter
 	void					setUsername(std::string username);
 	void					setHostname(std::string hostname);
 	void					setRealname(std::string username);
-	const std::string&		getUsername() const; // todo: private
-	const std::string&		getHostname() const; // todo: private
-	const std::string&		getRealname() const; // todo: private
-	const std::string		getUserRealHostNamesInfo() const;
-	void					setUserFlagOn();
-	bool					getUserFlag() const;
+	const std::string&		getUsername(void) const;
+	const std::string&		getHostname(void) const;
+	const std::string&		getRealname(void) const;
+	const std::string		getUserRealHostNamesInfo(void) const;
+	void					setUserFlagOn(void);
+	bool					getUserFlag(void) const;
+	std::string				getNamesPrefix(void) const;
 
-	std::string				getNamesPrefix() const;
-
-	void					setSvOperFlagOn();
-	bool					isSvOper() const;
+	void					setSvOperFlagOn(void);
+	bool					isSvOper(void) const;
 
 private:
-	void					marshalMessage(std::string& command, std::string& param);
+	void					marshalMessageToCmdAndParam(void);
 	std::string				extractFirstMsg(std::string& recv_buf);
-
-	void					processProtocol();
-	void					processAuthToWelcome();
-	bool					isPassed() const;
-	
-	void					processCommand();
-	void					clearCommandAndParam();
-
+	void					processProtocol(void);
+	void					processAuthToWelcome(void);
+	bool					isPassed(void) const;
+	void					processCommand(void);
+	void					clearCommandAndParam(void);
 	std::string&			getRecvBuf(void);
 	std::string&			getSendBuf(void);
 
-
 	SOCKET					sock_des_;
-
 	std::string				send_buf_;
 	std::string				recv_buf_;
-
 	std::string				command_;
 	std::string				param_;
-
 	bool					pass_flag_;
-	bool					nick_flag_; // nick_regi_flag
+	bool					nick_flag_;
 	bool					user_flag_;
-
 	std::string				nickname_;
 	std::string				username_;
-	std::string				hostname_; // add ip_addr ?
+	std::string				hostname_;
 	std::string				realname_;
-
 	bool					disconnect_flag_;
 	bool					sv_oper_flag_;
-
 	bool					passed_;
-	bool					welcomed_; // refistered
-	
+	bool					welcomed_;
+
 	Server*					sv_;
 	Command*				cmd_;
 	Protocol*				proto_;
