@@ -6,11 +6,15 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:33:06 by mgo               #+#    #+#             */
-/*   Updated: 2022/10/01 16:57:04 by mgo              ###   ########.fr       */
+/*   Updated: 2022/10/12 11:57:10 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
+#include "Server.hpp"
+#include "Protocol.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 #include "Chatbot.hpp"
 #include <iostream>
 #include <string>
@@ -64,7 +68,6 @@ void    Command::nick(Client* clnt)
 	{
 		if (clnt->isWelcomed())
 		{
-			// sending client nick protocol to the commander and others in channels the commander is in.
 			clnt->appendToSendBuf(proto_->clntNick(clnt, tmp_nick));
 			clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(clnt);
 			for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
@@ -76,7 +79,6 @@ void    Command::nick(Client* clnt)
 				each_clnt_ptr = NULL;
 			}
 			delete clnts_in_same_channs;
-			// replacing client key nick in each channel
 			sv_->requestAllChannsToReplaceKeyNickOfUser(clnt, tmp_nick);
 		}
 		else
@@ -250,11 +252,11 @@ void    Command::privmsg(Client* clnt)
 			if (chann_ptr)
 			{
 				std::string bot_msg = "";
-				// TODO::/
+				// todo: setting function in if statement with removing ret
 				bool ret = bot.CheckChatBotCommand(msg, bot_msg);
 				if (ret)
-				{	
-					// easy
+				{
+					// todo: setting bot privmsg protocol
 					chann_ptr->sendToAll(":NIGHTBOT!bot@localhost PRIVMSG " + chann_ptr->getName() + " :" + bot_msg + "\r\n");
 				}
 				chann_ptr->sendToOthers(clnt, \
@@ -380,7 +382,7 @@ void	Command::kick(Client* clnt)
 		clnt->appendToSendBuf(proto_->errChanOPrivsNeeded(clnt, ptr_chann));
 		return ;
 	}
-	
+
 	// ejecting the user
 	ptr_clnt_to_be_kicked = sv_->findClient(nick);
 	if (ptr_clnt_to_be_kicked)
@@ -422,23 +424,19 @@ void    Command::invite(Client* clnt)
 	nick = params.substr(0, pos_space_found);
 	chann_name = params.substr(pos_space_found + 1);
 
-	// chekcing a channel valid
+	// checking condition valid
 	ptr_chann = sv_->findChannel(chann_name);
 	if (ptr_chann == NULL)
 	{
 		clnt->appendToSendBuf(proto_->errNoSuchChannel(clnt, chann_name));
 		return ;
 	}
-
-	// checking a client valid
 	ptr_clnt_to_be_invtd = sv_->findClient(nick);
 	if (ptr_clnt_to_be_invtd == NULL)
 	{
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, nick));
 		return ;
 	}
-
-	// checking condition valid
 	if (ptr_chann->isUserIn(ptr_clnt_to_be_invtd))
 	{
 		clnt->appendToSendBuf(proto_->errUserOnChannel(clnt, \
@@ -451,6 +449,7 @@ void    Command::invite(Client* clnt)
 		return ;
 	}
 
+	// checking operator privilege
 	if (ptr_chann->isOperator(clnt))
 	{
 		ptr_clnt_to_be_invtd->appendToSendBuf(proto_->clntInviteClnt(clnt, \
@@ -475,28 +474,23 @@ void	Command::oper(Client* clnt)
 	pos_space_found = params.find(' ');
 	if (pos_space_found == std::string::npos)
 	{
-		// ERR_NEEDMOREPARAMS
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 		return ;
 	}
 	name = params.substr(0, pos_space_found);
 	password = params.substr(pos_space_found + 1);
 
-	// checking name and password valid
+	// checking information valid to give oper privilege
 	if (sv_->isOperName(name)\
 	 && sv_->isOperPassword(password)\
 	 && sv_->isOperHost(clnt->getHostname()))
 	{
-		// sending MODE protocol to give oper privilege
 		clnt->appendToSendBuf(proto_->svModeClntAddOper(clnt));
-		// setting sv_oper_flag ofr the client
 		clnt->setSvOperFlagOn();
-		// sending protocols to give oper privilege
 		clnt->appendToSendBuf(proto_->rplYoureOper(clnt));
 	}
 	else
 	{
-		// ERR_NOOPERHOST
 		clnt->appendToSendBuf(proto_->errNoOperHost(clnt));
 	}
 }
@@ -517,7 +511,6 @@ void		Command::kill(Client* clnt)
 	pos_space_found = params.find(' ');
 	if (pos_space_found == std::string::npos)
 	{
-		// ERR_NEEDMOREPARAMS
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 		return ;
 	}
@@ -525,35 +518,27 @@ void		Command::kill(Client* clnt)
 	comment = params.substr(pos_space_found + 1);
 	if (':' == comment.front())
 		comment.erase(0, 1);
-	
-	// setting comment message for protocols
-	msg_for_proto = "Killed (" + clnt->getNickname();
-	msg_for_proto += " (" + comment + "))";
 
-	// checking permission valid
+	// checking condition valid
 	if (clnt->isSvOper() == false)
 	{
-		// ERR_NOPRIVILEGES
 		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
 		return ;
 	}
-
-	// checking target_nick valid
 	target_clnt = sv_->findClient(target_nick);
 	if (target_clnt == NULL)
 	{
-		// ERR_NOSUCHNICK
 		clnt->appendToSendBuf(proto_->errNoSuchNick(clnt, target_nick));
 		return ;
 	}
 
-	// sending KILL and Closing_link protocols to the target
+	// sending protocols
+	msg_for_proto = "Killed (" + clnt->getNickname();
+	msg_for_proto += " (" + comment + "))";
 	target_clnt->appendToSendBuf(\
 		proto_->clntKillClnt(clnt, target_clnt, msg_for_proto));
 	target_clnt->appendToSendBuf(\
 		proto_->errorClosingLink(target_clnt, msg_for_proto));
-	
-	// sending QUIT of the target protocol to clients in the channel the target is in
 	clnts_in_same_channs = sv_->makeOtherClntListInSameChanns(target_clnt);
 	for (std::list<Client*>::iterator each_clnt_it(clnts_in_same_channs->begin())
 		; each_clnt_it != clnts_in_same_channs->end()
@@ -566,7 +551,6 @@ void		Command::kill(Client* clnt)
 	delete clnts_in_same_channs;
 	sv_->requestAllChannsToEraseOneUser(target_clnt);
 
-	// setting disconnect flag
 	target_clnt->setDisconnectFlag(true);
 }
 
@@ -576,30 +560,21 @@ void		Command::die(Client* clnt)
 	std::string		param(clnt->getParam());
 	std::string		msg_to_send;
 
-	msg_to_send = "Died (";
-	msg_to_send += clnt->getNickname();
-	if (clnt->getParam().empty())
-		msg_to_send += " (" + param + "))";
-	else
-		msg_to_send += " ())";
 	// chekcing permission
 	if (clnt->isSvOper())
 	{
-		// setting all channels to have no users
-		//sv_->requestAllChannsToEraseAllUser();
-
-		// setting disconnect_flag of all clients on
+		msg_to_send = "Died (";
+		msg_to_send += clnt->getNickname();
+		if (clnt->getParam().empty())
+			msg_to_send += " ())";
+		else
+			msg_to_send += " (" + param + "))";
 		sv_->requestAllClientsToDisconnect();
-
-		// sending Error Closing Link protocol to all clients
 		sv_->sendErrorClosingLinkProtoToAllClientsWithMsg(msg_to_send);
-
-		// setting Server status off
 		sv_->setStatusOff();
 	}
 	else
 	{
-		// ERR_NOPRIVILEGES
 		clnt->appendToSendBuf(proto_->errNoPrivileges(clnt));
 	}
 }

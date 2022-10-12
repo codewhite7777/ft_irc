@@ -6,65 +6,36 @@
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 17:35:38 by mgo               #+#    #+#             */
-/*   Updated: 2022/10/01 16:45:21 by mgo              ###   ########.fr       */
+/*   Updated: 2022/10/12 11:58:43 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef COMMAND_HPP
 # define COMMAND_HPP
 
-#include "Protocol.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
+class Server;
+class Protocol;
+class Client;
 
 class Command
 {
 public:
-	// todo: OCCF
 	Command(Server* sv, Protocol* proto);
 	~Command(void);
 
-	// PASS
 	void    pass(Client* clnt);
-
-	// NICK
 	void    nick(Client* clnt);
-
-	// USER
 	void    user(Client* clnt);
-
-	// PING
 	void	ping(Client* clnt);
-
-	// JOIN
 	void    join(Client* clnt);
-
-	// PART
 	void    part(Client* clnt);
-
-	// PRIVMSG
 	void    privmsg(Client* clnt);
-
-	// NOTICE
 	void	notice(Client* clnt);
-
-	// QUIT
 	void    quit(Client* clnt);
-
-	// KICK
 	void	kick(Client* clnt);
-
-	// INVITE
 	void    invite(Client* clnt);
-
-	// OPER
 	void	oper(Client* clnt);
-
-	// KILL
 	void	kill(Client* clnt);
-
-	// DIE
 	void	die(Client* clnt);
 
 private:
