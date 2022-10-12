@@ -173,7 +173,7 @@ std::string		Protocol::clntPartChann(Client* clnt, std::string msg)
 	return ret;
 }
 
-std::string		Protocol::msgPong(std::string token)
+std::string		Protocol::svPong(std::string token)
 {
 	std::string	ret;
 

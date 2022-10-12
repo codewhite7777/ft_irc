@@ -50,7 +50,7 @@ public:
 	std::string		clntQuit(Client* clnt, std::string msg);
 	std::string		clntNick(Client* clnt, std::string nick);
 	std::string		errorClosingLink(Client* clnt, std::string msg);
-	std::string		msgPong(std::string token);
+	std::string		svPong(std::string token);
 	std::string		clntKickUserInChann(Client* clnt, \
 								Channel* chann, Client* user, std::string msg);
 	std::string		clntInviteClnt(Client* clnt, \

@@ -205,7 +205,7 @@ void	Command::ping(Client* clnt)
 	std::string	token(clnt->getParam());
 
 	if (token.empty() == false)
-		clnt->appendToSendBuf(proto_->msgPong(token));
+		clnt->appendToSendBuf(proto_->svPong(token));
 	else
 		clnt->appendToSendBuf(proto_->errNeedMoreParams());
 }
