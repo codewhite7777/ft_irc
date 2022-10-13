@@ -242,7 +242,9 @@ void	Client::processProtocol(void)
 {
 	if (command_.empty() && param_.empty())
 		return ;
-	if (isWelcomed() == false)
+	if (command_ == "PING")
+		cmd_->ping(this);
+	else if (isWelcomed() == false)
 		processAuthToWelcome();
 	else
 		processCommand();
@@ -289,9 +291,7 @@ bool	Client::isWelcomed(void) const
 
 void	Client::processCommand(void)
 {
-	if (command_ == "PING")
-		cmd_->ping(this);
-	else if (command_ == "JOIN")
+	if (command_ == "JOIN")
 		cmd_->join(this);
 	else if (command_ == "PART")
 		cmd_->part(this);
@@ -311,8 +311,7 @@ void	Client::processCommand(void)
 		cmd_->oper(this);
 	else if (command_ == "kill")
 		cmd_->kill(this);
-	else if (command_ == "die"\
-		 || (command_.empty() && param_ == "die"))
+	else if (command_ == "die")
 		cmd_->die(this);
 }
 
