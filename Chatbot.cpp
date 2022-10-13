@@ -34,14 +34,10 @@ std::string		ChatBot::CommandList()
 
 void			ChatBot::AddCommand(std::string &contents)
 {
-	std::cout << "IN ADDCOMMAND\n";
 	std::vector<std::string> v = split(contents, ',');
-	std::cout <<"["<< v[0] <<"], [" << v[1] << "]\n";
 	if (v[0][0] == '!' && v[0] != "!add" && v[0] != "!delete" && v[0] != "!list")
 	{
-		std::cout << "size:[" << chatbot_command_list.size()<< "]\n";
 		chatbot_command_list[v[0]] = v[1];
-		std::cout << "size:[" << chatbot_command_list.size()<< "]\n";
 	}
 }
 
@@ -78,7 +74,7 @@ ChatBot::ChatBot()
 	chatbot_command_list.insert(std::make_pair("!info", "!add: register a new chatbot command !delete: remove a command !list: show registered commands"));
 }
 
-bool	ChatBot::CheckChatBotCommand(std::string param, std::string &ret)
+bool	ChatBot::CheckList(std::string param, std::string &ret)
 {
     std::map<std::string, std::string>::iterator 
     iter = chatbot_command_list.find(param);
@@ -92,7 +88,6 @@ bool	ChatBot::CheckChatBotCommand(std::string param, std::string &ret)
 
 bool	ChatBot::ChatBotCommand(std::string& param, std::string &bot_msg)
 {
-	std::cout << "CHAT BOT TEST START\n";
 	unsigned int ret = param.find(' ');
 	if ((int)ret != -1)
 	{
@@ -112,7 +107,7 @@ bool	ChatBot::ChatBotCommand(std::string& param, std::string &bot_msg)
 			bot_msg = CommandList();
 		else if (chat_command == "!now")
 			chatbot_command_list[chat_command] =  GetNowTime();
-		CheckChatBotCommand(chat_command, bot_msg);
+		CheckList(chat_command, bot_msg);
 		return true;
 	}
 	return false;

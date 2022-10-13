@@ -17,14 +17,13 @@
 # include <string>
 # include <map>
 
-#include <string>
 class ChatBot
 {
 public:
 	ChatBot(void);
 	~ChatBot(void);
 
-	bool	CheckChatBotCommand(std::string param, std::string &ret);
+	bool	CheckList(std::string param, std::string &ret);
 	bool	ChatBotCommand(std::string&, std::string&);
 	std::string		getPrefix(void);
 
@@ -34,7 +33,7 @@ private:
 	void			DeleteCommand(std::string &);
 	std::string		GetNowTime(void);
 	
-
+private:
 	std::map< std::string, std::string > chatbot_command_list;
 };
 
