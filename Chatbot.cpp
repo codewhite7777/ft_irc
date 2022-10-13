@@ -66,11 +66,13 @@ ChatBot::ChatBot()
 	// !now
 	chatbot_command_list.insert(std::make_pair("!now", GetNowTime()));
 
-	// !hi 
+	// !mgo
 	chatbot_command_list.insert(std::make_pair("!mgo", "mgo는 코딩 버스기사입니다."));
 
-	// !hi 
+	// !hena
 	chatbot_command_list.insert(std::make_pair("!hena", "미래의 청소부입니다."));
+	
+	chatbot_command_list.insert(std::make_pair("!info", "!add: register a new chatbot command !delete: remove a command !list: show registered commands"));
 }
 
 bool	ChatBot::CheckChatBotCommand(std::string param, std::string &ret)
