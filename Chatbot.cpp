@@ -65,6 +65,14 @@ ChatBot::ChatBot()
 
 	// !now
 	chatbot_command_list.insert(std::make_pair("!now", GetNowTime()));
+
+	// !mgo
+	chatbot_command_list.insert(std::make_pair("!mgo", "mgo는 코딩 버스기사입니다."));
+
+	// !hena
+	chatbot_command_list.insert(std::make_pair("!hena", "미래의 청소부입니다."));
+	
+	chatbot_command_list.insert(std::make_pair("!info", "!add: register a new chatbot command !delete: remove a command !list: show registered commands"));
 }
 
 bool	ChatBot::CheckChatBotCommand(std::string param, std::string &ret)
@@ -110,4 +118,9 @@ bool	ChatBot::ChatBotCommand(std::string& param, std::string &bot_msg)
 ChatBot::~ChatBot()
 {
 	chatbot_command_list.clear();
+}
+
+std::string		ChatBot::getPrefix()
+{
+	return ":NIGHTBOT!night@localhost ";
 }

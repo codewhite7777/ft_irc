@@ -24,6 +24,7 @@ public:
 	void			AddCommand(std::string&);
 	void			DeleteCommand(std::string &);
 	std::string		GetNowTime();
+	std::string		getPrefix();
 
 private:
 	std::map< std::string, std::string > chatbot_command_list;

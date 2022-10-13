@@ -246,7 +246,9 @@ void    Command::privmsg(Client* clnt)
 				{	
 					// todo: setting bot privmsg protocol
 					if (bot_msg != "")
-						chann_ptr->sendToAll(":NIGHTBOT!bot@localhost PRIVMSG " + chann_ptr->getName() + " :" + bot_msg + "\r\n");
+						
+						chann_ptr->sendToAll(proto_->chatPrivOthers(
+								chann_ptr->GetChatBot(), chann_ptr, bot_msg));
 				}
 			}
 			else

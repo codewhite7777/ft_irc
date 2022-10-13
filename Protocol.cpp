@@ -15,6 +15,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Chatbot.hpp"
 
 Protocol::Protocol(Server* sv)
 	: sv_(sv) {}
@@ -350,6 +351,20 @@ std::string		Protocol::errUserNotInChannel(Client* clnt, \
 	return ret;
 }
 
+std::string		Protocol::chatPrivOthers(ChatBot& chat, Channel *chann, std::string msg)
+{
+	std::string ret;
+
+	ret = chat.getPrefix();
+	ret += "PRIVMSG";
+	ret += " " + chann->getName();
+	ret += " :";
+	ret += msg;
+	ret += "\r\n";
+
+	return ret;
+}
+
 std::string     Protocol::errWrongPasswd()
 {
 	std::string ret;
@@ -502,3 +517,5 @@ Server* Protocol::getServer_(void)
 {
 	return sv_;
 }
+
+
