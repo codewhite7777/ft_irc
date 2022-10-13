@@ -26,8 +26,10 @@ std::string    Protocol::rplPass()
 {
 	std::string ret;
 
-	ret = RPL_NONE;
-	ret += " " +  sv_->getName() + " :info) Successful Authentication.\r\n";
+	ret = sv_->getNamePrefix();
+	ret += RPL_NONE;
+	ret += " :info) Successful Authentication.";
+	ret += "\r\n";
 	return ret;
 }
 
