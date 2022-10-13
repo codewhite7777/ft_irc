@@ -75,6 +75,7 @@ public:
 										Client* user, Channel* chann);
 	std::string		errNoOperHost(Client* clnt);
 	std::string		errNoPrivileges(Client* clnt);
+	std::string		errBadChanMask(Client* clnt, std::string chann_name);
 
 	std::string		chatPrivOthers(ChatBot& chat, Channel *chann, std::string msg);
 

@@ -515,6 +515,18 @@ std::string		Protocol::errNoPrivileges(Client* clnt)
 	return ret;
 }
 
+std::string		Protocol::errBadChanMask(Client* clnt, std::string chann_name)
+{
+	std::string		ret;
+
+	ret = sv_->getNamePrefix();
+	ret += ERR_BADCHANMASK;
+	ret += " " + clnt->getNickname();
+	ret += " " + chann_name;
+	ret += "\r\n";
+	return ret;
+}
+
 Server* Protocol::getServer_(void)
 {
 	return sv_;
