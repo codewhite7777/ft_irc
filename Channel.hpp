@@ -5,64 +5,48 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/28 18:32:23 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:31:13 by mgo              ###   ########.fr       */
+/*   Created: 2022/10/12 11:19:31 by mgo               #+#    #+#             */
+/*   Updated: 2022/10/12 11:19:32 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include "Client.hpp"
 # include <string>
 # include <map>
 # include <list>
 
 #include "Chatbot.hpp"
 
+class Client;
+
 class Channel
 {
 public:
-	Channel(std::string name);	// todo: use reference?
+	Channel(std::string name);
 	~Channel(void);
-	// todo: OCCF
-	
+
 	std::size_t			getCurrUserCount(void) const;
 	void				assignAsUser(Client* clnt);
 	void				assignAsOperator(Client* clnt);
-
-	// todo: eraseClntInChannel(Client* clnt);
-	/*
-		-> erase client as user in channel, 
-			if channel operator erase client as operator
-	*/
-
 	void				eraseAsUser(Client* clnt);
 	void				eraseAsOperator(Client* clnt);
-
 	const std::string&	getName(void) const;
-
 	std::string			getUserListStr(void);
-
 	bool				isOperator(Client* clnt);
-
 	void				sendToAll(std::string msg);
-
 	void				sendToOthers(Client* clnt, std::string msg);
-
 	bool				isUserIn(Client* clnt);
-
 	std::list<Client*>*	makeClntListInChannExceptOne(Client* clnt_to_excpt);
-
 	void				eraseClntIfIs(Client* clnt);
-
 	void				replaceClntKeyNick(Client* clnt, \
 											std::string nick_to_key);
 
+
 	// chatbot
 	ChatBot&			GetChatBot();
-
-
+  
 private:
 	Channel(void);
 

@@ -60,11 +60,9 @@ public:
 
 	std::string		errWrongPasswd();
 	std::string		errNotPassCmd();
-
 	std::string		errNicknameInUse(Client* clnt, std::string nick);
 	std::string		errNoNicknameGiven(Client* clnt);
 	std::string		errErroneusNickname(Client* clnt, std::string nick);
-
 	std::string		errNeedMoreParams();	
 	std::string		errNoSuchNick(Client* clnt, std::string nick);
 	std::string		errNoSuchChannel(Client* clnt, std::string chann_name);

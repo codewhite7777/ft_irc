@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/28 18:32:38 by alee              #+#    #+#             */
-/*   Updated: 2022/09/26 18:30:50 by mgo              ###   ########.fr       */
+/*   Created: 2022/10/12 11:19:20 by mgo               #+#    #+#             */
+/*   Updated: 2022/10/12 11:19:23 by mgo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 #include "Server.hpp"
 #include <string>
 #include <map>
+#include <list>
 Channel::Channel(std::string name)
 	: name_(name)
 	, curr_user_count_(0) {}
 
 Channel::~Channel(void) {}
 
-std::size_t		Channel::getCurrUserCount() const
+std::size_t		Channel::getCurrUserCount(void) const
 {
 	return curr_user_count_;
 }
