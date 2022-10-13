@@ -241,16 +241,10 @@ void    Command::privmsg(Client* clnt)
 			{
 				chann_ptr->sendToOthers(clnt, \
 					proto_->clntPrivmsgToChann(clnt, msg, chann_ptr));
-
-			
 				std::string bot_msg = "";
-				// todo: setting function in if statement with removing ret
-				bool ret = chann_ptr->GetChatBot().ChatBotCommand(msg, bot_msg);
-				if (ret)
+				if (chann_ptr->GetChatBot().ChatBotCommand(msg, bot_msg))
 				{	
-					// todo: setting bot privmsg protocol
 					if (bot_msg != "")
-						
 						chann_ptr->sendToAll(proto_->chatPrivOthers(
 								chann_ptr->GetChatBot(), chann_ptr, bot_msg));
 				}
