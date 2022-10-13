@@ -20,7 +20,7 @@ typedef enum e_port
 	WELL_KNOWN_PORT,
 	REGISTERED_PORT,
 	DYNAMIC_PORT,
-	INVALID_PORT,
+	INVALID_PORT
 }			t_port;
 
 bool						isNotAlnumAndUnderscore(const std::string& str);

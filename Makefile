@@ -13,7 +13,7 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror
 CXXDEBUG = -g -fsanitize=address
-CXX_VERSION = -std=c++98
+CXX_VERSION = -pedantic -std=c++98
 RM = rm -f
 
 NAME = ircserv
@@ -31,10 +31,10 @@ SRC_FILE	=	main.cpp \
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
 
 %.o	:	%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) -c $< -o $@
+	$(CXX) $(CXX_VERSION) $(CXXFLAGS) $(CXXDEBUG) -c $< -o $@
 
 $(NAME): $(OBJ_FILE)
-	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) $^ -o $@
+	$(CXX) $(CXX_VERSION) $(CXXFLAGS) $(CXXDEBUG) $^ -o $@
 
 all: $(NAME)
 

@@ -250,6 +250,7 @@ void	Server::networkProcess(void)
 	time_out.tv_usec = 0;
 	select_result = select(getMaxSD() + 1, &read_set_, &write_set_, NULL, \
 		&time_out);
+	// todo: if -1
 	if (select_result > 0)
 	{
 		if (FD_ISSET(listen_sock_, &read_set_))
@@ -369,14 +370,29 @@ void	Server::clientDisconnect(void)
 		{
 			if (iter->second->getSendBufLength() > 0)
 				sendMsgEachClnt(iter->first, iter->second);
+			requestAllChannsToQuitClntUnexpectdly(iter->second);
 			close(iter->first);
-			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			delete iter->second;
+			std::cout << iter->first << " Socket Disconnected" << std::endl;
 			iter = client_map_.erase(iter);
 			sock_count_ -= 1;
 		}
 		else
 			iter++;
+	}
+}
+
+void		Server::requestAllChannsToQuitClntUnexpectdly(Client* clnt)
+{
+	for (std::map<std::string, Channel*>::iterator	chann_it = chann_map_.begin()
+		; chann_it != chann_map_.end()
+		; ++chann_it)
+	{
+		if (chann_it->second->isUserIn(clnt))
+		{
+			chann_it->second->eraseClntIfIs(clnt);
+			chann_it->second->sendToAll(proto_->clntQuit(clnt, "unexpectedly quit"));
+		}
 	}
 }
 

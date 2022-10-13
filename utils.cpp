@@ -45,7 +45,7 @@ t_port	getPortType(int value)
 
 bool	setPortNumber(const char *str, int *o_value)
 {
-	long long	total = 0;
+	__int64_t	total(0);
 	t_port		retPort(INVALID_PORT);
 
 	while (*str)

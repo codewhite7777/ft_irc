@@ -43,7 +43,6 @@ public:
 	void				replaceClntKeyNick(Client* clnt, \
 											std::string nick_to_key);
 
-
 	// chatbot
 	ChatBot&			GetChatBot();
   

@@ -223,6 +223,8 @@ std::string		Protocol::clntNoticeToChann(Client* clnt, std::string msg, \
 	ret += "NOTICE ";
 	ret += chann->getName();
 	ret += " " + msg;
+	int	i(0);
+	ret += std::to_string(i);
 	ret += "\r\n";
 	return ret;
 }
@@ -531,5 +533,3 @@ Server* Protocol::getServer_(void)
 {
 	return sv_;
 }
-
-

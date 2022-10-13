@@ -23,7 +23,7 @@ typedef int	SOCKET;
 
 typedef enum e_buf
 {
-	BUFFER_MAX = 1024 << 4,
+	BUFFER_MAX = 1024 << 4
 }			t_buf;
 
 class Command;
@@ -85,6 +85,8 @@ private:
 	void					processClientMessages(void);
 
 	void					clientDisconnect(void);
+
+	void					requestAllChannsToQuitClntUnexpectdly(Client* clnt);
 
 	bool						status_;
 
