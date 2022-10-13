@@ -15,31 +15,24 @@
 
 # include <string>
 
-typedef int	SOCKET;
-
 typedef enum e_port
 {
 	WELL_KNOWN_PORT,
 	REGISTERED_PORT,
 	DYNAMIC_PORT,
-	INVALID_PORT,
+	INVALID_PORT
 }			t_port;
 
-typedef enum e_buf
-{
-	BUFFER_MAX = 1024 << 4,
-	// BUFFER_MAX = 100,
-}			t_buf;
+bool						isNotAlnumAndUnderscore(const std::string& str);
+bool						isOnlyNums(std::string str);
+bool						isSpecialCharactor(const std::string& str);
 
-// configure port
-bool	isValidPort(const std::string& port);
-t_port	getPortType(int value);
-bool	setPortNumber(const char *str, int *o_value);
+bool						isValidPort(const std::string& port);
+t_port						getPortType(int value);
+bool						setPortNumber(const char *str, int *o_value);
 
-// configure pwd
-bool	isValidPwd(const std::string& pwd);
-bool	isSpecialCharactor(const std::string& str);
+bool						isValidPwd(const std::string& pwd);
 
+std::vector<std::string>	split(std::string input, char delimiter);
 
-std::vector<std::string> split(std::string input, char delimiter);
 #endif

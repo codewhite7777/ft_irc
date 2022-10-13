@@ -5,14 +5,15 @@
 #                                                     +:+ +:+         +:+      #
 #    By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/08/17 07:01:17 by alee              #+#    #+#              #
-#    Updated: 2022/09/26 15:44:20 by mgo              ###   ########.fr        #
+#    Created: 2022/10/12 11:20:17 by mgo               #+#    #+#              #
+#    Updated: 2022/10/12 11:20:18 by mgo              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
-CXX_VERSION = -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror
+CXXDEBUG = -g -fsanitize=address
+CXX_VERSION = -pedantic -std=c++98
 RM = rm -f
 
 NAME = ircserv
@@ -23,36 +24,28 @@ SRC_FILE	=	main.cpp \
 				Protocol.cpp \
 				Client.cpp \
 				Channel.cpp \
-				utils.cpp
-
-#privmsg.cpp
-#quit.cpp
-#kick.cpp
-#invite.cpp
-#join.cpp
-#part.cpp
-#Message.cpp
-#mode.cpp
+				utils.cpp \
+				Singleton.cpp \
+				Chatbot.cpp
 
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
-BONUS_FILE =
 
-.PHONY: all
-all: $(NAME)
+%.o	:	%.cpp
+	$(CXX) $(CXX_VERSION) $(CXXFLAGS) $(CXXDEBUG) -c $< -o $@
 
 $(NAME): $(OBJ_FILE)
-	$(CXX) $(CXXFLAGS) $(CXX_VERSION) $^ -o $@
+	$(CXX) $(CXX_VERSION) $(CXXFLAGS) $(CXXDEBUG) $^ -o $@
 
-.PHONY: clean
+all: $(NAME)
+
 clean:
 	$(RM) $(OBJ_FILE)
 
-.PHONY: fclean
 fclean: clean
 	$(RM) $(NAME)
 
-.PHONY: re
 re:
 	make fclean
 	make all
 
+.PHONY: all clean fclean re
