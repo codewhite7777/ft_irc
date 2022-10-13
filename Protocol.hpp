@@ -18,7 +18,7 @@
 class Server;
 class Client;
 class Channel;
-
+class ChatBot;
 class Protocol
 {
 public:
@@ -76,6 +76,8 @@ public:
 										Client* user, Channel* chann);
 	std::string		errNoOperHost(Client* clnt);
 	std::string		errNoPrivileges(Client* clnt);
+
+	std::string		chatPrivOthers(ChatBot& chat, Channel *chann, std::string msg);
 
 private:
 	Server* getServer_();
