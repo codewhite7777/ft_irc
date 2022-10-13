@@ -250,7 +250,12 @@ void	Server::networkProcess(void)
 	time_out.tv_usec = 0;
 	select_result = select(getMaxSD() + 1, &read_set_, &write_set_, NULL, \
 		&time_out);
-	// todo: if -1
+	if (select_result == -1)
+	{
+		std::cerr << "select() failed\n";
+		status_ = false;
+		return ;
+	}
 	if (select_result > 0)
 	{
 		if (FD_ISSET(listen_sock_, &read_set_))
