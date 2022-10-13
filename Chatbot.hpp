@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Chatbot.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 13:26:15 by hena              #+#    #+#             */
+/*   Updated: 2022/10/13 13:27:21 by mgo              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
 #ifndef _CHATBOT_HPP_
 # define _CHATBOT_HPP_
 
@@ -8,25 +21,20 @@
 class ChatBot
 {
 public:
-	ChatBot();
-	~ChatBot();
-
-	//void	JoinChannel();
+	ChatBot(void);
+	~ChatBot(void);
 
 	bool	CheckChatBotCommand(std::string param, std::string &ret);
-	void	BroadCast(std::string server_name);
-
 	bool	ChatBotCommand(std::string&, std::string&);
-
-	// function
-
-	std::string		CommandList();
-	void			AddCommand(std::string&);
-	void			DeleteCommand(std::string &);
-	std::string		GetNowTime();
-	std::string		getPrefix();
+	std::string		getPrefix(void);
 
 private:
+	std::string		CommandList(void);
+	void			AddCommand(std::string&);
+	void			DeleteCommand(std::string &);
+	std::string		GetNowTime(void);
+	
+
 	std::map< std::string, std::string > chatbot_command_list;
 };
 

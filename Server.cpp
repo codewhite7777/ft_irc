@@ -103,15 +103,8 @@ Protocol*	Server::getProtocol() const
 std::string		Server::getCreatedDateAsString() const
 {
 	std::string		ret;
-	struct tm*		t;
 
-	t = localtime(&created_time_);
-	ret = std::to_string(t->tm_year + 1900) + "/";
-	ret += std::to_string(t->tm_mon + 1) + "/";
-	ret += std::to_string(t->tm_mday) + "/";
-	ret += std::to_string(t->tm_hour) + ":";
-	ret += std::to_string(t->tm_min)+ ":";
-	ret += std::to_string(t->tm_sec);
+	ret += ctime(&created_time_);
 	return (ret);
 }
 

@@ -40,7 +40,6 @@ void    Command::pass(Client* clnt)
 	}
 }
 
-
 void    Command::nick(Client* clnt)
 {
 	std::string			param(clnt->getParam());

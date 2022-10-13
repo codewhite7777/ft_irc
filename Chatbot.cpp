@@ -1,13 +1,25 @@
-#include <map>
-#include <iostream>
-#include <string>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Chatbot.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgo <mgo@student.42seoul.kr>               +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 13:26:15 by hena              #+#    #+#             */
+/*   Updated: 2022/10/13 13:29:44 by mgo              ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Chatbot.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
+#include "utils.hpp"
+#include <map>
+#include <iostream>
+#include <string>
 #include <time.h>
 #include <vector>
-#include "utils.hpp"
-using namespace std;
+
 std::string		ChatBot::CommandList()
 {
 	std::string list = "";
@@ -43,18 +55,9 @@ std::string		ChatBot::GetNowTime()
 {
 	std::string	now = "";
 	time_t timer;
-	struct tm* t;
 
 	timer = time(NULL);
-	t = localtime(&timer);
-
-	now += std::to_string(t->tm_year + 1900) + "/";
-	now += std::to_string(t->tm_mon + 1) + "/";
-	now += std::to_string(t->tm_mday) + "/";
-	now += std::to_string(t->tm_hour) + ":";
-	now += std::to_string(t->tm_min)+ ":";
-	now += std::to_string(t->tm_sec);
-
+	now += ctime(&timer);
 	return now;
 }
 
@@ -122,5 +125,5 @@ ChatBot::~ChatBot()
 
 std::string		ChatBot::getPrefix()
 {
-	return ":NIGHTBOT!night@localhost ";
+	return (":NIGHTBOT!night@localhost ");
 }
