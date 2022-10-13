@@ -29,7 +29,6 @@ SRC_FILE	=	main.cpp \
 				Chatbot.cpp
 
 OBJ_FILE = $(SRC_FILE:.cpp=.o)
-BONUS_FILE =
 
 %.o	:	%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEBUG) $(CXX_VERSION) -c $< -o $@
