@@ -177,7 +177,7 @@ void	Server::networkInit(void)
 		&optval, sizeof(optval));
 	if (retval == -1)
 	{
-		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
+		std::cerr << "Error: setting sockopt SO_REUSEADDR failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -187,7 +187,7 @@ void	Server::networkInit(void)
 		&optval, sizeof(optval));
 	if (retval == -1)
 	{
-		std::cerr << "Error: listen_sock_ setsockopt() failed" << std::endl;
+		std::cerr << "Error: setting sockopt TCP_NODELAY failed" << std::endl;
 		status_ = false;
 		return ;
 	}
@@ -322,7 +322,7 @@ void	Server::acceptClient(SOCKET listen_sock)
 		reinterpret_cast<sockaddr *>(&c_addr_in), &c_addr_len);
 	if (client_sock == -1)
 		return ;
-	if (sock_count_ >= FD_SETSIZE)
+	if (sock_count_ + 3 >= FD_SETSIZE)
 	{
 		close(client_sock);
 		return ;
@@ -333,15 +333,12 @@ void	Server::acceptClient(SOCKET listen_sock)
 	client_map_.insert(std::make_pair(client_sock, new_client));
 	sock_count_ += 1;
 
-	// todo: Server.displayConnectingClientInfo()
-	{
 	std::cout << "\t------------------------" << std::endl;
 	std::cout << "\tConnecting with a client" << std::endl;
 	std::cout << "\tClient socket : " << client_sock << std::endl;
 	std::cout << "\tClient port   : " << ntohs(c_addr_in.sin_port) << std::endl;
 	std::cout << "\tClient ip     : " << inet_ntoa(c_addr_in.sin_addr) << std::endl;
 	std::cout << "\t------------------------" << std::endl;
-	}
 }
 
 bool	Server::isOverlapNickName(std::string& search_nick)
