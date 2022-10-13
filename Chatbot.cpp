@@ -20,7 +20,7 @@
 #include <time.h>
 #include <vector>
 
-std::string		ChatBot::CommandList()
+std::string		ChatBot::CommandList(void)
 {
 	std::string list = "";
 	for (std::map< std::string, std::string>::iterator iter = chatbot_command_list.begin()
@@ -35,7 +35,8 @@ std::string		ChatBot::CommandList()
 void			ChatBot::AddCommand(std::string &contents)
 {
 	std::vector<std::string> v = split(contents, ',');
-	if (v[0][0] == '!' && v[0] != "!add" && v[0] != "!delete" && v[0] != "!list")
+	if (v[0][0] == '!' && v[0] != "!add" && v[0] != "!delete" \
+		&& v[0] != "!list" && v[0] != "!info")
 	{
 		chatbot_command_list[v[0]] = v[1];
 	}
@@ -43,7 +44,8 @@ void			ChatBot::AddCommand(std::string &contents)
 
 void			ChatBot::DeleteCommand(std::string &command)
 {
-	if (command[0] == '!' && command != "!add" && command != "!delete" && command != "!list")
+	if (command[0] == '!' && command != "!add" && command != "!delete" \
+		&& command != "!list" && command != "!info")
 		chatbot_command_list.erase(command);
 }
 
@@ -57,7 +59,7 @@ std::string		ChatBot::GetNowTime()
 	return now;
 }
 
-ChatBot::ChatBot()
+ChatBot::ChatBot(void)
 {
 	// !hi 
 	chatbot_command_list.insert(std::make_pair("!hi", "안녕하세요"));
@@ -66,12 +68,13 @@ ChatBot::ChatBot()
 	chatbot_command_list.insert(std::make_pair("!now", GetNowTime()));
 
 	// !mgo
-	chatbot_command_list.insert(std::make_pair("!mgo", "mgo는 코딩 버스기사입니다."));
+	chatbot_command_list.insert(std::make_pair("!mgo", "나는 항상 배가 고프다"));
 
 	// !hena
-	chatbot_command_list.insert(std::make_pair("!hena", "미래의 청소부입니다."));
-	
-	chatbot_command_list.insert(std::make_pair("!info", "!add: register a new chatbot command !delete: remove a command !list: show registered commands"));
+	chatbot_command_list.insert(std::make_pair("!hena", "뀨 저는 귀요미에욤"));
+
+	// !info
+	chatbot_command_list.insert(std::make_pair("!info", "기본 봇 명령어: !add, !delete, !list"));
 }
 
 bool	ChatBot::CheckList(std::string param, std::string &ret)
@@ -113,12 +116,12 @@ bool	ChatBot::ChatBotCommand(std::string& param, std::string &bot_msg)
 	return false;
 }
 
-ChatBot::~ChatBot()
+ChatBot::~ChatBot(void)
 {
 	chatbot_command_list.clear();
 }
 
-std::string		ChatBot::getPrefix()
+std::string		ChatBot::getPrefix(void)
 {
 	return (":NIGHTBOT!night@localhost ");
 }
