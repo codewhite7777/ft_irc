@@ -133,7 +133,7 @@ void    Command::join(Client* clnt)
 
 	for (std::size_t i = 0 ; i < chann_names.size() ; ++i)
 	{
-		if (chann_names[i].length() >= 65)
+		if (chann_names[i].length() >= 65 || chann_names[i].front() != '#')
 		{
 			clnt->appendToSendBuf(proto_->errBadChanMask(clnt, chann_names[i]));
 			continue;
