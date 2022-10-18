@@ -36,6 +36,11 @@ static void	set_server_off(int sig)
 		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGINT in server");
 	else if (sig == SIGQUIT)
 		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGQUIT in server");
+	else if (sig == SIGTERM)
+	{
+		sv->sendErrorClosingLinkProtoToAllClientsWithMsg("SIGTERM in server");
+		std::cout << "hena god in SIGTERM\n";
+	}
 	sv->setStatusOff();
 	std::cout << "signum: [" << sig << "]\n";
 }
@@ -44,6 +49,7 @@ static void	set_signal_handler(void)
 {
 	signal(SIGINT, set_server_off);
 	signal(SIGQUIT, set_server_off);
+	signal(SIGTERM, set_server_off);
 	signal(SIGPIPE, SIG_IGN);
 }
 
