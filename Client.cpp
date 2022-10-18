@@ -235,6 +235,15 @@ std::string	Client::extractFirstMsg(std::string& recv_buf)
 		first_msg = recv_buf.substr(0, found);
 		recv_buf.erase(0, found + 2);
 	}
+	else
+	{
+		found = recv_buf.find("\n");
+		if (found != std::string::npos)
+		{
+			first_msg = recv_buf.substr(0, found);
+			recv_buf.erase(0, found + 1);
+		}
+	}
 	return (first_msg);
 }
 

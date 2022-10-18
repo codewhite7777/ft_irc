@@ -128,12 +128,19 @@ void    Command::user(Client* clnt)
 
 void    Command::join(Client* clnt)
 {
+	std::string					param(clnt->getParam());
 	std::vector<std::string>	chann_names(split(clnt->getParam(), ','));
 	Channel*					chann_ptr(NULL);
+	size_t						found_space(0);
 
+	found_space = param.find(' ');
+	if (found_space == std::string::npos)
+		chann_names = split(param, ',');
+	else
+		chann_names = split(param.substr(0, found_space), ',');
 	for (std::size_t i = 0 ; i < chann_names.size() ; ++i)
 	{
-		if (chann_names[i].length() >= 65)
+		if (chann_names[i].length() >= 65 || chann_names[i].front() != '#')
 		{
 			clnt->appendToSendBuf(proto_->errBadChanMask(clnt, chann_names[i]));
 			continue;
